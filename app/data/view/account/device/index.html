@@ -1,0 +1,80 @@
+{extend name="table"}
+
+{block name="button"}
+<!--{if auth("config")}-->
+<button data-modal="{:url('config')}" data-width="800px" data-title="{:lang('账号接口配置')}" class='layui-btn layui-btn-sm layui-btn-primary'>{:lang('账号配置')}</button>
+<!--{/if}-->
+{/block}
+
+{block name="content"}
+<div class="layui-tab layui-tab-card">
+    <ul class="layui-tab-title">
+        {foreach ['index'=>lang('用户管理'),'recycle'=>lang('回 收 站')] as $k=>$v}{if isset($type) and $type eq $k}
+        <li data-open="{:url('index')}?type={$k}" class="layui-this">{$v}</li>
+        {else}
+        <li data-open="{:url('index')}?type={$k}">{$v}</li>
+        {/if}{/foreach}
+    </ul>
+    <div class="layui-tab-content">
+        {include file='account/device/index_search'}
+        <table id="UserTable" data-url="{:request()->url()}" data-target-search="form.form-search"></table>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        let $table = $('#UserTable').layTable({
+            even: true, height: 'full',
+            sort: {field: 'sort desc,id', type: 'desc'},
+            cols: [[
+                {field: 'id', hide: true},
+                {checkbox: true, fixed: true},
+                {field: 'sort', title: '{:lang("排序权重")}', width: 100, align: 'center', sort: true, templet: '#SortInputTpl'},
+                {field: 'headimg', title: '{:lang("头像")}', width: 60, align: 'center', templet: '<div>{{-showTableImage(d.headimg,true)}}</div>'},
+                {field: 'type', title: '{:lang("终端类型")}', minWidth: 110, align: 'center', templet: '<div>{{d.type_name||"-"}}</div>'},
+                {field: 'phone', title: '{:lang("绑定手机")}', minWidth: 110, align: 'center', templet: '<div>{{d.phone||"-"}}</div>'},
+                {field: 'username', title: '{:lang("用户姓名")}', minWidth: 100, align: 'center', templet: '<div>{{d.username||"-"}}</div>'},
+                {field: 'nickname', title: '{:lang("用户昵称")}', minWidth: 100, align: 'center', templet: '<div>{{d.nickname||"-"}}</div>'},
+                {
+                    field: 'id', title: '{:lang("关联账号")}', minWidth: 100, align: 'center', templet: function (d) {
+                        return d.user ? d.user.code : '-';
+                    }
+                },
+                // {field: 'status', title: '{:lang("账号状态")}', align: 'center', minWidth: 110, templet: '#StatusSwitchTpl'},
+                {field: 'create_time', title: '{:lang("首次登录")}', align: 'center', minWidth: 170, sort: true},
+                {toolbar: '#toolbar', field: 'id', title: '{:lang("操作面板")}', align: 'center', minWidth: 150, fixed: 'right'}
+            ]]
+        });
+
+        // 数据状态切换操作
+        layui.form.on('switch(StatusSwitch)', function (obj) {
+            let data = {id: obj.value, status: obj.elem.checked > 0 ? 1 : 0};
+            $.form.load("{:url('state')}", data, 'post', function (ret) {
+                let fn = () => $table.trigger('reload');
+                ret.code > 0 ? fn() : $.msg.error(ret.info, 3, fn);
+                return false;
+            }, false);
+        });
+    });
+</script>
+
+<!-- 数据状态切换模板 -->
+<script type="text/html" id="StatusSwitchTpl">
+    <!--{if auth("state")}-->
+    <input type="checkbox" value="{{d.id}}" lay-skin="switch" lay-text="{:lang('ON')}|{:lang('OFF')}" lay-filter="StatusSwitch" {{-d.status>0?'checked':''}}>
+    <!--{else}-->
+    {{-d.status ? '<b class="color-green">{:lang("ON")}</b>' : '<b class="color-red">{:lang("OFF")}</b>'}}
+    <!--{/if}-->
+</script>
+
+<!-- 列表排序权重模板 -->
+<script type="text/html" id="SortInputTpl">
+    <input type="number" min="0" data-blur-number="0" data-action-blur="{:sysuri()}" data-value="id#{{d.id}};action#sort;sort#{value}" data-loading="false" value="{{d.sort}}" class="layui-input text-center">
+</script>
+
+<script type="text/html" id="toolbar">
+    {if auth("remove")}
+    <a class="layui-btn layui-btn-sm layui-btn-danger" data-confirm="{:lang('确定要永久删除此账号吗？')}" data-action="{:url('remove')}" data-value="id#{{d.id}}">{:lang('删 除')}</a>
+    {/if}
+</script>
+{/block}
