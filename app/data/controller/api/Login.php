@@ -6,7 +6,6 @@ namespace app\data\controller\api;
 use app\data\model\account\DataAccountUser;
 use app\data\service\Account;
 use app\data\service\Message;
-use app\data\service\user\UserService;
 use think\admin\Controller;
 use think\admin\extend\CodeExtend;
 use think\admin\extend\ImageVerify;
