@@ -4,11 +4,62 @@ namespace app\data\service\oauth;
 
 /**
  * 苹果登录驱动
- * @class Apple
+ * @class AppleService
  * @package app\data\service\oauth
  */
-class Apple extends Contract
+class AppleService extends Contract
 {
+    /**
+     * 使用 Authorization Code 换取 Token
+     * @param string $code
+     * @param string|null $redirectUri
+     * @return array
+     * @throws \Exception
+     */
+    public function exchangeCode(string $code, ?string $redirectUri = null): array
+    {
+        $clientId = sysconf('login_apple_client_id') ?: env('LOGIN_APPLE_CLIENT_ID'); 
+        $clientSecret = sysconf('login_apple_client_secret') ?: env('LOGIN_APPLE_CLIENT_SECRET'); // Must be a generated JWT
+        $defaultRedirectUri = sysconf('login_apple_redirect_uri') ?: env('LOGIN_APPLE_REDIRECT_URI');
+
+        $redirectUri = $redirectUri ?: $defaultRedirectUri;
+
+        if (empty($clientId) || empty($clientSecret)) {
+             throw new \Exception('Apple Client ID 或 Secret 未配置 (Secret 需为 JWT)');
+        }
+
+        $url = "https://appleid.apple.com/auth/token";
+        $data = [
+            'client_id'     => $clientId,
+            'client_secret' => $clientSecret,
+            'code'          => $code,
+            'grant_type'    => 'authorization_code',
+            'redirect_uri'  => $redirectUri,
+        ];
+
+        $context = stream_context_create([
+            'http' => [
+                'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
+                'method'  => 'POST',
+                'content' => http_build_query($data),
+                'timeout' => 15
+            ]
+        ]);
+        
+        $response = file_get_contents($url, false, $context);
+
+        if ($response === false) {
+             throw new \Exception('连接 Apple 授权服务失败');
+        }
+
+        $result = json_decode($response, true);
+        if (isset($result['error'])) {
+             throw new \Exception($result['error_description'] ?? $result['error']);
+        }
+
+        return $result;
+    }
+
     public function verify(string $openid, string $token): array
     {
         if (empty($token)) {
@@ -49,8 +100,9 @@ class Apple extends Contract
                 throw new \Exception('Apple Token 发行者无效');
             }
 
-            // 验证 aud (Client ID)
-            $bundleId = sysconf('login_apple_bundle_id');
+            // 验证 aud (Bundle ID)
+            // 确保 Token 是颁发给我们的应用的
+            $bundleId = sysconf('login_apple_bundle_id') ?: env('LOGIN_APPLE_BUNDLE_ID');
             if (!empty($bundleId) && $payload['aud'] !== $bundleId) {
                 throw new \Exception('Apple Bundle ID 不匹配');
             }
@@ -71,6 +123,7 @@ class Apple extends Contract
 
             return [
                 'openid'   => $openid,
+                'email'    => $payload['email'] ?? '',
                 'nickname' => '', // Apple Token 不包含昵称，需客户端首次传参
                 'headimg'  => '', 
                 'unionid'  => '',
@@ -79,6 +132,21 @@ class Apple extends Contract
         } catch (\Exception $e) {
             throw new \Exception("Apple 登录验证失败: " . $e->getMessage());
         }
+    }
+
+    /**
+     * Base64Url 解码
+     * @param string $input
+     * @return string
+     */
+    private function base64UrlDecode(string $input): string
+    {
+        $remainder = strlen($input) % 4;
+        if ($remainder) {
+            $padlen = 4 - $remainder;
+            $input .= str_repeat('=', $padlen);
+        }
+        return base64_decode(str_replace(['-', '_'], ['+', '/'], $input));
     }
 
     /**

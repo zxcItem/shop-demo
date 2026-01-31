@@ -28,15 +28,33 @@ class Apple extends Controller
                 $this->error('登录通道未开通');
             }
 
+            $driver = \app\data\service\Oauth::mk(Account::APPLE);
+
+            // 1. 如果有 Code，先换取 Token (适用于 Web/PC 服务端模式)
+            $code = $this->request->post('code');
+            $redirectUri = $this->request->post('redirect_uri');
+            $token = $this->request->post('token');
+
+            if (!empty($code)) {
+                if (method_exists($driver, 'exchangeCode')) {
+                    $tokenData = $driver->exchangeCode($code, $redirectUri);
+                    // Apple 返回的 id_token 才是我们要验证的 identity token
+                    $token = $tokenData['id_token'] ?? $tokenData['access_token'] ?? '';
+                } else {
+                    $this->error('当前通道不支持 Authorization Code 模式');
+                }
+            }
+
             // 调用服务验证 Token
-            $oauthUser = \app\data\service\Oauth::mk(Account::APPLE)->verify(
-                $data['openid'], 
-                $this->request->post('token', '')
+            $oauthUser = $driver->verify(
+                $data['openid'] ?? '', 
+                $token
             );
 
             // 构建账号数据
             $authData = [
                 'openid'  => $oauthUser['openid'],
+                'email'   => $oauthUser['email'] ?? '',
                 'unionid' => $this->request->post('unionid', $oauthUser['unionid'] ?? ''),
                 'nickname'=> $this->request->post('nickname', $oauthUser['nickname'] ?? ''),
                 'headimg' => $this->request->post('headimg', $oauthUser['headimg'] ?? ''),

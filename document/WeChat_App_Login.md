@@ -15,11 +15,12 @@
     *   登录/注册。
 
 ## 3. 配置项
+支持在后台系统配置 (`sys_config`) 或环境变量 (`.env`) 中设置。优先读取 `sys_config`，若为空则读取 `.env`。
 
-| 配置键名 | 说明 |
-| :--- | :--- |
-| `login_wechat_appid` | 开放平台 AppID |
-| `login_wechat_secret` | 开放平台 AppSecret |
+| 配置键名 (sys_config) | 环境变量 (.env) | 说明 |
+| :--- | :--- | :--- |
+| `login_wechat_appid` | `WECHAT_APPID` | 开放平台 AppID |
+| `login_wechat_secret` | `WECHAT_APPSECRET` | 开放平台 AppSecret |
 
 ## 4. 接口规范
 

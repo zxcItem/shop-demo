@@ -4,11 +4,62 @@ namespace app\data\service\oauth;
 
 /**
  * QQ登录驱动
- * @class Qq
+ * @class QqService
  * @package app\data\service\oauth
  */
-class Qq extends Contract
+class QqService extends Contract
 {
+    /**
+     * 使用 Authorization Code 换取 Token
+     * @param string $code
+     * @param string|null $redirectUri
+     * @return array
+     * @throws \Exception
+     */
+    public function exchangeCode(string $code, ?string $redirectUri = null): array
+    {
+        $appId = sysconf('login_qq_appid') ?: env('LOGIN_QQ_APPID');
+        $appKey = sysconf('login_qq_appkey') ?: env('LOGIN_QQ_APPKEY');
+        $defaultRedirectUri = sysconf('login_qq_redirect_uri') ?: env('LOGIN_QQ_REDIRECT_URI');
+        
+        $redirectUri = $redirectUri ?: $defaultRedirectUri;
+
+        if (empty($appId) || empty($appKey)) {
+             throw new \Exception('QQ App ID 或 Key 未配置');
+        }
+
+        $url = "https://graph.qq.com/oauth2.0/token";
+        $data = [
+            'grant_type'    => 'authorization_code',
+            'client_id'     => $appId,
+            'client_secret' => $appKey,
+            'code'          => $code,
+            'redirect_uri'  => $redirectUri,
+            'fmt'           => 'json'
+        ];
+
+        $context = stream_context_create([
+            'http' => [
+                'method'  => 'GET',
+                'timeout' => 15
+            ]
+        ]);
+        
+        $requestUrl = $url . '?' . http_build_query($data);
+        $response = file_get_contents($requestUrl, false, $context);
+
+        if ($response === false) {
+             throw new \Exception('连接 QQ 授权服务失败');
+        }
+
+        $result = json_decode($response, true);
+        if (isset($result['error'])) {
+             throw new \Exception($result['error_description'] ?? 'QQ Token Exchange Error');
+        }
+
+        return $result;
+    }
+
     public function verify(string $openid, string $token): array
     {
         if (empty($token)) {
@@ -40,7 +91,7 @@ class Qq extends Contract
             }
 
             // 获取用户信息 (需要 AppID)
-            $appId = sysconf('login_qq_appid');
+            $appId = sysconf('login_qq_appid') ?: env('LOGIN_QQ_APPID');
             $userInfo = [];
             
             if (!empty($appId)) {

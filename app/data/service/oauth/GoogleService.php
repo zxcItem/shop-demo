@@ -4,11 +4,62 @@ namespace app\data\service\oauth;
 
 /**
  * 谷歌登录驱动
- * @class Google
+ * @class GoogleService
  * @package app\data\service\oauth
  */
-class Google extends Contract
+class GoogleService extends Contract
 {
+    /**
+     * 使用 Authorization Code 换取 Token
+     * @param string $code
+     * @param string|null $redirectUri
+     * @return array
+     * @throws \Exception
+     */
+    public function exchangeCode(string $code, ?string $redirectUri = null): array
+    {
+        $clientId = sysconf('login_google_client_id') ?: env('LOGIN_GOOGLE_CLIENT_ID');
+        $clientSecret = sysconf('login_google_client_secret') ?: env('LOGIN_GOOGLE_CLIENT_SECRET');
+        $defaultRedirectUri = sysconf('login_google_redirect_uri') ?: env('LOGIN_GOOGLE_REDIRECT_URI');
+
+        $redirectUri = $redirectUri ?: $defaultRedirectUri;
+
+        if (empty($clientId) || empty($clientSecret)) {
+             throw new \Exception('Google Client ID 或 Secret 未配置');
+        }
+
+        $url = 'https://oauth2.googleapis.com/token';
+        $data = [
+            'code'          => $code,
+            'client_id'     => explode(',', $clientId)[0], // 取第一个作为主要 ID
+            'client_secret' => $clientSecret,
+            'redirect_uri'  => $redirectUri,
+            'grant_type'    => 'authorization_code',
+        ];
+
+        $context = stream_context_create([
+            'http' => [
+                'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
+                'method'  => 'POST',
+                'content' => http_build_query($data),
+                'timeout' => 15
+            ]
+        ]);
+        
+        $response = file_get_contents($url, false, $context);
+
+        if ($response === false) {
+             throw new \Exception('连接 Google 授权服务失败');
+        }
+
+        $result = json_decode($response, true);
+        if (isset($result['error'])) {
+             throw new \Exception($result['error_description'] ?? $result['error']);
+        }
+
+        return $result;
+    }
+
     public function verify(string $openid, string $token): array
     {
         if (empty($token)) {
@@ -17,7 +68,7 @@ class Google extends Contract
         }
 
         // 获取配置的 Client ID
-        $clientId = sysconf('login_google_client_id');
+        $clientId = sysconf('login_google_client_id') ?: env('LOGIN_GOOGLE_CLIENT_ID');
 
         try {
             // 验证 Google ID Token
@@ -57,8 +108,15 @@ class Google extends Contract
                 throw new \Exception('Google Client ID 不匹配');
             }
 
+            // 验证 Issuer
+            $validIssuers = ['accounts.google.com', 'https://accounts.google.com'];
+            if (isset($payload['iss']) && !in_array($payload['iss'], $validIssuers)) {
+                 throw new \Exception('Google Token 签发者无效');
+            }
+
             // 验证 OpenID (Subject)
-            if ($payload['sub'] !== $openid) {
+            // 仅当传入 openid 不为空时验证，以支持 Code 换 Token 后自动获取 OpenID 的场景
+            if (!empty($openid) && $payload['sub'] !== $openid) {
                 throw new \Exception('Google 账号标识不匹配');
             }
             

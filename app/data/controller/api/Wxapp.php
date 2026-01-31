@@ -39,8 +39,8 @@ class Wxapp extends Controller
         $wxapp = ConfigService::get();
         if (Account::field($this->type)) {
             $this->params = [
-                'appid'      => $wxapp['appid'] ?? '',
-                'appsecret'  => $wxapp['appkey'] ?? '',
+                'appid'      => env('WECHAT_MINI_APPID') ?: ($wxapp['appid'] ?? ''),
+                'appsecret'  => env('WECHAT_MINI_APPSECRET') ?: ($wxapp['appkey'] ?? ''),
                 'cache_path' => syspath('runtime/wechat'),
             ];
         } else {

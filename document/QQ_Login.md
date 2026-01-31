@@ -15,11 +15,12 @@ QQ 互联登录，适用于国内用户群体。
     *   (可选) 如有 UnionID 权限，同时记录 UnionID。
 
 ## 3. 配置项
+支持在后台系统配置 (`sys_config`) 或环境变量 (`.env`) 中设置。优先读取 `sys_config`，若为空则读取 `.env`。
 
-| 配置键名 | 说明 |
-| :--- | :--- |
-| `login_qq_appid` | QQ 互联 App ID |
-| `login_qq_appkey` | QQ 互联 App Key |
+| 配置键名 (sys_config) | 环境变量 (.env) | 说明 |
+| :--- | :--- | :--- |
+| `login_qq_appid` | `LOGIN_QQ_APPID` | QQ 互联 App ID |
+| `login_qq_appkey` | `LOGIN_QQ_APPKEY` | QQ 互联 App Key |
 
 ## 4. 接口规范
 

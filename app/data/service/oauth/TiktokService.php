@@ -4,11 +4,62 @@ namespace app\data\service\oauth;
 
 /**
  * 抖音/TikTok登录驱动
- * @class Tiktok
+ * @class TiktokService
  * @package app\data\service\oauth
  */
-class Tiktok extends Contract
+class TiktokService extends Contract
 {
+    /**
+     * 使用 Authorization Code 换取 Token
+     * @param string $code
+     * @param string|null $redirectUri
+     * @return array
+     * @throws \Exception
+     */
+    public function exchangeCode(string $code, ?string $redirectUri = null): array
+    {
+        $clientKey = sysconf('login_tiktok_client_key') ?: env('LOGIN_TIKTOK_CLIENT_KEY');
+        $clientSecret = sysconf('login_tiktok_client_secret') ?: env('LOGIN_TIKTOK_CLIENT_SECRET');
+        $defaultRedirectUri = sysconf('login_tiktok_redirect_uri') ?: env('LOGIN_TIKTOK_REDIRECT_URI');
+
+        $redirectUri = $redirectUri ?: $defaultRedirectUri;
+
+        if (empty($clientKey) || empty($clientSecret)) {
+             throw new \Exception('TikTok Client Key 或 Secret 未配置');
+        }
+        
+        $url = "https://open.tiktokapis.com/v2/oauth/token/";
+        $data = [
+            'client_key'    => $clientKey,
+            'client_secret' => $clientSecret,
+            'code'          => $code,
+            'grant_type'    => 'authorization_code',
+            'redirect_uri'  => $redirectUri,
+        ];
+
+        $context = stream_context_create([
+            'http' => [
+                'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
+                'method'  => 'POST',
+                'content' => http_build_query($data),
+                'timeout' => 15
+            ]
+        ]);
+        
+        $response = file_get_contents($url, false, $context);
+
+        if ($response === false) {
+             throw new \Exception('连接 TikTok 授权服务失败');
+        }
+
+        $result = json_decode($response, true);
+        if (isset($result['error'])) {
+             throw new \Exception($result['error_description'] ?? $result['error']);
+        }
+
+        return $result;
+    }
+
     public function verify(string $openid, string $token): array
     {
         if (empty($token)) {

@@ -13,12 +13,12 @@
     *   自动注册/登录，绑定手机号。
 
 ## 3. 配置项
-配置位于 `sys_config` 或 `app/data/service/ConfigService.php` 中：
+支持在后台系统配置 (`sys_config`) 或环境变量 (`.env`) 中设置。优先读取 `sys_config`，若为空则读取 `.env`。
 
-| 配置键名 | 说明 |
-| :--- | :--- |
-| `wxapp_appid` | 小程序 AppID |
-| `wxapp_appsecret` | 小程序 AppSecret |
+| 配置键名 (sys_config) | 环境变量 (.env) | 说明 |
+| :--- | :--- | :--- |
+| `wxapp_appid` | `WECHAT_MINI_APPID` | 小程序 AppID |
+| `wxapp_appkey` | `WECHAT_MINI_APPSECRET` | 小程序 AppSecret (注意：数据库键名为 `wxapp_appkey`，环境变量建议统一) |
 
 ## 4. 接口规范
 

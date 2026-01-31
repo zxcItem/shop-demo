@@ -18,13 +18,14 @@ Apple 登录是 iOS 应用上架必须支持的登录方式（如果应用支持
     *   **注意**: Apple User ID 较长，数据库字段需支持 128 位。
 
 ## 3. 配置项
+支持在后台系统配置 (`sys_config`) 或环境变量 (`.env`) 中设置。优先读取 `sys_config`，若为空则读取 `.env`。
 
-| 配置键名 | 说明 |
-| :--- | :--- |
-| `login_apple_bundle_id` | App ID (Bundle ID) |
-| `login_apple_team_id` | Team ID |
-| `login_apple_key_id` | Key ID (用于私钥签名，如果需要获取 refresh_token) |
-| `login_apple_p8_file` | P8 私钥文件路径 |
+| 配置键名 (sys_config) | 环境变量 (.env) | 说明 |
+| :--- | :--- | :--- |
+| `login_apple_bundle_id` | `LOGIN_APPLE_BUNDLE_ID` | App ID (Bundle ID) |
+| `login_apple_team_id` | `LOGIN_APPLE_TEAM_ID` | Team ID |
+| `login_apple_key_id` | `LOGIN_APPLE_KEY_ID` | Key ID (可选) |
+| `login_apple_p8_file` | `LOGIN_APPLE_P8_FILE` | P8 私钥文件路径 (可选) |
 
 ## 4. 接口规范
 

@@ -17,12 +17,12 @@ Facebook 登录允许用户使用其 Facebook 账号快速登录。
     *   验证通过后，自动注册或登录。
 
 ## 3. 配置项
-建议在后台系统配置中添加：
+支持在后台系统配置 (`sys_config`) 或环境变量 (`.env`) 中设置。优先读取 `sys_config`，若为空则读取 `.env`。
 
-| 配置键名 | 说明 |
-| :--- | :--- |
-| `login_facebook_app_id` | Meta Developers App ID |
-| `login_facebook_app_secret` | App Secret (用于后端生成 app_access_token) |
+| 配置键名 (sys_config) | 环境变量 (.env) | 说明 |
+| :--- | :--- | :--- |
+| `login_facebook_app_id` | `LOGIN_FACEBOOK_APP_ID` | Meta Developers App ID |
+| `login_facebook_app_secret` | `LOGIN_FACEBOOK_APP_SECRET` | App Secret (用于后端生成 app_access_token) |
 
 ## 4. 接口规范
 

@@ -15,11 +15,12 @@
     *   获取用户信息（头像、昵称、UnionID）。
 
 ## 3. 配置项
+支持在后台系统配置 (`sys_config`) 或环境变量 (`.env`) 中设置。优先读取 `sys_config`，若为空则读取 `.env`。
 
-| 配置键名 | 说明 |
-| :--- | :--- |
-| `login_tiktok_client_key` | Client Key (App Key) |
-| `login_tiktok_client_secret` | Client Secret |
+| 配置键名 (sys_config) | 环境变量 (.env) | 说明 |
+| :--- | :--- | :--- |
+| `login_tiktok_client_key` | `LOGIN_TIKTOK_CLIENT_KEY` | Client Key (App Key) |
+| `login_tiktok_client_secret` | `LOGIN_TIKTOK_CLIENT_SECRET` | Client Secret |
 
 ## 4. 接口规范
 

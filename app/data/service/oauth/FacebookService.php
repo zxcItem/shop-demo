@@ -4,11 +4,63 @@ namespace app\data\service\oauth;
 
 /**
  * Facebook登录驱动
- * @class Facebook
+ * @class FacebookService
  * @package app\data\service\oauth
  */
-class Facebook extends Contract
+class FacebookService extends Contract
 {
+    /**
+     * 使用 Authorization Code 换取 Token
+     * @param string $code
+     * @param string|null $redirectUri
+     * @return array
+     * @throws \Exception
+     */
+    public function exchangeCode(string $code, ?string $redirectUri = null): array
+    {
+        $appId = sysconf('login_facebook_app_id') ?: env('LOGIN_FACEBOOK_APP_ID');
+        $appSecret = sysconf('login_facebook_app_secret') ?: env('LOGIN_FACEBOOK_APP_SECRET');
+        $defaultRedirectUri = sysconf('login_facebook_redirect_uri') ?: env('LOGIN_FACEBOOK_REDIRECT_URI');
+        
+        $redirectUri = $redirectUri ?: $defaultRedirectUri;
+
+        if (empty($appId) || empty($appSecret)) {
+             throw new \Exception('Facebook App ID 或 Secret 未配置');
+        }
+
+        $url = "https://graph.facebook.com/v19.0/oauth/access_token";
+        $data = [
+            'client_id'     => $appId,
+            'client_secret' => $appSecret,
+            'redirect_uri'  => $redirectUri,
+            'code'          => $code,
+        ];
+
+        $context = stream_context_create([
+            'http' => [
+                'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
+                'method'  => 'GET', // Facebook access_token supports GET
+                'content' => http_build_query($data),
+                'timeout' => 15
+            ]
+        ]);
+        
+        // Use full URL for GET
+        $requestUrl = $url . '?' . http_build_query($data);
+        $response = file_get_contents($requestUrl);
+
+        if ($response === false) {
+             throw new \Exception('连接 Facebook 授权服务失败');
+        }
+
+        $result = json_decode($response, true);
+        if (isset($result['error'])) {
+             throw new \Exception($result['error']['message'] ?? 'Facebook Token Exchange Error');
+        }
+
+        return $result;
+    }
+
     public function verify(string $openid, string $token): array
     {
         if (empty($token)) {
@@ -16,8 +68,8 @@ class Facebook extends Contract
         }
 
         // 获取配置
-        $appId = sysconf('login_facebook_app_id');
-        $appSecret = sysconf('login_facebook_app_secret');
+        $appId = sysconf('login_facebook_app_id') ?: env('LOGIN_FACEBOOK_APP_ID');
+        $appSecret = sysconf('login_facebook_app_secret') ?: env('LOGIN_FACEBOOK_APP_SECRET');
 
         try {
             // 生成 app_access_token (无需用户授权，用于后端查询)
