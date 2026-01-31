@@ -96,21 +96,40 @@ class Login extends Controller
         try {
             $data = $this->_vali([
                 'type.default'   => 'phone',
-                'phone.mobile'     => '登录手机错误',
-                'phone.require'    => '登录手机为空',
-                'password.require' => '登录密码为空',
+                'username.require' => '账号为空',
+                'password.require' => '密码为空',
             ]);
-            $inset = ['phone' => $data['phone'], 'deleted' => 0];
-            // 通过手机查询所有终端
-            $account = Account::mk('', $inset);
-            if ($account->isNull()) $this->error('手机未注册');
+            
+            // 判断是否为邮箱
+            if (filter_var($data['username'], FILTER_VALIDATE_EMAIL)) {
+                $type = Account::EMAIL;
+                $map = ['openid' => $data['username'], 'deleted' => 0];
+            } 
+            // 判断是否为手机号 (简单判断11位数字)
+            elseif (preg_match("/^1[3-9]\d{9}$/", $data['username'])) {
+                $type = Account::PHONE;
+                $map = ['phone' => $data['username'], 'deleted' => 0];
+            }
+            // 否则视为普通用户名
+            else {
+                $type = Account::USERNAME;
+                $map = ['openid' => $data['username'], 'deleted' => 0];
+            }
+
+            // 实例化账号
+            // 注意：如果是手机号登录，Account::mk 会自动处理 phone 字段
+            // 如果是 EMAIL/USERNAME，Account::mk 会处理 openid 字段
+            $account = Account::mk($type, $map);
+            
+            if ($account->isNull()) {
+                $this->error('账号不存在或未注册');
+            }
+            
             if ($account->pwdVerify($data['password'])) {
-                // 如果当前终端账号不存在则创建
-                if ($account->getType() !== $data['type']) {
-                    $account = Account::mk($data['type'], $inset);
-                    $account->isNull() && $account->set($inset);
-                }
-                $account->isBind() || $account->bind($inset, $inset);
+                // 如果是请求的类型与实际账号类型不一致（例如前端传了 type=web 但实际是手机号登录），这里做个兼容处理
+                // 但通常 Account::mk 已经处理了类型
+                
+                $account->isBind() || $account->bind($map, $map);
                 $this->success('登录成功', $account->expire()->get(true));
             } else {
                 $this->error('密码错误');
