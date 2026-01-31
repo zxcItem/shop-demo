@@ -17,24 +17,62 @@ use think\admin\extend\JwtExtend;
  */
 abstract class Account
 {
-    public const WAP = 'wap';
-    public const WEB = 'web';
-    public const WXAPP = 'wxapp';
+    // -----------------------------------------------------------------------------------------
+    // 登录方式常量定义 (不区分终端，只区分验证方式)
+    // -----------------------------------------------------------------------------------------
+    
+    // 手机号登录 (短信验证码/一键登录) - 适用于: App/H5/PC/小程序
+    public const PHONE = 'phone';
+    
+    // 微信登录 (OpenID/UnionID) - 适用于: App/PC扫码/小程序/公众号
     public const WECHAT = 'wechat';
-    public const IOSAPP = 'iosapp';
-    public const ANDROID = 'android';
+    
+    // 邮箱登录 (账号密码) - 适用于: Web/App
+    public const EMAIL = 'email';
+    
+    // 用户名登录 (账号密码) - 适用于: Web/App后台
+    public const USERNAME = 'username';
+    
+    // 第三方 - QQ登录
+    public const QQ = 'qq';
+    
+    // 第三方 - 苹果登录
+    public const APPLE = 'apple';
+
+    // 第三方 - 谷歌登录
+    public const GOOGLE = 'google';
+
+    // 第三方 - Facebook登录
+    public const FACEBOOK = 'facebook';
+
+    // 第三方 - 抖音/TikTok登录
+    public const TIKTOK = 'tiktok';
+    
+    // -----------------------------------------------------------------------------------------
 
     // 已禁用的账号通道
     private static $denys = null;
     private static $cacheKey = 'account.denys';
 
     private static $types = [
-        self::WAP     => ['name' => '手机浏览器', 'field' => 'phone', 'status' => 1],
-        self::WEB     => ['name' => '电脑浏览器', 'field' => 'phone', 'status' => 1],
-        self::WXAPP   => ['name' => '微信小程序', 'field' => 'openid', 'status' => 1],
-        self::WECHAT  => ['name' => '微信服务号', 'field' => 'openid', 'status' => 1],
-        self::IOSAPP  => ['name' => '苹果APP应用', 'field' => 'phone', 'status' => 1],
-        self::ANDROID => ['name' => '安卓APP应用', 'field' => 'phone', 'status' => 1],
+        // 手机号体系
+        self::PHONE    => ['name' => '手机号登录', 'field' => 'phone', 'status' => 1],
+        
+        // 微信体系
+        self::WECHAT   => ['name' => '微信登录', 'field' => 'openid', 'status' => 1],
+        
+        // 传统体系 (复用 openid 字段存储账号标识)
+        self::EMAIL    => ['name' => '邮箱登录', 'field' => 'openid', 'status' => 1],
+        self::USERNAME => ['name' => '用户名登录', 'field' => 'openid', 'status' => 1],
+        
+        // 国内第三方
+        self::QQ       => ['name' => 'QQ登录', 'field' => 'openid', 'status' => 1],
+        self::TIKTOK   => ['name' => '抖音登录', 'field' => 'openid', 'status' => 1],
+
+        // 国际第三方
+        self::APPLE    => ['name' => '苹果登录', 'field' => 'openid', 'status' => 1],
+        self::GOOGLE   => ['name' => '谷歌登录', 'field' => 'openid', 'status' => 1],
+        self::FACEBOOK => ['name' => '脸书登录', 'field' => 'openid', 'status' => 1],
     ];
 
     /**

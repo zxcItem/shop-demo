@@ -458,6 +458,23 @@ class AccountAccess implements AccountInterface
     private function save(array $data): DataAccountBind
     {
         if (empty($data)) throw new Exception('资料不能为空！');
+        
+        // 自动通过 UnionId 关联主账号
+        if (empty($this->bind->getAttr('unid')) && !empty($data['unionid'])) {
+            $map = ['unionid' => $data['unionid'], 'deleted' => 0];
+            // 1. 优先查找主账号
+            $user = DataAccountUser::mk()->where($map)->findOrEmpty();
+            if ($user->isExists()) {
+                $data['unid'] = $user->getAttr('id');
+            } else {
+                // 2. 查找其他已绑定的终端账号
+                $bind = DataAccountBind::mk()->where($map)->where('unid', '>', 0)->findOrEmpty();
+                if ($bind->isExists()) {
+                    $data['unid'] = $bind->getAttr('unid');
+                }
+            }
+        }
+        
         $data['extra'] = array_merge($this->bind->getAttr('extra'), $data['extra'] ?? []);
         // 写入默认头像内容
         if (empty($data['headimg']) && empty($this->bind->getAttr('headimg'))) {
@@ -470,6 +487,14 @@ class AccountAccess implements AccountInterface
         }
         // 更新写入终端账号
         if ($this->bind->save($data) && $this->bind->isExists()) {
+            // 触发绑定事件
+            if (!empty($data['unid'])) {
+                $this->app->event->trigger('DataAccountBind', [
+                    'type' => $this->type,
+                    'unid' => intval($data['unid']),
+                    'usid' => intval($this->bind->getAttr('id')),
+                ]);
+            }
             return $this->bind->refresh();
         } else {
             throw new Exception('资料保存失败！');

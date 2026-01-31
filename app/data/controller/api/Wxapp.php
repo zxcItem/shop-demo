@@ -22,7 +22,7 @@ class Wxapp extends Controller
      * 接口通道类型
      * @var string
      */
-    private $type = Account::WXAPP;
+    private $type = Account::WECHAT;
 
     /**
      * 小程序配置参数
@@ -132,7 +132,7 @@ class Wxapp extends Controller
             if (is_array($result) && !empty($result['phoneNumber'])) {
                 $data = ['appid' => $this->params['appid'], 'openid' => $input['openid']];
                 ($account = Account::mk($this->type))->set($data);
-                $account->bind(['phone' => $result['phoneNumber']], $data);
+                $account->bind(['phone' => $result['phoneNumber']]);
                 $this->success('绑定成功', $account->get(true));
             } else {
                 $this->error('解析失败');
