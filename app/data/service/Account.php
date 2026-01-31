@@ -4,6 +4,7 @@
 namespace app\data\service;
 
 use app\data\model\account\DataAccountAuth;
+use app\data\model\account\DataAccountBind;
 use app\data\service\contract\AccountAccess;
 use app\data\service\contract\AccountInterface;
 use think\admin\Exception;
@@ -301,5 +302,36 @@ abstract class Account
     public static function invite_code():string
     {
         return strtoupper(CodeExtend::random(5, 3));
+    }
+
+    /**
+     * 绑定第三方账号
+     * @param integer $unid 用户编号
+     * @param string $type 接口类型
+     * @param array $data 接口数据
+     * @return array
+     * @throws \think\admin\Exception
+     */
+    public static function bind(int $unid, string $type, array $data): array
+    {
+        $account = self::mk($type, $data);
+        $account->set($data);
+        return $account->bind(['id' => $unid]);
+    }
+
+    /**
+     * 解绑第三方账号
+     * @param integer $unid 用户编号
+     * @param string $type 接口类型
+     * @return array
+     * @throws \think\admin\Exception
+     */
+    public static function unBind(int $unid, string $type): array
+    {
+        $bind = DataAccountBind::mk()->where([
+            'unid' => $unid, 'type' => $type, 'deleted' => 0
+        ])->findOrEmpty();
+        if ($bind->isEmpty()) throw new Exception('未找到绑定的账号！');
+        return self::mk($type, ['id' => $bind->getAttr('id')])->unBind();
     }
 }

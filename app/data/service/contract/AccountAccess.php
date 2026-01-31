@@ -220,6 +220,21 @@ class AccountAccess implements AccountInterface
     {
         if ($this->bind->isEmpty()) throw new Exception('终端账号异常！');
         $this->user = DataAccountUser::mk()->where(['deleted' => 0])->where($map)->findOrEmpty();
+        // 检查账号是否已被绑定
+        if (($unid = intval($this->bind->getAttr('unid'))) > 0) {
+            if ($this->user->isExists() && $unid !== intval($this->user->getAttr('id'))) {
+                throw new Exception('该账号已被其他用户绑定，请解绑后再试！');
+            }
+        }
+        // 检查用户是否已绑定同类账号
+        if ($this->user->isExists()) {
+            $count = DataAccountBind::mk()->where([
+                'unid'    => $this->user->getAttr('id'),
+                'type'    => $this->type,
+                'deleted' => 0,
+            ])->where('id', '<>', $this->bind->getAttr('id'))->count();
+            if ($count > 0) throw new Exception('您已绑定该类型的其他账号，请先解绑！');
+        }
         if (!empty($data['extra'])) $this->user->setAttr('extra', array_merge($this->user->getAttr('extra'), $data['extra']));
         unset($data['id'], $data['code'], $data['extra']);
         // 生成新的用户编号
