@@ -24,6 +24,7 @@
     "zoujingli/qrcode": "^1.0",
     "zoujingli/think-library": "^6.1",
     "zoujingli/think-plugs-admin": "^1.0",
+    "zoujingli/think-plugs-wechat": "^1.0",
     "zoujingli/think-plugs-static": "^1.0",
     "zoujingli/wechat-developer": "^1.2",
     "phpmailer/phpmailer": "^6.7"

@@ -24,8 +24,11 @@ abstract class Account
     // 手机号登录 (短信验证码/一键登录) - 适用于: App/H5/PC/小程序
     public const PHONE = 'phone';
     
-    // 微信登录 (OpenID/UnionID) - 适用于: App/PC扫码/小程序/公众号
+    // 微信服务号/PC扫码/App登录
     public const WECHAT = 'wechat';
+
+    // 微信小程序登录
+    public const WXAPP = 'wxapp';
     
     // 邮箱登录 (账号密码) - 适用于: Web/App
     public const EMAIL = 'email';
@@ -60,6 +63,7 @@ abstract class Account
         
         // 微信体系
         self::WECHAT   => ['name' => '微信登录', 'field' => 'openid', 'status' => 1],
+        self::WXAPP    => ['name' => '微信小程序', 'field' => 'openid', 'status' => 1],
         
         // 传统体系 (复用 openid 字段存储账号标识)
         self::EMAIL    => ['name' => '邮箱登录', 'field' => 'openid', 'status' => 1],

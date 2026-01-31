@@ -28,7 +28,7 @@ class Login extends Controller
     {
         try {
             $data = $this->_vali([
-                'type.value'       => 'wap',
+                'type.value'       => 'phone',
                 'phone.mobile'     => '手机号错误',
                 'phone.require'    => '手机号为空',
                 'verify.require'   => '验证码为空',
@@ -75,7 +75,7 @@ class Login extends Controller
                 $user = DataAccountUser::mk()->findOrEmpty($vars['unid']);
                 if ($user->isEmpty()) $this->error('无效账号！');
                 $inset = ['phone' => $user->getAttr('phone')];
-                $account = Account::mk(Account::WAP, $inset);
+                $account = Account::mk(Account::PHONE, $inset);
                 $account->set(['unid' => $user->getAttr('id')] + $inset);
                 $this->success('登录成功！', $account->token()->get(true));
             } else {
@@ -96,7 +96,7 @@ class Login extends Controller
     {
         try {
             $data = $this->_vali([
-                'type.default'   => 'wap',
+                'type.default'   => 'phone',
                 'phone.mobile'     => '登录手机错误',
                 'phone.require'    => '登录手机为空',
                 'password.require' => '登录密码为空',
@@ -170,8 +170,8 @@ class Login extends Controller
             ]);
             if (Message::checkVerifyCode($data['verify'], $data['phone'], Message::tRegister)) {
                 Message::clearVerifyCode($data['phone'], Message::tRegister);
-                // 兼容处理：如果通道认证字段非手机号，强制修正为 WAP 通道
-                $type = Account::field($data['type']) === 'phone' ? $data['type'] : Account::WAP;
+                // 兼容处理：如果通道认证字段非手机号，强制修正为 PHONE 通道
+                $type = Account::field($data['type']) === 'phone' ? $data['type'] : Account::PHONE;
                 $account = Account::mk($type);
                 $account->set($inset = ['phone' => $data['phone'], 'deleted' => 0]);
                 $account->isBind() || $account->bind($inset, $inset);

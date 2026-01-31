@@ -22,7 +22,7 @@ class Wxapp extends Controller
      * 接口通道类型
      * @var string
      */
-    private $type = Account::WECHAT;
+    private $type = Account::WXAPP;
 
     /**
      * 小程序配置参数
