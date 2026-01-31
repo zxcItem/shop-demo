@@ -17,17 +17,21 @@
   "require": {
     "php": ">=7.1",
     "ext-json": "*",
+    "alibabacloud/vod-20170321": "^3.10",
+    "aliyuncs/oss-sdk-php": "^2.7",
+    "phpmailer/phpmailer": "^6.7",
     "predis/predis": "^3.3",
+    "qcloud/cos-sdk-v5": "^2.6",
+    "tencentcloud/vod": "^3.0",
     "topthink/think-orm": "^2.0|^3.0",
     "workerman/gateway-worker": "^4.0",
     "zoujingli/ip2region": "^3.0",
     "zoujingli/qrcode": "^1.0",
     "zoujingli/think-library": "^6.1",
     "zoujingli/think-plugs-admin": "^1.0",
-    "zoujingli/think-plugs-wechat": "^1.0",
     "zoujingli/think-plugs-static": "^1.0",
-    "zoujingli/wechat-developer": "^1.2",
-    "phpmailer/phpmailer": "^6.7"
+    "zoujingli/think-plugs-wechat": "^1.0",
+    "zoujingli/wechat-developer": "^1.2"
   },
   "autoload": {
     "psr-0": {
