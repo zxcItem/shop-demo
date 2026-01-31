@@ -19,10 +19,8 @@ class Apple extends Controller
     public function index()
     {
         try {
-            $data = $this->_vali([
-                'openid.require' => '账号标识为空',
-            ]);
-
+            $data = $this->request->post();
+            
             // 检查通道是否有效
             if (empty(Account::get(Account::APPLE)['status'])) {
                 $this->error('登录通道未开通');
