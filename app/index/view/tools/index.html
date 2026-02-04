@@ -1,0 +1,281 @@
+{extend name="tools/layout" /}
+
+{block name="style"}
+<style>
+    .banner { 
+        background: linear-gradient(135deg, #009688 0%, #35bdb2 100%); 
+        padding: 40px 20px; 
+        border-radius: 8px; 
+        color: #fff; 
+        margin-bottom: 30px; 
+        box-shadow: 0 4px 20px rgba(0, 150, 136, 0.3);
+        text-align: center;
+    }
+    .banner h1 { font-size: 32px; font-weight: bold; margin-bottom: 10px; letter-spacing: 1px; }
+    .banner p { font-size: 16px; opacity: 0.9; }
+    
+    .category-title { 
+        font-size: 18px; 
+        font-weight: bold; 
+        color: #333; 
+        margin: 25px 0 15px; 
+        padding-left: 10px; 
+        border-left: 4px solid #009688; 
+        line-height: 1;
+    }
+    
+    .tool-card { 
+        cursor: pointer; 
+        height: 140px; 
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        background: #fff;
+        position: relative;
+        overflow: hidden;
+    }
+    .tool-icon-box {
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 15px;
+        transition: all 0.3s;
+    }
+    .tool-icon { font-size: 28px; color: #fff; }
+    
+    /* 不同分类的图标颜色 */
+    .cat-data .tool-icon-box { background: linear-gradient(135deg, #1E9FFF 0%, #63b9ff 100%); box-shadow: 0 4px 10px rgba(30, 159, 255, 0.3); }
+    .cat-enc .tool-icon-box { background: linear-gradient(135deg, #FFB800 0%, #ffcf4d 100%); box-shadow: 0 4px 10px rgba(255, 184, 0, 0.3); }
+    .cat-dev .tool-icon-box { background: linear-gradient(135deg, #009688 0%, #35bdb2 100%); box-shadow: 0 4px 10px rgba(0, 150, 136, 0.3); }
+    .cat-net .tool-icon-box { background: linear-gradient(135deg, #FF5722 0%, #ff8b66 100%); box-shadow: 0 4px 10px rgba(255, 87, 34, 0.3); }
+    
+    .tool-title { font-size: 16px; font-weight: bold; color: #333; margin-bottom: 6px; }
+    .tool-desc { font-size: 12px; color: #999; padding: 0 10px; line-height: 1.4; }
+    
+    .tool-card:hover { transform: none; }
+    .tool-card:hover .tool-icon-box { transform: scale(1.1) rotate(5deg); }
+</style>
+{/block}
+
+{block name="main"}
+<div class="banner layui-anim layui-anim-fadein">
+    <h1>开发者工具箱</h1>
+    <p>汇集开发中常用的各种在线工具，提高您的工作效率</p>
+</div>
+
+<!-- 常用转换 -->
+<div class="category-title">数据转换</div>
+<div class="layui-row layui-col-space20">
+    <!-- JSON -->
+    <div class="layui-col-md3 layui-col-sm4 layui-col-xs6">
+        <div class="layui-card tool-card cat-data" data-url="{:url('json')}">
+            <div class="tool-icon-box"><i class="layui-icon layui-icon-code-circle tool-icon"></i></div>
+            <div class="tool-title">JSON 格式化</div>
+            <div class="tool-desc">JSON 校验、格式化、压缩、转义</div>
+        </div>
+    </div>
+    <!-- Date -->
+    <div class="layui-col-md3 layui-col-sm4 layui-col-xs6">
+        <div class="layui-card tool-card cat-data" data-url="{:url('date')}">
+            <div class="tool-icon-box"><i class="layui-icon layui-icon-date tool-icon"></i></div>
+            <div class="tool-title">日期时间转换</div>
+            <div class="tool-desc">时间戳、日期互转，世界时间</div>
+        </div>
+    </div>
+    <!-- Base64 -->
+    <div class="layui-col-md3 layui-col-sm4 layui-col-xs6">
+        <div class="layui-card tool-card cat-data" data-url="{:url('base64')}">
+            <div class="tool-icon-box"><i class="layui-icon layui-icon-fonts-clear tool-icon"></i></div>
+            <div class="tool-title">Base64 编解码</div>
+            <div class="tool-desc">文本/图片的 Base64 编码与解码</div>
+        </div>
+    </div>
+    <!-- URL -->
+    <div class="layui-col-md3 layui-col-sm4 layui-col-xs6">
+        <div class="layui-card tool-card cat-data" data-url="{:url('url')}">
+            <div class="tool-icon-box"><i class="layui-icon layui-icon-link tool-icon"></i></div>
+            <div class="tool-title">URL 编解码</div>
+            <div class="tool-desc">URL 参数编码、解码工具</div>
+        </div>
+    </div>
+     <!-- Number -->
+     <div class="layui-col-md3 layui-col-sm4 layui-col-xs6">
+        <div class="layui-card tool-card cat-data" data-url="{:url('number')}">
+            <div class="tool-icon-box"><i class="layui-icon layui-icon-cols tool-icon"></i></div>
+            <div class="tool-title">进制转换</div>
+            <div class="tool-desc">二进制、八进制、十进制、十六进制</div>
+        </div>
+    </div>
+     <!-- Unicode -->
+     <div class="layui-col-md3 layui-col-sm4 layui-col-xs6">
+        <div class="layui-card tool-card cat-data" data-url="{:url('unicode')}">
+            <div class="tool-icon-box"><i class="layui-icon layui-icon-fonts-code tool-icon"></i></div>
+            <div class="tool-title">Unicode 转换</div>
+            <div class="tool-desc">Unicode 与中文互转，ASCII 转换</div>
+        </div>
+    </div>
+</div>
+
+<!-- 编码加密 -->
+<div class="category-title">编码加密</div>
+<div class="layui-row layui-col-space20">
+    <!-- MD5 -->
+    <div class="layui-col-md3 layui-col-sm4 layui-col-xs6">
+        <div class="layui-card tool-card cat-enc" data-url="{:url('md5')}">
+            <div class="tool-icon-box"><i class="layui-icon layui-icon-password tool-icon"></i></div>
+            <div class="tool-title">MD5/SHA 哈希</div>
+            <div class="tool-desc">MD5, SHA1, SHA256, SHA512 计算</div>
+        </div>
+    </div>
+    <!-- Random -->
+    <div class="layui-col-md3 layui-col-sm4 layui-col-xs6">
+        <div class="layui-card tool-card cat-enc" data-url="{:url('random')}">
+            <div class="tool-icon-box"><i class="layui-icon layui-icon-util tool-icon"></i></div>
+            <div class="tool-title">随机密码生成</div>
+            <div class="tool-desc">生成高强度随机密码、UUID</div>
+        </div>
+    </div>
+     <!-- QRCode -->
+     <div class="layui-col-md3 layui-col-sm4 layui-col-xs6">
+        <div class="layui-card tool-card cat-enc" data-url="{:url('qrcode')}">
+            <div class="tool-icon-box"><i class="layui-icon layui-icon-cellphone tool-icon"></i></div>
+            <div class="tool-title">二维码生成</div>
+            <div class="tool-desc">文本、链接转二维码图片</div>
+        </div>
+    </div>
+     <!-- HTML Entity -->
+     <div class="layui-col-md3 layui-col-sm4 layui-col-xs6">
+        <div class="layui-card tool-card cat-enc" data-url="{:url('html_entity')}">
+            <div class="tool-icon-box"><i class="layui-icon layui-icon-code-circle tool-icon"></i></div>
+            <div class="tool-title">HTML 实体编码</div>
+            <div class="tool-desc">HTML 特殊字符转义与还原</div>
+        </div>
+    </div>
+</div>
+
+<!-- 开发辅助 -->
+<div class="category-title">开发辅助</div>
+<div class="layui-row layui-col-space20">
+    <!-- Regex -->
+    <div class="layui-col-md3 layui-col-sm4 layui-col-xs6">
+        <div class="layui-card tool-card cat-dev" data-url="{:url('regex')}">
+            <div class="tool-icon-box"><i class="layui-icon layui-icon-engine tool-icon"></i></div>
+            <div class="tool-title">正则测试</div>
+            <div class="tool-desc">正则表达式在线测试、常用正则</div>
+        </div>
+    </div>
+    <!-- Color -->
+    <div class="layui-col-md3 layui-col-sm4 layui-col-xs6">
+        <div class="layui-card tool-card cat-dev" data-url="{:url('color')}">
+            <div class="tool-icon-box"><i class="layui-icon layui-icon-theme tool-icon"></i></div>
+            <div class="tool-title">颜色转换</div>
+            <div class="tool-desc">HEX, RGB, RGBA 颜色格式互转</div>
+        </div>
+    </div>
+     <!-- Diff -->
+     <div class="layui-col-md3 layui-col-sm4 layui-col-xs6">
+        <div class="layui-card tool-card cat-dev" data-url="{:url('diff')}">
+            <div class="tool-icon-box"><i class="layui-icon layui-icon-subtraction tool-icon"></i></div>
+            <div class="tool-title">文本差异对比</div>
+            <div class="tool-desc">在线对比两段文本的差异</div>
+        </div>
+    </div>
+    <!-- Cron -->
+    <div class="layui-col-md3 layui-col-sm4 layui-col-xs6">
+        <div class="layui-card tool-card cat-dev" data-url="{:url('cron')}">
+            <div class="tool-icon-box"><i class="layui-icon layui-icon-log tool-icon"></i></div>
+            <div class="tool-title">Cron 表达式</div>
+            <div class="tool-desc">Cron 表达式生成与解析</div>
+        </div>
+    </div>
+    <!-- SQL -->
+    <div class="layui-col-md3 layui-col-sm4 layui-col-xs6">
+        <div class="layui-card tool-card cat-dev" data-url="{:url('sql')}">
+            <div class="tool-icon-box"><i class="layui-icon layui-icon-table tool-icon"></i></div>
+            <div class="tool-title">SQL 格式化</div>
+            <div class="tool-desc">SQL 语句美化、压缩</div>
+        </div>
+    </div>
+     <!-- XML -->
+     <div class="layui-col-md3 layui-col-sm4 layui-col-xs6">
+        <div class="layui-card tool-card cat-dev" data-url="{:url('xml')}">
+            <div class="tool-icon-box"><i class="layui-icon layui-icon-list tool-icon"></i></div>
+            <div class="tool-title">XML/JSON 互转</div>
+            <div class="tool-desc">XML 与 JSON 数据格式互相转换</div>
+        </div>
+        <!-- CSS -->
+    <div class="layui-col-md3 layui-col-sm4 layui-col-xs6">
+        <div class="layui-card tool-card cat-dev" data-url="{:url('css')}">
+            <div class="tool-icon-box"><i class="layui-icon layui-icon-theme tool-icon"></i></div>
+            <div class="tool-title">CSS 格式化</div>
+            <div class="tool-desc">CSS 代码美化、压缩工具</div>
+        </div>
+    </div>
+    <!-- Markdown -->
+    <div class="layui-col-md3 layui-col-sm4 layui-col-xs6">
+        <div class="layui-card tool-card cat-dev" data-url="{:url('markdown')}">
+            <div class="tool-icon-box"><i class="layui-icon layui-icon-read tool-icon"></i></div>
+            <div class="tool-title">Markdown 预览</div>
+            <div class="tool-desc">Markdown 在线编辑与实时预览</div>
+        </div>
+    </div>
+</div>
+
+<!-- 网络工具 -->
+ <div class="category-title">网络工具</div>
+ <div class="layui-row layui-col-space20">
+    <!-- IP -->
+    <div class="layui-col-md3 layui-col-sm4 layui-col-xs6">
+        <div class="layui-card tool-card cat-net" data-url="{:url('ip')}">
+            <div class="tool-icon-box"><i class="layui-icon layui-icon-website tool-icon"></i></div>
+            <div class="tool-title">IP 地址查询</div>
+            <div class="tool-desc">IP 归属地查询、本机 IP</div>
+        </div>
+    </div>
+    <!-- UA -->
+    <div class="layui-col-md3 layui-col-sm4 layui-col-xs6">
+        <div class="layui-card tool-card cat-net" data-url="{:url('ua')}">
+            <div class="tool-icon-box"><i class="layui-icon layui-icon-ie tool-icon"></i></div>
+            <div class="tool-title">User-Agent 分析</div>
+            <div class="tool-desc">解析 UA 字符串中的设备、浏览器信息</div>
+        </div>
+    </div>
+    <!-- HTTP -->
+    <div class="layui-col-md3 layui-col-sm4 layui-col-xs6">
+        <div class="layui-card tool-card cat-net" data-url="{:url('http')}">
+            <div class="tool-icon-box"><i class="layui-icon layui-icon-release tool-icon"></i></div>
+            <div class="tool-title">HTTP 接口测试</div>
+            <div class="tool-desc">在线发送 GET/POST 请求测试接口</div>
+        </div>
+    </div>
+    <!-- Image Base64 -->
+     <div class="layui-col-md3 layui-col-sm4 layui-col-xs6">
+        <div class="layui-card tool-card cat-net" data-url="{:url('image_base64')}">
+            <div class="tool-icon-box"><i class="layui-icon layui-icon-picture tool-icon"></i></div>
+            <div class="tool-title">图片 Base64</div>
+            <div class="tool-desc">图片转 Base64 编码字符串</div>
+        </div>
+    </div>
+</div>
+{/block}
+
+{block name="script"}
+<script>
+layui.use(['layer', 'jquery'], function(){
+    var layer = layui.layer;
+    var $ = layui.jquery;
+    
+    $('.tool-card').on('click', function(){
+        var url = $(this).data('url');
+        if(url) {
+            window.location.href = url;
+        }
+    });
+});
+</script>
+{/block}

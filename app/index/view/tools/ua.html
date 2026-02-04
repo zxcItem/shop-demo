@@ -1,0 +1,98 @@
+{extend name="tools/layout" /}
+
+{block name="style"}
+<style>
+    .ua-info-table {
+        width: 100%;
+        margin-top: 15px;
+    }
+    .ua-info-table td {
+        padding: 10px;
+        border-bottom: 1px solid #eee;
+    }
+    .ua-info-table td:first-child {
+        width: 120px;
+        font-weight: bold;
+        color: #666;
+    }
+    .ua-icon {
+        font-size: 18px;
+        margin-right: 5px;
+        color: #009688;
+    }
+</style>
+{/block}
+
+{block name="main"}
+<div class="layui-card">
+    <div class="layui-card-header">User-Agent 分析</div>
+    <div class="layui-card-body">
+        <div class="layui-form-item">
+            <textarea id="ua-input" placeholder="输入 User-Agent 字符串..." class="layui-textarea" style="height: 100px;"></textarea>
+        </div>
+        <div class="layui-form-item">
+            <button class="layui-btn layui-btn-normal" id="btn-parse">分析</button>
+            <button class="layui-btn layui-btn-primary" id="btn-use-my">使用本机 UA</button>
+            <button class="layui-btn layui-btn-danger" id="btn-clear">清空</button>
+        </div>
+
+        <div id="result-container" style="display:none; margin-top: 20px;">
+            <blockquote class="layui-elem-quote layui-quote-nm">
+                <table class="ua-info-table">
+                    <tr><td><i class="layui-icon layui-icon-website ua-icon"></i>浏览器</td><td id="res-browser">-</td></tr>
+                    <tr><td><i class="layui-icon layui-icon-engine ua-icon"></i>引擎</td><td id="res-engine">-</td></tr>
+                    <tr><td><i class="layui-icon layui-icon-hardware ua-icon"></i>操作系统</td><td id="res-os">-</td></tr>
+                    <tr><td><i class="layui-icon layui-icon-cellphone ua-icon"></i>设备</td><td id="res-device">-</td></tr>
+                    <tr><td><i class="layui-icon layui-icon-cpu ua-icon"></i>CPU</td><td id="res-cpu">-</td></tr>
+                </table>
+            </blockquote>
+        </div>
+    </div>
+</div>
+{/block}
+
+{block name="script"}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/UAParser.js/1.0.35/ua-parser.min.js"></script>
+<script>
+layui.use(['layer', 'jquery'], function(){
+    var layer = layui.layer,
+        $ = layui.jquery;
+
+    function parseUA(uaString) {
+        if(!uaString) {
+            layer.msg('请输入 User-Agent', {icon: 0});
+            return;
+        }
+
+        var parser = new UAParser(uaString);
+        var result = parser.getResult();
+
+        $('#res-browser').text((result.browser.name || 'Unknown') + ' ' + (result.browser.version || ''));
+        $('#res-engine').text((result.engine.name || 'Unknown') + ' ' + (result.engine.version || ''));
+        $('#res-os').text((result.os.name || 'Unknown') + ' ' + (result.os.version || ''));
+        $('#res-device').text((result.device.vendor || '') + ' ' + (result.device.model || '') + ' (' + (result.device.type || 'Desktop') + ')');
+        $('#res-cpu').text(result.cpu.architecture || 'Unknown');
+
+        $('#result-container').show();
+    }
+
+    $('#btn-parse').click(function(){
+        parseUA($('#ua-input').val());
+    });
+
+    $('#btn-use-my').click(function(){
+        var myUA = navigator.userAgent;
+        $('#ua-input').val(myUA);
+        parseUA(myUA);
+    });
+
+    $('#btn-clear').click(function(){
+        $('#ua-input').val('');
+        $('#result-container').hide();
+    });
+
+    // Initial load
+    $('#ua-input').val(navigator.userAgent);
+});
+</script>
+{/block}

@@ -1,0 +1,117 @@
+{extend name="tools/layout" /}
+
+{block name="style"}
+<style>
+    .ip-info-table {
+        width: 100%;
+        margin-top: 15px;
+    }
+    .ip-info-table td {
+        padding: 10px;
+        border-bottom: 1px solid #eee;
+    }
+    .ip-info-table td:first-child {
+        width: 120px;
+        font-weight: bold;
+        color: #666;
+    }
+    .big-ip {
+        font-size: 24px;
+        color: #009688;
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+</style>
+{/block}
+
+{block name="main"}
+<div class="layui-card">
+    <div class="layui-card-header">IP 地址查询</div>
+    <div class="layui-card-body">
+        <div class="layui-form">
+            <div class="layui-form-item">
+                <div class="layui-inline" style="width: 300px;">
+                    <input type="text" id="ip-input" placeholder="输入 IP 地址 (留空查询本机)" class="layui-input">
+                </div>
+                <div class="layui-inline">
+                    <button class="layui-btn layui-btn-normal" id="btn-query">查询</button>
+                    <button class="layui-btn layui-btn-primary" id="btn-myip">本机 IP</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="result-container" style="display:none; margin-top: 20px;">
+            <blockquote class="layui-elem-quote layui-quote-nm">
+                <div class="big-ip" id="res-ip"></div>
+                <table class="ip-info-table">
+                    <tr><td>地理位置</td><td id="res-location">-</td></tr>
+                    <tr><td>国家/地区</td><td id="res-country">-</td></tr>
+                    <tr><td>城市</td><td id="res-city">-</td></tr>
+                    <tr><td>ISP 运营商</td><td id="res-isp">-</td></tr>
+                    <tr><td>时区</td><td id="res-timezone">-</td></tr>
+                    <tr><td>经纬度</td><td id="res-latlon">-</td></tr>
+                    <tr><td>AS 号</td><td id="res-as">-</td></tr>
+                </table>
+            </blockquote>
+        </div>
+    </div>
+</div>
+{/block}
+
+{block name="script"}
+<script>
+layui.use(['layer', 'jquery'], function(){
+    var layer = layui.layer,
+        $ = layui.jquery;
+
+    function queryIP(ip) {
+        var loading = layer.load(2);
+        var api = ip ? 'https://ipapi.co/' + ip + '/json/' : 'https://ipapi.co/json/';
+        
+        // Note: ipapi.co has rate limits. Alternatives: http://ip-api.com/json/ (HTTP only for free), https://ipwho.is/
+        // Using ipapi.co for HTTPS support, but fallback might be needed.
+        
+        $.ajax({
+            url: api,
+            type: 'GET',
+            dataType: 'json',
+            success: function(data) {
+                layer.close(loading);
+                if(data.error) {
+                    layer.msg('查询失败: ' + data.reason, {icon: 2});
+                    return;
+                }
+                
+                $('#res-ip').text(data.ip);
+                $('#res-location').text((data.region || '') + ' ' + (data.city || ''));
+                $('#res-country').text(data.country_name);
+                $('#res-city').text(data.city);
+                $('#res-isp').text(data.org);
+                $('#res-timezone').text(data.timezone);
+                $('#res-latlon').text(data.latitude + ', ' + data.longitude);
+                $('#res-as').text(data.asn);
+                
+                $('#result-container').show();
+            },
+            error: function() {
+                layer.close(loading);
+                layer.msg('查询接口请求失败，可能是跨域或频率限制', {icon: 2});
+            }
+        });
+    }
+
+    $('#btn-query').click(function(){
+        var ip = $('#ip-input').val();
+        queryIP(ip);
+    });
+
+    $('#btn-myip').click(function(){
+        $('#ip-input').val('');
+        queryIP('');
+    });
+
+    // Auto query my ip on load
+    // queryIP(''); 
+});
+</script>
+{/block}

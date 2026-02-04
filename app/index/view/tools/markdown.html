@@ -1,0 +1,74 @@
+{extend name="tools/layout" /}
+
+{block name="style"}
+<style>
+    .markdown-preview {
+        background-color: #fff;
+        border: 1px solid #e6e6e6;
+        padding: 20px;
+        height: 500px;
+        overflow-y: auto;
+        border-radius: 4px;
+    }
+    /* Simple markdown styles */
+    .markdown-preview h1 { font-size: 2em; margin-bottom: 0.5em; border-bottom: 1px solid #eee; padding-bottom: 0.3em; }
+    .markdown-preview h2 { font-size: 1.5em; margin-bottom: 0.5em; border-bottom: 1px solid #eee; padding-bottom: 0.3em; }
+    .markdown-preview p { margin-bottom: 1em; line-height: 1.6; }
+    .markdown-preview code { background-color: #f0f0f0; padding: 2px 4px; border-radius: 3px; font-family: monospace; }
+    .markdown-preview pre { background-color: #f6f8fa; padding: 16px; border-radius: 6px; overflow: auto; margin-bottom: 1em; }
+    .markdown-preview blockquote { border-left: 4px solid #dfe2e5; color: #6a737d; padding-left: 16px; margin: 0 0 1em 0; }
+    .markdown-preview ul, .markdown-preview ol { padding-left: 2em; margin-bottom: 1em; }
+    .markdown-preview img { max-width: 100%; }
+</style>
+{/block}
+
+{block name="main"}
+<div class="layui-card">
+    <div class="layui-card-header">Markdown 编辑 / 预览</div>
+    <div class="layui-card-body">
+        <div class="layui-row layui-col-space15">
+            <div class="layui-col-md6">
+                <textarea id="md-input" placeholder="在此输入 Markdown 内容..." class="layui-textarea" style="height: 500px; font-family: monospace; font-size: 14px;"></textarea>
+            </div>
+            <div class="layui-col-md6">
+                <div id="md-preview" class="markdown-preview"></div>
+            </div>
+        </div>
+        <div class="layui-form-item" style="margin-top: 15px; text-align: right;">
+             <button class="layui-btn layui-btn-danger" id="btn-clear">清空</button>
+        </div>
+    </div>
+</div>
+{/block}
+
+{block name="script"}
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script>
+layui.use(['layer', 'jquery'], function(){
+    var layer = layui.layer,
+        $ = layui.jquery;
+
+    var input = $('#md-input');
+    var preview = $('#md-preview');
+
+    function updatePreview() {
+        var text = input.val();
+        var html = marked.parse(text);
+        preview.html(html);
+    }
+
+    input.on('input', function(){
+        updatePreview();
+    });
+
+    $('#btn-clear').click(function(){
+        input.val('');
+        updatePreview();
+    });
+
+    // Initial example
+    input.val("# Hello Markdown\n\nThis is a **bold** text and this is *italic*.\n\n- List item 1\n- List item 2\n\n```javascript\nconsole.log('Hello World');\n```");
+    updatePreview();
+});
+</script>
+{/block}

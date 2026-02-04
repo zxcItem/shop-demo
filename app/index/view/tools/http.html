@@ -1,0 +1,172 @@
+{extend name="tools/layout" /}
+
+{block name="style"}
+<style>
+    .http-response {
+        background-color: #f8f9fa;
+        padding: 15px;
+        border-radius: 4px;
+        border: 1px solid #e6e6e6;
+        min-height: 200px;
+        white-space: pre-wrap;
+        font-family: monospace;
+        word-break: break-all;
+    }
+    .header-row {
+        margin-bottom: 10px;
+    }
+</style>
+{/block}
+
+{block name="main"}
+<div class="layui-card">
+    <div class="layui-card-header">HTTP 请求测试</div>
+    <div class="layui-card-body">
+        <blockquote class="layui-elem-quote layui-text" style="border-left: 5px solid #FF5722;">
+            注意：由于浏览器的同源策略（CORS）限制，此工具只能请求允许跨域的接口（Access-Control-Allow-Origin: *）。
+        </blockquote>
+
+        <div class="layui-form">
+            <div class="layui-form-item">
+                <div class="layui-inline" style="width: 100px;">
+                    <select id="http-method">
+                        <option value="GET">GET</option>
+                        <option value="POST">POST</option>
+                        <option value="PUT">PUT</option>
+                        <option value="DELETE">DELETE</option>
+                        <option value="PATCH">PATCH</option>
+                        <option value="HEAD">HEAD</option>
+                        <option value="OPTIONS">OPTIONS</option>
+                    </select>
+                </div>
+                <div class="layui-inline" style="width: calc(100% - 220px);">
+                    <input type="text" id="http-url" placeholder="https://api.example.com/v1/users" class="layui-input">
+                </div>
+                <div class="layui-inline">
+                    <button class="layui-btn layui-btn-normal" id="btn-send">发送请求</button>
+                </div>
+            </div>
+
+            <div class="layui-tab layui-tab-brief">
+                <ul class="layui-tab-title">
+                    <li class="layui-this">请求体 (Body)</li>
+                    <li>请求头 (Headers)</li>
+                </ul>
+                <div class="layui-tab-content">
+                    <div class="layui-tab-item layui-show">
+                        <textarea id="http-body" placeholder="JSON or Form Data..." class="layui-textarea" style="height: 150px; font-family: monospace;"></textarea>
+                    </div>
+                    <div class="layui-tab-item">
+                        <textarea id="http-headers" placeholder="Key: Value (每行一个)" class="layui-textarea" style="height: 150px; font-family: monospace;"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+                <legend>响应结果</legend>
+            </fieldset>
+            
+            <div class="layui-row layui-col-space15">
+                <div class="layui-col-md12">
+                    <div class="layui-card">
+                        <div class="layui-card-header">
+                            Status: <span id="res-status" class="layui-badge layui-bg-gray">-</span>
+                            <span style="float: right;">Time: <span id="res-time">-</span> ms</span>
+                        </div>
+                        <div class="layui-card-body">
+                            <div class="layui-tab layui-tab-brief">
+                                <ul class="layui-tab-title">
+                                    <li class="layui-this">Response Body</li>
+                                    <li>Response Headers</li>
+                                </ul>
+                                <div class="layui-tab-content">
+                                    <div class="layui-tab-item layui-show">
+                                        <div id="res-body" class="http-response"></div>
+                                    </div>
+                                    <div class="layui-tab-item">
+                                        <div id="res-headers" class="http-response"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{/block}
+
+{block name="script"}
+<script>
+layui.use(['layer', 'jquery', 'form', 'element'], function(){
+    var layer = layui.layer,
+        $ = layui.jquery,
+        form = layui.form,
+        element = layui.element;
+
+    $('#btn-send').click(function(){
+        var method = $('#http-method').val();
+        var url = $('#http-url').val();
+        var body = $('#http-body').val();
+        var headersText = $('#http-headers').val();
+
+        if(!url) {
+            layer.msg('请输入 URL', {icon: 0});
+            return;
+        }
+
+        // Parse headers
+        var headers = {};
+        if(headersText) {
+            var lines = headersText.split('\n');
+            for(var i=0; i<lines.length; i++) {
+                var line = lines[i].trim();
+                if(line) {
+                    var parts = line.split(':');
+                    if(parts.length >= 2) {
+                        var key = parts[0].trim();
+                        var val = parts.slice(1).join(':').trim();
+                        headers[key] = val;
+                    }
+                }
+            }
+        }
+
+        var startTime = new Date().getTime();
+        var loading = layer.load(2);
+        
+        $('#res-status').text('Loading...');
+        $('#res-time').text('-');
+        $('#res-body').text('');
+        $('#res-headers').text('');
+
+        $.ajax({
+            url: url,
+            type: method,
+            data: body,
+            headers: headers,
+            complete: function(xhr, status) {
+                layer.close(loading);
+                var endTime = new Date().getTime();
+                var duration = endTime - startTime;
+
+                var statusColor = xhr.status >= 200 && xhr.status < 300 ? 'layui-bg-green' : (xhr.status >= 400 ? 'layui-bg-red' : 'layui-bg-orange');
+                $('#res-status').text(xhr.status + ' ' + xhr.statusText).attr('class', 'layui-badge ' + statusColor);
+                $('#res-time').text(duration);
+
+                // Format body if JSON
+                var resBody = xhr.responseText;
+                try {
+                    resBody = JSON.stringify(JSON.parse(resBody), null, 2);
+                } catch(e) {}
+                $('#res-body').text(resBody);
+
+                $('#res-headers').text(xhr.getAllResponseHeaders());
+            }
+        });
+    });
+});
+</script>
+{/block}

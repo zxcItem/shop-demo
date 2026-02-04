@@ -1,0 +1,97 @@
+{extend name="tools/layout" /}
+
+{block name="main"}
+<div class="layui-card">
+    <div class="layui-card-header">Unicode 编码转换</div>
+    <div class="layui-card-body">
+        <div class="layui-form-item">
+            <div class="layui-btn-group">
+                <button class="layui-btn layui-btn-normal" id="btn-str2uni">中文 &rarr; Unicode</button>
+                <button class="layui-btn layui-btn-warm" id="btn-uni2str">Unicode &rarr; 中文</button>
+                <button class="layui-btn layui-btn-normal" id="btn-str2ascii">Native &rarr; ASCII</button>
+                <button class="layui-btn layui-btn-warm" id="btn-ascii2str">ASCII &rarr; Native</button>
+                <button class="layui-btn layui-btn-danger" id="btn-clear">清空</button>
+            </div>
+        </div>
+
+        <div class="layui-row layui-col-space15">
+            <div class="layui-col-md6">
+                <textarea id="input-box" placeholder="输入内容..." class="layui-textarea" style="height: 300px;"></textarea>
+            </div>
+            <div class="layui-col-md6">
+                <textarea id="output-box" placeholder="转换结果..." class="layui-textarea" style="height: 300px; background-color: #f8f9fa;" readonly></textarea>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}
+
+{block name="script"}
+<script>
+layui.use(['layer', 'jquery'], function(){
+    var layer = layui.layer, $ = layui.jquery;
+
+    // Chinese -> Unicode
+    $('#btn-str2uni').click(function(){
+        var str = $('#input-box').val();
+        if(!str) return;
+        var res = [];
+        for(var i=0; i<str.length; i++) {
+            res[i] = ("00" + str.charCodeAt(i).toString(16)).slice(-4);
+        }
+        $('#output-box').val("\\u" + res.join("\\u"));
+    });
+
+    // Unicode -> Chinese
+    $('#btn-uni2str').click(function(){
+        var str = $('#input-box').val();
+        if(!str) return;
+        try {
+            str = str.replace(/\\/g, "%");
+            $('#output-box').val(unescape(str));
+        } catch(e) {
+            // fallback
+             try {
+                // Manually parse \uXXXX
+                var res = str.replace(/\\u[\dA-F]{4}/gi, function (match) {
+                    return String.fromCharCode(parseInt(match.replace(/\\u/g, ''), 16));
+                });
+                $('#output-box').val(res);
+             } catch(e2) {
+                 layer.msg('转换失败', {icon: 2});
+             }
+        }
+    });
+
+    // Native -> ASCII
+    $('#btn-str2ascii').click(function(){
+        var str = $('#input-box').val();
+        if(!str) return;
+        var res = "";
+        for(var i=0; i<str.length; i++){
+            res += "&#" + str.charCodeAt(i) + ";";
+        }
+        $('#output-box').val(res);
+    });
+
+    // ASCII -> Native
+    $('#btn-ascii2str').click(function(){
+         var str = $('#input-box').val();
+        if(!str) return;
+        try {
+             var res = str.replace(/&#(\d+);/g, function(match, dec) {
+                return String.fromCharCode(dec);
+             });
+             $('#output-box').val(res);
+        } catch(e) {
+             layer.msg('转换失败', {icon: 2});
+        }
+    });
+
+    $('#btn-clear').click(function(){
+        $('#input-box').val('');
+        $('#output-box').val('');
+    });
+});
+</script>
+{/block}

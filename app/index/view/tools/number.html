@@ -1,0 +1,129 @@
+{extend name="tools/layout" /}
+
+{block name="main"}
+<div class="layui-card">
+    <div class="layui-card-header">进制转换 (2 ~ 36进制)</div>
+    <div class="layui-card-body">
+        
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label">输入数值</label>
+                <div class="layui-input-inline" style="width: 300px;">
+                    <input type="text" id="num-input" placeholder="输入数字..." class="layui-input">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">源进制</label>
+                <div class="layui-input-inline" style="width: 100px;">
+                    <select id="base-from" class="layui-input" style="display:block;">
+                        <option value="2">2 (二进制)</option>
+                        <option value="8">8 (八进制)</option>
+                        <option value="10" selected>10 (十进制)</option>
+                        <option value="16">16 (十六进制)</option>
+                        <option value="32">32</option>
+                        <option value="36">36</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <hr>
+        
+        <div class="layui-row layui-col-space15" id="result-area">
+            <!-- 结果动态生成 -->
+            <div class="layui-col-md6">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">二进制</label>
+                    <div class="layui-input-block">
+                        <input type="text" readonly class="layui-input res-item" data-base="2">
+                    </div>
+                </div>
+            </div>
+            <div class="layui-col-md6">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">八进制</label>
+                    <div class="layui-input-block">
+                        <input type="text" readonly class="layui-input res-item" data-base="8">
+                    </div>
+                </div>
+            </div>
+            <div class="layui-col-md6">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">十进制</label>
+                    <div class="layui-input-block">
+                        <input type="text" readonly class="layui-input res-item" data-base="10">
+                    </div>
+                </div>
+            </div>
+            <div class="layui-col-md6">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">十六进制</label>
+                    <div class="layui-input-block">
+                        <input type="text" readonly class="layui-input res-item" data-base="16">
+                    </div>
+                </div>
+            </div>
+            <div class="layui-col-md6">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">32进制</label>
+                    <div class="layui-input-block">
+                        <input type="text" readonly class="layui-input res-item" data-base="32">
+                    </div>
+                </div>
+            </div>
+            <div class="layui-col-md6">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">36进制</label>
+                    <div class="layui-input-block">
+                        <input type="text" readonly class="layui-input res-item" data-base="36">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+{/block}
+
+{block name="script"}
+<script>
+layui.use(['layer', 'jquery'], function(){
+    var $ = layui.jquery;
+
+    function convert() {
+        var val = $('#num-input').val().trim();
+        var from = parseInt($('#base-from').val());
+        
+        if(!val) {
+            $('.res-item').val('');
+            return;
+        }
+
+        // Parse to decimal first
+        var decimal;
+        try {
+            decimal = parseInt(val, from);
+        } catch(e) {
+            decimal = NaN;
+        }
+
+        if(isNaN(decimal)) {
+            // Check if valid for the base
+            // Simple check: if parseInt returns NaN or if converting back doesn't match roughly
+            // For now just clear if invalid
+             $('.res-item').val('无效输入');
+             return;
+        }
+
+        $('.res-item').each(function(){
+            var toBase = parseInt($(this).data('base'));
+            var res = decimal.toString(toBase).toUpperCase();
+            $(this).val(res);
+        });
+    }
+
+    $('#num-input').on('input', convert);
+    $('#base-from').on('change', convert);
+});
+</script>
+{/block}

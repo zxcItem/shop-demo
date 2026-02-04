@@ -1,0 +1,67 @@
+{extend name="tools/layout" /}
+
+{block name="main"}
+<div class="layui-card">
+    <div class="layui-card-header">SQL 格式化 / 压缩</div>
+    <div class="layui-card-body">
+        <div class="layui-form-item">
+            <div class="layui-btn-group">
+                <button class="layui-btn layui-btn-normal" id="btn-format">格式化</button>
+                <button class="layui-btn layui-btn-primary" id="btn-compress">压缩</button>
+                <button class="layui-btn layui-btn-danger" id="btn-clear">清空</button>
+            </div>
+            <div class="layui-inline" style="margin-left: 10px;">
+                <select id="sql-dialect" class="layui-input" style="height: 38px; display: inline-block; width: auto;">
+                    <option value="sql">Standard SQL</option>
+                    <option value="mysql">MySQL</option>
+                    <option value="postgresql">PostgreSQL</option>
+                    <option value="plsql">PL/SQL</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="layui-row layui-col-space15">
+            <div class="layui-col-md6">
+                <textarea id="input-box" placeholder="在此输入 SQL 语句..." class="layui-textarea" style="height: 400px;"></textarea>
+            </div>
+            <div class="layui-col-md6">
+                <textarea id="output-box" placeholder="处理结果..." class="layui-textarea" style="height: 400px; background-color: #f8f9fa;" readonly></textarea>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}
+
+{block name="script"}
+<script src="https://cdn.bootcdn.net/ajax/libs/sql-formatter/4.0.2/sql-formatter.min.js"></script>
+<script>
+layui.use(['layer', 'jquery'], function(){
+    var layer = layui.layer, $ = layui.jquery;
+
+    $('#btn-format').click(function(){
+        var sql = $('#input-box').val();
+        if(!sql) return;
+        var dialect = $('#sql-dialect').val();
+        try {
+            var formatted = sqlFormatter.format(sql, { language: dialect });
+            $('#output-box').val(formatted);
+        } catch(e) {
+            layer.msg('格式化失败: ' + e.message, {icon: 2});
+        }
+    });
+
+    $('#btn-compress').click(function(){
+        var sql = $('#input-box').val();
+        if(!sql) return;
+        // Simple compress
+        var compressed = sql.replace(/\s+/g, ' ').trim();
+        $('#output-box').val(compressed);
+    });
+
+    $('#btn-clear').click(function(){
+        $('#input-box').val('');
+        $('#output-box').val('');
+    });
+});
+</script>
+{/block}

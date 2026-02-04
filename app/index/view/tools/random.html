@@ -1,0 +1,106 @@
+{extend name="tools/layout" /}
+
+{block name="main"}
+<div class="layui-card">
+    <div class="layui-card-header">随机密码 / UUID 生成</div>
+    <div class="layui-card-body">
+        
+        <div class="layui-form">
+            <div class="layui-form-item">
+                <label class="layui-form-label">包含字符</label>
+                <div class="layui-input-block">
+                    <input type="checkbox" name="use_num" title="数字 (0-9)" checked>
+                    <input type="checkbox" name="use_low" title="小写字母 (a-z)" checked>
+                    <input type="checkbox" name="use_up" title="大写字母 (A-Z)" checked>
+                    <input type="checkbox" name="use_spec" title="特殊符号 (!@#$...)">
+                </div>
+            </div>
+            
+            <div class="layui-form-item">
+                <label class="layui-form-label">密码长度</label>
+                <div class="layui-input-inline">
+                    <input type="number" id="pwd-len" value="16" min="4" max="128" class="layui-input">
+                </div>
+                <div class="layui-form-mid layui-word-aux">生成数量：</div>
+                <div class="layui-input-inline">
+                     <input type="number" id="pwd-count" value="5" min="1" max="50" class="layui-input">
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <button class="layui-btn" id="btn-gen-pwd">生成密码</button>
+                    <button class="layui-btn layui-btn-warm" id="btn-gen-uuid">生成 UUID</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="layui-form-item layui-form-text">
+            <label class="layui-form-label">生成结果</label>
+            <div class="layui-input-block">
+                <textarea id="output-box" class="layui-textarea" rows="10" readonly></textarea>
+            </div>
+        </div>
+
+    </div>
+</div>
+{/block}
+
+{block name="script"}
+<script>
+layui.use(['layer', 'jquery', 'form'], function(){
+    var layer = layui.layer, $ = layui.jquery, form = layui.form;
+
+    function getRandomChar(str) {
+        return str.charAt(Math.floor(Math.random() * str.length));
+    }
+
+    $('#btn-gen-pwd').click(function(){
+        var useNum = $('input[name="use_num"]').prop('checked');
+        var useLow = $('input[name="use_low"]').prop('checked');
+        var useUp = $('input[name="use_up"]').prop('checked');
+        var useSpec = $('input[name="use_spec"]').prop('checked');
+        
+        if(!useNum && !useLow && !useUp && !useSpec) {
+            layer.msg('请至少选择一种字符类型');
+            return;
+        }
+
+        var chars = "";
+        if(useNum) chars += "0123456789";
+        if(useLow) chars += "abcdefghijklmnopqrstuvwxyz";
+        if(useUp) chars += "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        if(useSpec) chars += "!@#$%^&*()_+-=[]{}|;:,.<>?";
+
+        var len = parseInt($('#pwd-len').val()) || 16;
+        var count = parseInt($('#pwd-count').val()) || 5;
+        var result = [];
+
+        for(var k=0; k<count; k++) {
+            var pwd = "";
+            for(var i=0; i<len; i++) {
+                pwd += getRandomChar(chars);
+            }
+            result.push(pwd);
+        }
+
+        $('#output-box').val(result.join("\n"));
+    });
+
+    $('#btn-gen-uuid').click(function(){
+        var count = parseInt($('#pwd-count').val()) || 5;
+        var result = [];
+        for(var k=0; k<count; k++) {
+            var d = new Date().getTime();
+            var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                var r = (d + Math.random()*16)%16 | 0;
+                d = Math.floor(d/16);
+                return (c=='x' ? r : (r&0x3|0x8)).toString(16);
+            });
+            result.push(uuid);
+        }
+        $('#output-box').val(result.join("\n"));
+    });
+});
+</script>
+{/block}

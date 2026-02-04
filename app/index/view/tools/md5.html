@@ -1,0 +1,86 @@
+{extend name="tools/layout" /}
+
+{block name="main"}
+<div class="layui-card">
+    <div class="layui-card-header">MD5 / SHA 哈希计算</div>
+    <div class="layui-card-body">
+        
+        <div class="layui-form-item layui-form-text">
+            <label class="layui-form-label">输入内容</label>
+            <div class="layui-input-block">
+                <textarea id="input-box" placeholder="请输入要计算的内容..." class="layui-textarea"></textarea>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn" id="btn-calc">计算哈希</button>
+                <button class="layui-btn layui-btn-primary" id="btn-clear">清空</button>
+            </div>
+        </div>
+
+        <hr>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">MD5 (32位)</label>
+            <div class="layui-input-block">
+                <input type="text" id="res-md5" class="layui-input" readonly>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">MD5 (16位)</label>
+            <div class="layui-input-block">
+                <input type="text" id="res-md5-16" class="layui-input" readonly>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">SHA1</label>
+            <div class="layui-input-block">
+                <input type="text" id="res-sha1" class="layui-input" readonly>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">SHA256</label>
+            <div class="layui-input-block">
+                <input type="text" id="res-sha256" class="layui-input" readonly>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">SHA512</label>
+            <div class="layui-input-block">
+                <input type="text" id="res-sha512" class="layui-input" readonly>
+            </div>
+        </div>
+
+    </div>
+</div>
+{/block}
+
+{block name="script"}
+<script src="https://cdn.bootcdn.net/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+<script>
+layui.use(['layer', 'jquery'], function(){
+    var layer = layui.layer, $ = layui.jquery;
+
+    $('#btn-calc').click(function(){
+        var val = $('#input-box').val();
+        if(!val) { layer.msg('请输入内容'); return; }
+
+        var md5 = CryptoJS.MD5(val).toString();
+        var sha1 = CryptoJS.SHA1(val).toString();
+        var sha256 = CryptoJS.SHA256(val).toString();
+        var sha512 = CryptoJS.SHA512(val).toString();
+
+        $('#res-md5').val(md5);
+        $('#res-md5-16').val(md5.substr(8, 16));
+        $('#res-sha1').val(sha1);
+        $('#res-sha256').val(sha256);
+        $('#res-sha512').val(sha512);
+    });
+
+    $('#btn-clear').click(function(){
+        $('input, textarea').val('');
+    });
+});
+</script>
+{/block}

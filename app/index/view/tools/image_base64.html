@@ -1,0 +1,205 @@
+{extend name="tools/layout" /}
+
+{block name="style"}
+<style>
+    .upload-area {
+        border: 2px dashed #009688;
+        border-radius: 10px;
+        padding: 40px;
+        text-align: center;
+        background-color: #f9f9f9;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    .upload-area:hover {
+        background-color: #f0f0f0;
+        border-color: #00796b;
+    }
+    .upload-icon {
+        font-size: 48px;
+        color: #009688;
+        margin-bottom: 10px;
+    }
+    .preview-img {
+        max-width: 100%;
+        max-height: 300px;
+        border: 1px solid #eee;
+        padding: 5px;
+        border-radius: 4px;
+        margin-top: 10px;
+        display: none;
+    }
+</style>
+{/block}
+
+{block name="main"}
+<div class="layui-card">
+    <div class="layui-card-header">图片 / Base64 互转</div>
+    <div class="layui-card-body">
+        <div class="layui-tab layui-tab-brief">
+            <ul class="layui-tab-title">
+                <li class="layui-this">图片转 Base64</li>
+                <li>Base64 转图片</li>
+            </ul>
+            <div class="layui-tab-content">
+                <!-- Image to Base64 -->
+                <div class="layui-tab-item layui-show">
+                    <div class="upload-area" id="upload-box">
+                        <i class="layui-icon layui-icon-upload-drag upload-icon"></i>
+                        <h3>点击或拖拽图片到此处</h3>
+                        <p>支持 PNG, JPG, GIF, SVG, WEBP 等格式</p>
+                        <input type="file" id="file-input" style="display: none;" accept="image/*">
+                    </div>
+                    
+                    <div class="layui-row layui-col-space15" style="margin-top: 20px;">
+                        <div class="layui-col-md6">
+                            <div style="text-align: center;">
+                                <img id="preview-img-1" class="preview-img">
+                                <div id="img-info" style="margin-top: 5px; color: #666;"></div>
+                            </div>
+                        </div>
+                        <div class="layui-col-md6">
+                            <textarea id="base64-output" placeholder="Base64 结果..." class="layui-textarea" style="height: 300px;"></textarea>
+                            <div style="margin-top: 10px;">
+                                <button class="layui-btn layui-btn-normal" id="btn-copy-1">复制 Base64</button>
+                                <button class="layui-btn layui-btn-primary" id="btn-clear-1">清空</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Base64 to Image -->
+                <div class="layui-tab-item">
+                    <div class="layui-row layui-col-space15">
+                        <div class="layui-col-md6">
+                            <textarea id="base64-input" placeholder="粘贴 Base64 字符串 (包含 data:image/...;base64, 前缀)" class="layui-textarea" style="height: 300px;"></textarea>
+                            <div style="margin-top: 10px;">
+                                <button class="layui-btn layui-btn-normal" id="btn-convert">转换显示</button>
+                                <button class="layui-btn layui-btn-primary" id="btn-clear-2">清空</button>
+                            </div>
+                        </div>
+                        <div class="layui-col-md6">
+                            <div style="text-align: center; border: 1px solid #eee; min-height: 300px; display: flex; align-items: center; justify-content: center; background: #fcfcfc;">
+                                <img id="preview-img-2" class="preview-img" style="display: none;">
+                                <span id="placeholder-text" style="color: #ccc;">图片预览区域</span>
+                            </div>
+                            <div style="text-align: center; margin-top: 10px;">
+                                <a id="btn-download" class="layui-btn layui-btn-disabled">下载图片</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}
+
+{block name="script"}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.11/clipboard.min.js"></script>
+<script>
+layui.use(['layer', 'jquery', 'element'], function(){
+    var layer = layui.layer,
+        $ = layui.jquery,
+        element = layui.element;
+
+    // --- Image to Base64 ---
+    var uploadBox = $('#upload-box');
+    var fileInput = $('#file-input');
+    var previewImg1 = $('#preview-img-1');
+    var base64Output = $('#base64-output');
+    var imgInfo = $('#img-info');
+
+    uploadBox.click(function(){
+        fileInput.click();
+    });
+
+    uploadBox.on('dragover', function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        $(this).css('background-color', '#e0f2f1');
+    });
+
+    uploadBox.on('dragleave', function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        $(this).css('background-color', '#f9f9f9');
+    });
+
+    uploadBox.on('drop', function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        $(this).css('background-color', '#f9f9f9');
+        var files = e.originalEvent.dataTransfer.files;
+        if(files.length > 0) {
+            handleFile(files[0]);
+        }
+    });
+
+    fileInput.change(function(){
+        if(this.files.length > 0) {
+            handleFile(this.files[0]);
+        }
+    });
+
+    function handleFile(file) {
+        if(!file.type.match('image.*')) {
+            layer.msg('请上传图片文件', {icon: 2});
+            return;
+        }
+
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            var result = e.target.result;
+            previewImg1.attr('src', result).show();
+            base64Output.val(result);
+            imgInfo.text('文件名: ' + file.name + ' | 大小: ' + (file.size/1024).toFixed(2) + ' KB');
+        };
+        reader.readAsDataURL(file);
+    }
+
+    $('#btn-clear-1').click(function(){
+        fileInput.val('');
+        previewImg1.hide().attr('src', '');
+        base64Output.val('');
+        imgInfo.text('');
+    });
+
+    var clipboard = new ClipboardJS('#btn-copy-1', {
+        target: function(trigger) {
+            return document.getElementById('base64-output');
+        }
+    });
+    clipboard.on('success', function(e) { layer.msg('复制成功', {icon: 1}); e.clearSelection(); });
+
+
+    // --- Base64 to Image ---
+    $('#btn-convert').click(function(){
+        var base64 = $('#base64-input').val().trim();
+        if(!base64) return;
+        
+        if(base64.indexOf('data:image') !== 0) {
+            // Try to fix missing prefix if user just pasted raw base64
+            // But we don't know the mime type easily, so let's warn first
+            // Or assume png/jpg? Let's just warn.
+            // layer.msg('Base64 字符串似乎缺少 data:image... 前缀，尝试自动修复可能失败', {icon: 0});
+            // Let's try to add prefix if it looks like raw base64
+            base64 = 'data:image/png;base64,' + base64; 
+        }
+
+        $('#preview-img-2').attr('src', base64).show();
+        $('#placeholder-text').hide();
+        
+        $('#btn-download').removeClass('layui-btn-disabled').attr('href', base64).attr('download', 'image.png');
+    });
+
+    $('#btn-clear-2').click(function(){
+        $('#base64-input').val('');
+        $('#preview-img-2').hide().attr('src', '');
+        $('#placeholder-text').show();
+        $('#btn-download').addClass('layui-btn-disabled').removeAttr('href');
+    });
+
+});
+</script>
+{/block}

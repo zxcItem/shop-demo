@@ -1,0 +1,82 @@
+{extend name="tools/layout" /}
+
+{block name="style"}
+<style>
+    /* CSS specific styles if any */
+</style>
+{/block}
+
+{block name="main"}
+<div class="layui-card">
+    <div class="layui-card-header">CSS 格式化 / 压缩</div>
+    <div class="layui-card-body">
+        <div class="layui-form-item">
+            <div class="layui-btn-group">
+                <button class="layui-btn layui-btn-normal" id="btn-format">格式化</button>
+                <button class="layui-btn layui-btn-primary" id="btn-compress">压缩</button>
+                <button class="layui-btn layui-btn-danger" id="btn-clear">清空</button>
+                <button class="layui-btn" id="btn-copy">复制结果</button>
+            </div>
+        </div>
+        
+        <div class="layui-row layui-col-space15">
+            <div class="layui-col-md6">
+                <textarea id="input-box" placeholder="在此输入 CSS 代码..." class="layui-textarea" style="height: 450px; font-family: monospace;"></textarea>
+            </div>
+            <div class="layui-col-md6">
+                <textarea id="output-box" placeholder="处理结果..." class="layui-textarea" style="height: 450px; background-color: #f8f9fa; font-family: monospace;" readonly></textarea>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}
+
+{block name="script"}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.14.7/beautify-css.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.11/clipboard.min.js"></script>
+<script>
+layui.use(['layer', 'jquery'], function(){
+    var layer = layui.layer,
+        $ = layui.jquery;
+
+    $('#btn-format').click(function(){
+        var css = $('#input-box').val();
+        if(!css) return;
+        try {
+            var formatted = css_beautify(css, {
+                indent_size: 4,
+                space_around_combinator: true,
+                newline_between_rules: true
+            });
+            $('#output-box').val(formatted);
+        } catch(e) {
+            layer.msg('格式化失败: ' + e.message, {icon: 2});
+        }
+    });
+
+    $('#btn-compress').click(function(){
+        var css = $('#input-box').val();
+        if(!css) return;
+        // Simple regex based compression
+        var compressed = css.replace(/\/\*(?:(?!\*\/)[\s\S])*\*\/|[\r\n\t]+/g, '')
+                            .replace(/ {2,}/g, ' ')
+                            .replace(/ ([{:}]) /g, '$1')
+                            .replace(/([;,]) /g, '$1')
+                            .replace(/ !/g, '!');
+        $('#output-box').val(compressed);
+    });
+
+    $('#btn-clear').click(function(){
+        $('#input-box').val('');
+        $('#output-box').val('');
+    });
+
+    var clipboard = new ClipboardJS('#btn-copy', {
+        target: function(trigger) {
+            return document.getElementById('output-box');
+        }
+    });
+    clipboard.on('success', function(e) { layer.msg('复制成功', {icon: 1}); e.clearSelection(); });
+});
+</script>
+{/block}

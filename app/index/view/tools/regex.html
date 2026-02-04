@@ -1,0 +1,137 @@
+{extend name="tools/layout" /}
+
+{block name="main"}
+<div class="layui-card">
+    <div class="layui-card-header">正则表达式测试</div>
+    <div class="layui-card-body">
+        
+        <div class="layui-form">
+            <div class="layui-form-item">
+                <div class="layui-inline" style="width: 70%;">
+                    <div class="layui-input-group">
+                        <div class="layui-input-prefix">/</div>
+                        <input type="text" id="regex-pattern" placeholder="在此输入正则表达式，例如: \d+" class="layui-input">
+                        <div class="layui-input-suffix">/</div>
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <input type="checkbox" id="flag-g" title="g (全局)" checked>
+                    <input type="checkbox" id="flag-i" title="i (忽略大小写)">
+                    <input type="checkbox" id="flag-m" title="m (多行)">
+                </div>
+                <div class="layui-inline">
+                    <button class="layui-btn" id="btn-test">测试匹配</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="layui-row layui-col-space15">
+            <div class="layui-col-md12">
+                <div class="layui-form-item layui-form-text">
+                    <label class="layui-form-label" style="padding-left:0; text-align:left;">待匹配文本</label>
+                    <div class="layui-input-block" style="margin-left:0;">
+                        <textarea id="regex-text" class="layui-textarea" rows="6" placeholder="输入要测试的文本内容..."></textarea>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="layui-col-md12">
+                <div class="layui-form-item layui-form-text">
+                    <label class="layui-form-label" style="padding-left:0; text-align:left;">匹配结果</label>
+                    <div class="layui-input-block" style="margin-left:0;">
+                        <div id="regex-result" style="min-height: 150px; padding: 10px; border: 1px solid #e6e6e6; background: #f8f9fa; border-radius: 4px; white-space: pre-wrap;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <fieldset class="layui-elem-field layui-field-title" style="margin-top: 30px;">
+            <legend>常用正则表达式</legend>
+        </fieldset>
+        <div class="layui-btn-container">
+            <button class="layui-btn layui-btn-primary layui-btn-sm btn-quick" data-regex="[\u4e00-\u9fa5]">中文字符</button>
+            <button class="layui-btn layui-btn-primary layui-btn-sm btn-quick" data-regex="[^\x00-\xff]">双字节字符</button>
+            <button class="layui-btn layui-btn-primary layui-btn-sm btn-quick" data-regex="\n\s*\r">空白行</button>
+            <button class="layui-btn layui-btn-primary layui-btn-sm btn-quick" data-regex="[\w!#$%&'*+/=?^_`{|}~-]+(?:\.[\w!#$%&'*+/=?^_`{|}~-]+)*@(?:[\w](?:[\w-]*[\w])?\.)+[\w](?:[\w-]*[\w])?">Email</button>
+            <button class="layui-btn layui-btn-primary layui-btn-sm btn-quick" data-regex="[a-zA-z]+://[^\s]*">网址URL</button>
+            <button class="layui-btn layui-btn-primary layui-btn-sm btn-quick" data-regex="\d{3}-\d{8}|\d{4}-\d{7}">国内电话</button>
+            <button class="layui-btn layui-btn-primary layui-btn-sm btn-quick" data-regex="[1-9][0-9]{4,}">腾讯QQ</button>
+            <button class="layui-btn layui-btn-primary layui-btn-sm btn-quick" data-regex="[1-9]\d{5}(?!\d)">邮政编码</button>
+            <button class="layui-btn layui-btn-primary layui-btn-sm btn-quick" data-regex="^(\d{6})(\d{4})(\d{2})(\d{2})(\d{3})([0-9]|X)$">身份证</button>
+            <button class="layui-btn layui-btn-primary layui-btn-sm btn-quick" data-regex="^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$">IP地址</button>
+        </div>
+
+    </div>
+</div>
+{/block}
+
+{block name="script"}
+<script>
+layui.use(['layer', 'jquery', 'form'], function(){
+    var layer = layui.layer, $ = layui.jquery;
+
+    function runRegex() {
+        var pattern = $('#regex-pattern').val();
+        var text = $('#regex-text').val();
+        
+        if(!pattern) return;
+        
+        var flags = '';
+        if($('#flag-g').prop('checked')) flags += 'g';
+        if($('#flag-i').prop('checked')) flags += 'i';
+        if($('#flag-m').prop('checked')) flags += 'm';
+
+        try {
+            var regex = new RegExp(pattern, flags);
+            var resultHtml = '';
+            
+            if(!text) {
+                $('#regex-result').html('<span style="color:#999;">请输入待匹配文本...</span>');
+                return;
+            }
+
+            // Highlight matches
+            var lastIndex = 0;
+            var match;
+            var matchesCount = 0;
+            
+            // Simple approach: replace matches with highlighted span
+            // Note: This is a basic implementation. Complex regex might need more care.
+            
+            // If global flag is not set, only first match
+            if(flags.indexOf('g') === -1) {
+                match = regex.exec(text);
+                if(match) {
+                     resultHtml = text.substring(0, match.index) + 
+                                  '<span style="background-color: #ffeb3b; border-radius: 2px;">' + 
+                                  $('<div>').text(match[0]).html() + 
+                                  '</span>' + 
+                                  text.substring(match.index + match[0].length);
+                     matchesCount = 1;
+                } else {
+                    resultHtml = $('<div>').text(text).html();
+                }
+            } else {
+                resultHtml = text.replace(regex, function(match) {
+                    matchesCount++;
+                    return '<span style="background-color: #ffeb3b; border-radius: 2px;">' + $('<div>').text(match).html() + '</span>';
+                });
+            }
+
+            $('#regex-result').html(resultHtml);
+            layer.msg('共找到 ' + matchesCount + ' 处匹配');
+
+        } catch(e) {
+            $('#regex-result').html('<span style="color:red;">正则表达式错误: ' + e.message + '</span>');
+        }
+    }
+
+    $('#btn-test').click(runRegex);
+
+    $('.btn-quick').click(function(){
+        $('#regex-pattern').val($(this).data('regex'));
+        runRegex();
+    });
+});
+</script>
+{/block}

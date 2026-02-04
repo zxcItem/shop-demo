@@ -1,0 +1,65 @@
+{extend name="tools/layout" /}
+
+{block name="main"}
+<div class="layui-card">
+    <div class="layui-card-header">URL 编码 / 解码</div>
+    <div class="layui-card-body">
+        <div class="layui-form-item">
+            <div class="layui-btn-group">
+                <button class="layui-btn layui-btn-normal" id="btn-encode">EncodeURI</button>
+                <button class="layui-btn layui-btn-normal" id="btn-encode-comp">EncodeURIComponent</button>
+                <button class="layui-btn layui-btn-warm" id="btn-decode">Decode</button>
+                <button class="layui-btn layui-btn-danger" id="btn-clear">清空</button>
+            </div>
+            <div class="layui-form-mid layui-word-aux" style="margin-left: 10px;">EncodeURIComponent 会转义更多字符（如 / : & = 等）</div>
+        </div>
+
+        <div class="layui-row layui-col-space15">
+            <div class="layui-col-md6">
+                <textarea id="input-box" placeholder="请输入要处理的URL或文本..." class="layui-textarea" style="height: 300px;"></textarea>
+            </div>
+            <div class="layui-col-md6">
+                <textarea id="output-box" placeholder="处理结果..." class="layui-textarea" style="height: 300px; background-color: #f8f9fa;" readonly></textarea>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}
+
+{block name="script"}
+<script>
+layui.use(['layer', 'jquery'], function(){
+    var layer = layui.layer, $ = layui.jquery;
+
+    $('#btn-encode').click(function(){
+        var val = $('#input-box').val();
+        if(val) $('#output-box').val(encodeURI(val));
+    });
+
+    $('#btn-encode-comp').click(function(){
+        var val = $('#input-box').val();
+        if(val) $('#output-box').val(encodeURIComponent(val));
+    });
+
+    $('#btn-decode').click(function(){
+        var val = $('#input-box').val();
+        if(val) {
+            try {
+                $('#output-box').val(decodeURIComponent(val));
+            } catch(e) {
+                try {
+                     $('#output-box').val(decodeURI(val));
+                } catch(e2) {
+                     layer.msg('解码失败，格式可能不正确', {icon: 2});
+                }
+            }
+        }
+    });
+
+    $('#btn-clear').click(function(){
+        $('#input-box').val('');
+        $('#output-box').val('');
+    });
+});
+</script>
+{/block}

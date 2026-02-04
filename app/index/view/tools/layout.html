@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="utf-8">
+    <title>{$title|default='在线工具箱'}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="__ROOT__/static/plugs/layui/css/layui.css">
+    <style>
+        :root {
+            --primary-color: #393D49;
+            --accent-color: #009688;
+            --bg-color: #f2f3f5;
+            --card-bg: #ffffff;
+            --text-main: #333333;
+            --text-secondary: #666666;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+        body { background-color: var(--bg-color); color: var(--text-main); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; padding: 20px 0; min-height: 100vh; display: flex; flex-direction: column; }
+        .layui-container { max-width: 1200px; flex: 1; }
+        
+        /* 卡片通用样式 */
+        .layui-card { border-radius: var(--border-radius); box-shadow: var(--box-shadow); border: none; margin-bottom: 20px; transition: all 0.3s ease; overflow: hidden; }
+        .layui-card:hover { box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1); transform: translateY(-2px); }
+        .layui-card-header { background-color: #fff; border-bottom: 1px solid #f0f0f0; font-weight: 600; font-size: 16px; padding: 0 20px; height: 50px; line-height: 50px; color: var(--text-main); position: relative; }
+        .layui-card-header::before { content: ''; position: absolute; left: 0; top: 15px; bottom: 15px; width: 4px; background-color: var(--accent-color); border-radius: 0 4px 4px 0; }
+        .layui-card-body { padding: 25px; }
+        
+        /* 按钮美化 */
+        .layui-btn { border-radius: 4px; height: 38px; line-height: 38px; padding: 0 20px; font-size: 14px; transition: all 0.3s; box-shadow: 0 2px 6px rgba(0,0,0,0.1); border: none; }
+        .layui-btn-normal { background-color: #1E9FFF; }
+        .layui-btn-warm { background-color: #FFB800; }
+        .layui-btn-danger { background-color: #FF5722; }
+        .layui-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); opacity: 0.9; }
+        
+        /* 输入框美化 */
+        .layui-input, .layui-textarea, .layui-select { border-radius: 4px; border-color: #e6e6e6; transition: all 0.3s; padding-left: 12px; }
+        .layui-input:focus, .layui-textarea:focus { border-color: var(--accent-color); box-shadow: 0 0 0 3px rgba(0, 150, 136, 0.1); }
+        .layui-form-label { width: 100px; padding: 9px 15px; color: var(--text-secondary); }
+        .layui-input-block { margin-left: 130px; }
+        
+        /* 导航栏 */
+        .tool-nav { margin-bottom: 25px; background: #fff; padding: 15px 20px; border-radius: var(--border-radius); box-shadow: var(--box-shadow); display: flex; align-items: center; justify-content: space-between; }
+        .tool-nav .breadcrumb { font-size: 14px; }
+        .tool-nav .breadcrumb a { color: var(--text-secondary); margin-right: 8px; transition: color 0.2s; }
+        .tool-nav .breadcrumb a:hover { color: var(--accent-color); }
+        .tool-nav .breadcrumb cite { color: var(--text-main); font-weight: bold; font-style: normal; }
+        .tool-nav .breadcrumb .separator { margin-right: 8px; color: #ccc; font-family: sans-serif; }
+        
+        /* 代码框通用 */
+        .code-box { font-family: "Fira Code", Consolas, Monaco, monospace; font-size: 14px; line-height: 1.6; border-radius: 4px; background-color: #fafafa; border: 1px solid #eee; color: #333; }
+        
+        /* 页脚 */
+        .footer { text-align: center; margin-top: 40px; color: #999; font-size: 13px; padding-bottom: 20px; }
+        
+        /* 响应式调整 */
+        @media screen and (max-width: 768px) {
+            .layui-container { padding: 0 10px; }
+            .layui-card-body { padding: 15px; }
+            .layui-input-block { margin-left: 0; }
+            .layui-form-label { float: none; width: auto; padding: 9px 0; text-align: left; }
+        }
+    </style>
+    {block name="style"}{/block}
+</head>
+<body>
+
+<div class="layui-container">
+    {if isset($title) && $title != '在线工具箱'}
+    <div class="tool-nav layui-anim layui-anim-downbit">
+        <span class="breadcrumb">
+            <a href="{:url('index')}"><i class="layui-icon layui-icon-home"></i> 首页</a> 
+            <span class="separator">/</span> 
+            <cite>{$title}</cite>
+        </span>
+        <a href="{:url('index')}" class="layui-btn layui-btn-sm layui-btn-primary" style="border: 1px solid #e6e6e6; background: transparent; color: #666; box-shadow: none;">
+            <i class="layui-icon layui-icon-return"></i> 返回列表
+        </a>
+    </div>
+    {/if}
+    
+    <div class="layui-anim layui-anim-upbit">
+        {block name="main"}{/block}
+    </div>
+    
+    <div class="footer">
+        <p>&copy; {:date('Y')} 在线工具箱 · 让开发更简单</p>
+    </div>
+</div>
+
+<script src="__ROOT__/static/plugs/layui/layui.js"></script>
+<script>
+    layui.config({
+        base: '__ROOT__/static/plugs/layui/'
+    });
+    // 全局通用脚本
+    layui.use(['element', 'layer'], function(){
+        var element = layui.element;
+        var layer = layui.layer;
+    });
+</script>
+{block name="script"}{/block}
+</body>
+</html>

@@ -1,0 +1,75 @@
+{extend name="tools/layout" /}
+
+{block name="main"}
+<div class="layui-card">
+    <div class="layui-card-header">二维码生成</div>
+    <div class="layui-card-body">
+        
+        <div class="layui-row layui-col-space20">
+            <div class="layui-col-md6">
+                <div class="layui-form-item layui-form-text">
+                    <label class="layui-form-label" style="text-align:left; padding-left:0;">文本 / 链接</label>
+                    <div class="layui-input-block" style="margin-left:0;">
+                        <textarea id="input-box" class="layui-textarea" placeholder="在此输入内容..." style="height: 150px;"></textarea>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <button class="layui-btn" id="btn-gen">生成二维码</button>
+                </div>
+            </div>
+            
+            <div class="layui-col-md6" style="text-align: center;">
+                <div id="qrcode-area" style="margin-top: 20px; padding: 20px; background: #f8f9fa; display: inline-block; border: 1px solid #eee;">
+                    <div style="color: #999;">二维码将显示在这里</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+{/block}
+
+{block name="script"}
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.qrcode/1.0/jquery.qrcode.min.js"></script>
+<script>
+layui.use(['layer', 'jquery'], function(){
+    var layer = layui.layer, $ = layui.jquery;
+
+    $('#btn-gen').click(function(){
+        var txt = $('#input-box').val(); // jquery.qrcode handles utf-8 automatically in newer versions or needs helper? 
+        // older jquery.qrcode needs utf16to8
+        
+        if(!txt) { layer.msg('请输入内容'); return; }
+
+        $('#qrcode-area').empty();
+        
+        // Handling utf-8 for chinese characters
+        function toUtf8(str) {    
+            var out, i, len, c;    
+            out = "";    
+            len = str.length;    
+            for(i = 0; i < len; i++) {    
+                c = str.charCodeAt(i);    
+                if ((c >= 0x0001) && (c <= 0x007F)) {    
+                    out += str.charAt(i);    
+                } else if (c > 0x07FF) {    
+                    out += String.fromCharCode(0xE0 | ((c >> 12) & 0x0F));    
+                    out += String.fromCharCode(0x80 | ((c >>  6) & 0x3F));    
+                    out += String.fromCharCode(0x80 | ((c >>  0) & 0x3F));    
+                } else {    
+                    out += String.fromCharCode(0xC0 | ((c >>  6) & 0x1F));    
+                    out += String.fromCharCode(0x80 | ((c >>  0) & 0x3F));    
+                }    
+            }    
+            return out;    
+        } 
+
+        $('#qrcode-area').qrcode({
+            text: toUtf8(txt),
+            width: 200,
+            height: 200
+        });
+    });
+});
+</script>
+{/block}

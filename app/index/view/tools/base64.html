@@ -1,0 +1,89 @@
+{extend name="tools/layout" /}
+
+{block name="main"}
+<div class="layui-card">
+    <div class="layui-card-header">Base64 编码 / 解码</div>
+    <div class="layui-card-body">
+        <div class="layui-form-item">
+            <div class="layui-btn-group">
+                <button class="layui-btn layui-btn-normal" id="btn-encode">Base64 编码</button>
+                <button class="layui-btn layui-btn-warm" id="btn-decode">Base64 解码</button>
+                <button class="layui-btn layui-btn-danger" id="btn-clear">清空</button>
+            </div>
+            <div class="layui-inline" style="margin-left: 10px;">
+                <input type="checkbox" id="chk-urlsafe" title="URL安全模式 (使用 -_ 替换 +/)" style="vertical-align: middle;"> <label for="chk-urlsafe" style="cursor: pointer; color: #666;">URL Safe 模式</label>
+            </div>
+        </div>
+
+        <div class="layui-row layui-col-space15">
+            <div class="layui-col-md6">
+                <div class="layui-form-item layui-form-text">
+                    <label class="layui-form-label" style="text-align: left; padding-left: 0;">原始内容</label>
+                    <div class="layui-input-block" style="margin-left: 0;">
+                        <textarea id="input-box" placeholder="请输入要编码的文本，或Base64字符串..." class="layui-textarea" style="height: 300px;"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-col-md6">
+                <div class="layui-form-item layui-form-text">
+                    <label class="layui-form-label" style="text-align: left; padding-left: 0;">处理结果</label>
+                    <div class="layui-input-block" style="margin-left: 0;">
+                        <textarea id="output-box" placeholder="结果显示区域" class="layui-textarea" style="height: 300px; background-color: #f8f9fa;" readonly></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}
+
+{block name="script"}
+<script>
+layui.use(['layer', 'jquery'], function(){
+    var layer = layui.layer, $ = layui.jquery;
+
+    // 处理中文编码问题
+    function utf8_to_b64(str) {
+        return window.btoa(unescape(encodeURIComponent(str)));
+    }
+
+    function b64_to_utf8(str) {
+        return decodeURIComponent(escape(window.atob(str)));
+    }
+
+    $('#btn-encode').click(function(){
+        var str = $('#input-box').val();
+        if(!str) return;
+        try {
+            var res = utf8_to_b64(str);
+            if($('#chk-urlsafe').prop('checked')) {
+                res = res.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+            }
+            $('#output-box').val(res);
+        } catch(e) {
+            layer.msg('编码失败: ' + e.message, {icon: 2});
+        }
+    });
+
+    $('#btn-decode').click(function(){
+        var str = $('#input-box').val().trim();
+        if(!str) return;
+        try {
+            if($('#chk-urlsafe').prop('checked') || str.indexOf('-') > -1 || str.indexOf('_') > -1) {
+                str = str.replace(/-/g, '+').replace(/_/g, '/');
+                while (str.length % 4) { str += '='; }
+            }
+            var res = b64_to_utf8(str);
+            $('#output-box').val(res);
+        } catch(e) {
+            layer.msg('解码失败，请检查输入是否为有效的Base64字符串', {icon: 2});
+        }
+    });
+
+    $('#btn-clear').click(function(){
+        $('#input-box').val('');
+        $('#output-box').val('');
+    });
+});
+</script>
+{/block}

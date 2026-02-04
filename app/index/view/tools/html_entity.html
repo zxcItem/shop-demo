@@ -1,0 +1,56 @@
+{extend name="tools/layout" /}
+
+{block name="main"}
+<div class="layui-card">
+    <div class="layui-card-header">HTML 实体编码转换</div>
+    <div class="layui-card-body">
+        <div class="layui-form-item">
+            <div class="layui-btn-group">
+                <button class="layui-btn layui-btn-normal" id="btn-encode">HTML 编码 (Encode)</button>
+                <button class="layui-btn layui-btn-warm" id="btn-decode">HTML 解码 (Decode)</button>
+                <button class="layui-btn layui-btn-danger" id="btn-clear">清空</button>
+            </div>
+        </div>
+
+        <div class="layui-row layui-col-space15">
+            <div class="layui-col-md6">
+                <textarea id="input-box" placeholder="请输入 HTML 代码..." class="layui-textarea" style="height: 300px;"></textarea>
+            </div>
+            <div class="layui-col-md6">
+                <textarea id="output-box" placeholder="处理结果..." class="layui-textarea" style="height: 300px; background-color: #f8f9fa;" readonly></textarea>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}
+
+{block name="script"}
+<script>
+layui.use(['layer', 'jquery'], function(){
+    var layer = layui.layer, $ = layui.jquery;
+
+    function htmlEncode(value){
+        return $('<div/>').text(value).html();
+    }
+
+    function htmlDecode(value){
+        return $('<div/>').html(value).text();
+    }
+
+    $('#btn-encode').click(function(){
+        var val = $('#input-box').val();
+        if(val) $('#output-box').val(htmlEncode(val));
+    });
+
+    $('#btn-decode').click(function(){
+        var val = $('#input-box').val();
+        if(val) $('#output-box').val(htmlDecode(val));
+    });
+
+    $('#btn-clear').click(function(){
+        $('#input-box').val('');
+        $('#output-box').val('');
+    });
+});
+</script>
+{/block}
