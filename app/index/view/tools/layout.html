@@ -81,9 +81,15 @@
     </div>
     {/if}
     
+    <!-- 顶部广告位 -->
+    {block name="ad_top"}{/block}
+    
     <div class="layui-anim layui-anim-upbit">
         {block name="main"}{/block}
     </div>
+    
+    <!-- 底部广告位 -->
+    {block name="ad_bottom"}{/block}
     
     <div class="footer">
         <p>&copy; {:date('Y')} 在线工具箱 · 让开发更简单</p>
