@@ -2,7 +2,9 @@
 <html lang="zh-cn">
 <head>
     <meta charset="utf-8">
-    <title>{$title|default='在线工具箱'}</title>
+    <title>{block name="title"}{$title|default='在线工具箱'}{/block}</title>
+    <meta name="keywords" content="{block name="keywords"}{$keywords|default='在线工具箱,开发者工具,JSON格式化,Base64编码,MD5加密,时间戳转换'}{/block}">
+    <meta name="description" content="{block name="description"}{$description|default='一个为开发者提供的免费在线工具箱，包含JSON格式化、Base64编码解码、MD5加密、时间戳转换等常用工具，简单好用。'}{/block}">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <link rel="stylesheet" href="__ROOT__/static/plugs/layui/css/layui.css">
     <style>

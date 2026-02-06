@@ -1,5 +1,8 @@
 {extend name="tools/layout" /}
 
+{block name="keywords"}图片转Base64,Base64转图片,图片编码,DataURI{/block}
+{block name="description"}在线图片与Base64编码互转工具，支持PNG、JPG、GIF等多种格式，提供预览和一键复制功能。{/block}
+
 {block name="style"}
 <style>
     .upload-area {
@@ -48,8 +51,8 @@
                         <i class="layui-icon layui-icon-upload-drag upload-icon"></i>
                         <h3>点击或拖拽图片到此处</h3>
                         <p>支持 PNG, JPG, GIF, SVG, WEBP 等格式</p>
-                        <input type="file" id="file-input" style="display: none;" accept="image/*">
                     </div>
+                    <input type="file" id="file-input" style="display: none;" accept="image/*">
                     
                     <div class="layui-row layui-col-space15" style="margin-top: 20px;">
                         <div class="layui-col-md6">
