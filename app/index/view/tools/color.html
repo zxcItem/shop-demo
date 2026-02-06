@@ -16,7 +16,8 @@
                 </div>
             </div>
             <div class="layui-inline">
-                <div id="color-preview" style="width: 38px; height: 38px; border-radius: 4px; background-color: #fff; border: 1px solid #e6e6e6;"></div>
+                <div id="color-preview" style="width: 38px; height: 38px; border-radius: 4px; background-color: #fff; border: 1px solid #e6e6e6; cursor: pointer;" title="点击选择颜色"></div>
+                <input type="color" id="color-picker" style="opacity: 0; position: absolute; left: 0; top: 0; width: 0; height: 0;">
             </div>
             <div class="layui-inline">
                 <button class="layui-btn" id="btn-convert">转换</button>
@@ -69,7 +70,21 @@ layui.use(['layer', 'jquery'], function(){
     $('#btn-convert').click(function(){
         var val = $('#color-input').val().trim();
         if(!val) return;
+        processColor(val);
+    });
 
+    // 颜色选择器交互
+    $('#color-preview').click(function() {
+        $('#color-picker').click();
+    });
+
+    $('#color-picker').on('input change', function() {
+        var color = $(this).val();
+        $('#color-input').val(color);
+        processColor(color);
+    });
+
+    function processColor(val) {
         $('#color-preview').css('background-color', val);
 
         // Check if HEX
@@ -110,7 +125,7 @@ layui.use(['layer', 'jquery'], function(){
         else {
             layer.msg('无法识别的颜色格式');
         }
-    });
+    }
 });
 </script>
 {/block}
