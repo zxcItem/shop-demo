@@ -69,9 +69,15 @@
 <div class="banner layui-anim layui-anim-fadein">
     <h1>开发者工具箱</h1>
     <p>汇集开发中常用的各种在线工具，提高您的工作效率</p>
+    <div style="max-width: 500px; margin: 20px auto 0; position: relative;">
+        <input type="text" id="tool-search" placeholder="搜索工具 (支持中文/拼音/关键词)..." class="layui-input" style="height: 46px; border-radius: 23px; padding-left: 20px; padding-right: 50px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border: none;">
+        <i class="layui-icon layui-icon-search" style="position: absolute; right: 20px; top: 13px; color: #999; font-size: 20px; cursor: pointer;"></i>
+    </div>
 </div>
 
+<div id="tool-list">
 <!-- 常用转换 -->
+<div class="category-block">
 <div class="category-title">数据转换</div>
 <div class="layui-row layui-col-space20">
     <!-- JSON -->
@@ -123,7 +129,9 @@
         </div>
     </div>
 </div>
+</div><!-- end category-block -->
 
+<div class="category-block">
 <!-- 编码加密 -->
 <div class="category-title">编码加密</div>
 <div class="layui-row layui-col-space20">
@@ -229,7 +237,9 @@
         </div>
     </div>
 </div>
+</div><!-- end category-block -->
 
+<div class="category-block">
 <!-- 网络工具 -->
  <div class="category-title">网络工具</div>
  <div class="layui-row layui-col-space20">
@@ -266,6 +276,25 @@
         </div>
     </div>
 </div>
+</div><!-- end category-block -->
+</div><!-- end tool-list -->
+{/block}
+
+{block name="page_content"}
+<div class="layui-card">
+    <div class="layui-card-header">关于在线工具箱</div>
+    <div class="layui-card-body" style="line-height: 1.8; color: #666;">
+        <p>这是一个为开发人员精心打造的免费在线工具箱。我们致力于提供简洁、高效、安全的开发者工具，帮助您在日常开发工作中提高效率。</p>
+        <p>目前包含以下常用工具：</p>
+        <ul>
+            <li><strong>数据转换</strong>：JSON 格式化/压缩/校验、Unix 时间戳转换、Base64 编码/解码、URL 编码/解码。</li>
+            <li><strong>编码加密</strong>：MD5/SHA 哈希计算、随机密码生成、二维码生成、HTML 实体编码。</li>
+            <li><strong>开发辅助</strong>：正则表达式测试、颜色格式转换、文本差异对比、Cron 表达式生成、SQL/CSS/XML 格式化。</li>
+            <li><strong>网络工具</strong>：IP 地址查询、User-Agent 分析、HTTP 接口测试、图片转 Base64。</li>
+        </ul>
+        <p style="margin-top: 10px;">所有工具均在浏览器端运行（部分需后端辅助），无需安装任何软件，打开即用。如果您觉得好用，欢迎通过 Ctrl+D 收藏本站！</p>
+    </div>
+</div>
 {/block}
 
 {block name="script"}
@@ -279,6 +308,41 @@ layui.use(['layer', 'jquery'], function(){
         if(url) {
             window.location.href = url;
         }
+    });
+
+    // 搜索功能
+    $('#tool-search').on('input', function(){
+        var keyword = $(this).val().toLowerCase().trim();
+        if(!keyword) {
+            $('.category-block').show();
+            $('.layui-col-md3').show();
+            return;
+        }
+        
+        $('.category-block').each(function(){
+            var $block = $(this);
+            var hasVisibleTool = false;
+            
+            $block.find('.tool-card').each(function(){
+                var $card = $(this);
+                var title = $card.find('.tool-title').text().toLowerCase();
+                var desc = $card.find('.tool-desc').text().toLowerCase();
+                var $col = $card.parent(); // layui-col-md3
+                
+                if(title.indexOf(keyword) > -1 || desc.indexOf(keyword) > -1) {
+                    $col.show();
+                    hasVisibleTool = true;
+                } else {
+                    $col.hide();
+                }
+            });
+            
+            if(hasVisibleTool) {
+                $block.show();
+            } else {
+                $block.hide();
+            }
+        });
     });
 });
 </script>

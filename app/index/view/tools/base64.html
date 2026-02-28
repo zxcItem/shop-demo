@@ -7,14 +7,15 @@
 <div class="layui-card">
     <div class="layui-card-header">Base64 编码 / 解码</div>
     <div class="layui-card-body">
-        <div class="layui-form-item">
+        <div class="layui-form-item" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap;">
             <div class="layui-btn-group">
                 <button class="layui-btn layui-btn-normal" id="btn-encode">Base64 编码</button>
                 <button class="layui-btn layui-btn-warm" id="btn-decode">Base64 解码</button>
                 <button class="layui-btn layui-btn-danger" id="btn-clear">清空</button>
             </div>
-            <div class="layui-inline" style="margin-left: 10px;">
-                <input type="checkbox" id="chk-urlsafe" title="URL安全模式 (使用 -_ 替换 +/)" style="vertical-align: middle;"> <label for="chk-urlsafe" style="cursor: pointer; color: #666;">URL Safe 模式</label>
+            <div style="margin-left: 10px; display: flex; align-items: center;">
+                <input type="checkbox" id="chk-urlsafe" style="width: 16px; height: 16px; margin-right: 5px;"> 
+                <label for="chk-urlsafe" style="cursor: pointer; color: #666; user-select: none;">URL Safe 模式 (使用 -_ 替换 +/)</label>
             </div>
         </div>
 

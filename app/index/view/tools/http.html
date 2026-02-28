@@ -30,8 +30,8 @@
         </blockquote>
 
         <div class="layui-form">
-            <div class="layui-form-item">
-                <div class="layui-inline" style="width: 100px;">
+            <div class="layui-row layui-col-space10">
+                <div class="layui-col-md2 layui-col-xs4">
                     <select id="http-method">
                         <option value="GET">GET</option>
                         <option value="POST">POST</option>
@@ -42,11 +42,11 @@
                         <option value="OPTIONS">OPTIONS</option>
                     </select>
                 </div>
-                <div class="layui-inline" style="width: calc(100% - 220px);">
+                <div class="layui-col-md8 layui-col-xs8">
                     <input type="text" id="http-url" placeholder="https://api.example.com/v1/users" class="layui-input">
                 </div>
-                <div class="layui-inline">
-                    <button class="layui-btn layui-btn-normal" id="btn-send">发送请求</button>
+                <div class="layui-col-md2 layui-col-xs12">
+                    <button class="layui-btn layui-btn-normal layui-btn-fluid" id="btn-send">发送请求</button>
                 </div>
             </div>
 

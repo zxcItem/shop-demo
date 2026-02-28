@@ -9,21 +9,23 @@
     <div class="layui-card-body">
         
         <div class="layui-form">
-            <div class="layui-form-item">
-                <div class="layui-inline" style="width: 70%;">
-                    <div class="layui-input-group">
-                        <div class="layui-input-prefix">/</div>
-                        <input type="text" id="regex-pattern" placeholder="在此输入正则表达式，例如: \d+" class="layui-input">
-                        <div class="layui-input-suffix">/</div>
+            <div class="layui-row layui-col-space15">
+                <div class="layui-col-md8">
+                    <div class="layui-input-group" style="display: flex;">
+                        <div class="layui-input-prefix" style="padding: 0 10px; line-height: 38px; background: #f8f9fa; border: 1px solid #dfe6e9; border-right: none; border-radius: 4px 0 0 4px;">/</div>
+                        <input type="text" id="regex-pattern" placeholder="在此输入正则表达式，例如: \d+" class="layui-input" style="border-radius: 0;">
+                        <div class="layui-input-suffix" style="padding: 0 10px; line-height: 38px; background: #f8f9fa; border: 1px solid #dfe6e9; border-left: none; border-radius: 0 4px 4px 0;">/</div>
                     </div>
                 </div>
-                <div class="layui-inline">
-                    <input type="checkbox" id="flag-g" title="g (全局)" checked>
-                    <input type="checkbox" id="flag-i" title="i (忽略大小写)">
-                    <input type="checkbox" id="flag-m" title="m (多行)">
+                <div class="layui-col-md2">
+                    <div style="padding-top: 8px;">
+                        <input type="checkbox" id="flag-g" title="g" lay-skin="primary" checked>
+                        <input type="checkbox" id="flag-i" title="i" lay-skin="primary">
+                        <input type="checkbox" id="flag-m" title="m" lay-skin="primary">
+                    </div>
                 </div>
-                <div class="layui-inline">
-                    <button class="layui-btn" id="btn-test">测试匹配</button>
+                <div class="layui-col-md2">
+                    <button class="layui-btn layui-btn-normal layui-btn-fluid" id="btn-test">测试匹配</button>
                 </div>
             </div>
         </div>
