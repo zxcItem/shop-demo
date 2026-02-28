@@ -3,12 +3,7 @@
 {block name="keywords"}JSON格式化,JSON校验,JSON美化,JSON压缩,在线JSON工具{/block}
 {block name="description"}在线JSON格式化与校验工具，支持JSON美化、压缩、错误检查，提供语法高亮显示，是开发调试JSON数据的利器。{/block}
 
-{block name="style"}
-<style>
-    .layui-textarea { min-height: 400px; font-family: Consolas, "Courier New", monospace; font-size: 14px; }
-    .error-msg { color: #FF5722; margin-left: 10px; display: none; }
-</style>
-{/block}
+{block name="style"}{/block}
 
 {block name="main"}
 <div class="layui-card">
@@ -27,10 +22,10 @@
         
         <div class="layui-row layui-col-space15">
             <div class="layui-col-md6">
-                <textarea class="layui-textarea" id="json-src" placeholder="在此输入 JSON 字符串..."></textarea>
+                <textarea class="layui-textarea code-textarea" id="json-src" placeholder="在此输入 JSON 字符串..."></textarea>
             </div>
             <div class="layui-col-md6">
-                <textarea class="layui-textarea" id="json-target" placeholder="处理结果..." readonly></textarea>
+                <textarea class="layui-textarea code-textarea" id="json-target" placeholder="处理结果..." readonly></textarea>
             </div>
         </div>
     </div>

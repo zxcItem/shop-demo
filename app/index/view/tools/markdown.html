@@ -3,72 +3,7 @@
 {block name="keywords"}Markdown编辑器,Markdown预览,在线Markdown,Markdown转HTML{/block}
 {block name="description"}在线Markdown编辑器与实时预览工具，支持标准Markdown语法，可导出HTML代码，写作更高效。{/block}
 
-{block name="style"}
-<style>
-    .markdown-editor-container {
-        display: flex;
-        height: 600px;
-        border: 1px solid #e6e6e6;
-        border-radius: 4px;
-        overflow: hidden;
-    }
-    .markdown-input-area, .markdown-preview-area {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-    }
-    .markdown-input-area {
-        border-right: 1px solid #e6e6e6;
-        background-color: #f8f9fa;
-    }
-    .area-header {
-        padding: 10px 15px;
-        background-color: #f1f2f6;
-        border-bottom: 1px solid #e6e6e6;
-        font-weight: bold;
-        color: #555;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-    .md-textarea {
-        flex: 1;
-        width: 100%;
-        border: none;
-        padding: 15px;
-        font-family: 'Fira Code', Consolas, Monaco, monospace;
-        font-size: 14px;
-        line-height: 1.6;
-        resize: none;
-        outline: none;
-        background-color: #fafafa;
-        box-sizing: border-box;
-    }
-    .md-preview {
-        flex: 1;
-        padding: 20px;
-        overflow-y: auto;
-        background-color: #fff;
-    }
-    
-    /* Markdown Preview Styles */
-    .md-preview h1, .md-preview h2, .md-preview h3 { margin-top: 1em; margin-bottom: 0.5em; font-weight: 600; line-height: 1.25; }
-    .md-preview h1 { font-size: 2em; border-bottom: 1px solid #eaecef; padding-bottom: 0.3em; }
-    .md-preview h2 { font-size: 1.5em; border-bottom: 1px solid #eaecef; padding-bottom: 0.3em; }
-    .md-preview p { margin-bottom: 1em; line-height: 1.6; }
-    .md-preview code { padding: 0.2em 0.4em; margin: 0; font-size: 85%; background-color: #f6f8fa; border-radius: 3px; font-family: monospace; }
-    .md-preview pre { padding: 16px; overflow: auto; line-height: 1.45; background-color: #f6f8fa; border-radius: 3px; margin-bottom: 1em; }
-    .md-preview pre code { display: inline; padding: 0; margin: 0; overflow: visible; line-height: inherit; word-wrap: normal; background-color: initial; border: 0; font-size: 100%; word-break: normal; white-space: pre; background: transparent; }
-    .md-preview blockquote { padding: 0 1em; color: #6a737d; border-left: 0.25em solid #dfe2e5; margin: 0 0 1em 0; }
-    .md-preview ul, .md-preview ol { padding-left: 2em; margin-bottom: 1em; }
-    .md-preview img { max-width: 100%; box-sizing: content-box; background-color: #fff; }
-    .md-preview table { display: block; width: 100%; overflow: auto; margin-bottom: 1em; border-spacing: 0; border-collapse: collapse; }
-    .md-preview table tr { background-color: #fff; border-top: 1px solid #c6cbd1; }
-    .md-preview table tr:nth-child(2n) { background-color: #f6f8fa; }
-    .md-preview table th, .md-preview table td { padding: 6px 13px; border: 1px solid #dfe2e5; }
-    .md-preview hr { height: 0.25em; padding: 0; margin: 24px 0; background-color: #e1e4e8; border: 0; }
-</style>
-{/block}
+{block name="style"}{/block}
 
 {block name="main"}
 <div class="layui-card">

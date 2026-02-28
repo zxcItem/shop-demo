@@ -3,67 +3,7 @@
 {block name="keywords"}在线工具箱,开发者工具,程序员工具,JSON格式化,Base64编码,MD5加密,时间戳转换,正则测试,颜色转换{/block}
 {block name="description"}免费好用的在线工具箱，为开发者提供JSON格式化、Base64编码解码、MD5加密、时间戳转换、正则表达式测试、颜色转换等多种实用工具，提高开发效率。{/block}
 
-{block name="style"}
-<style>
-    .banner { 
-        background: linear-gradient(135deg, #009688 0%, #35bdb2 100%); 
-        padding: 40px 20px; 
-        border-radius: 8px; 
-        color: #fff; 
-        margin-bottom: 30px; 
-        box-shadow: 0 4px 20px rgba(0, 150, 136, 0.3);
-        text-align: center;
-    }
-    .banner h1 { font-size: 32px; font-weight: bold; margin-bottom: 10px; letter-spacing: 1px; }
-    .banner p { font-size: 16px; opacity: 0.9; }
-    
-    .category-title { 
-        font-size: 18px; 
-        font-weight: bold; 
-        color: #333; 
-        margin: 25px 0 15px; 
-        padding-left: 10px; 
-        border-left: 4px solid #009688; 
-        line-height: 1;
-    }
-    
-    .tool-card { 
-        cursor: pointer; 
-        height: 140px; 
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        text-align: center;
-        background: #fff;
-        position: relative;
-        overflow: hidden;
-    }
-    .tool-icon-box {
-        width: 56px;
-        height: 56px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: 15px;
-        transition: all 0.3s;
-    }
-    .tool-icon { font-size: 28px; color: #fff; }
-    
-    /* 不同分类的图标颜色 */
-    .cat-data .tool-icon-box { background: linear-gradient(135deg, #1E9FFF 0%, #63b9ff 100%); box-shadow: 0 4px 10px rgba(30, 159, 255, 0.3); }
-    .cat-enc .tool-icon-box { background: linear-gradient(135deg, #FFB800 0%, #ffcf4d 100%); box-shadow: 0 4px 10px rgba(255, 184, 0, 0.3); }
-    .cat-dev .tool-icon-box { background: linear-gradient(135deg, #009688 0%, #35bdb2 100%); box-shadow: 0 4px 10px rgba(0, 150, 136, 0.3); }
-    .cat-net .tool-icon-box { background: linear-gradient(135deg, #FF5722 0%, #ff8b66 100%); box-shadow: 0 4px 10px rgba(255, 87, 34, 0.3); }
-    
-    .tool-title { font-size: 16px; font-weight: bold; color: #333; margin-bottom: 6px; }
-    .tool-desc { font-size: 12px; color: #999; padding: 0 10px; line-height: 1.4; }
-    
-    .tool-card:hover { transform: none; }
-    .tool-card:hover .tool-icon-box { transform: scale(1.1) rotate(5deg); }
-</style>
-{/block}
+{block name="style"}{/block}
 
 {block name="main"}
 <div class="banner layui-anim layui-anim-fadein">
