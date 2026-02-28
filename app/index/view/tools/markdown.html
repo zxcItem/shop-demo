@@ -5,23 +5,68 @@
 
 {block name="style"}
 <style>
-    .markdown-preview {
-        background-color: #fff;
+    .markdown-editor-container {
+        display: flex;
+        height: 600px;
         border: 1px solid #e6e6e6;
-        padding: 20px;
-        height: 500px;
-        overflow-y: auto;
         border-radius: 4px;
+        overflow: hidden;
     }
-    /* Simple markdown styles */
-    .markdown-preview h1 { font-size: 2em; margin-bottom: 0.5em; border-bottom: 1px solid #eee; padding-bottom: 0.3em; }
-    .markdown-preview h2 { font-size: 1.5em; margin-bottom: 0.5em; border-bottom: 1px solid #eee; padding-bottom: 0.3em; }
-    .markdown-preview p { margin-bottom: 1em; line-height: 1.6; }
-    .markdown-preview code { background-color: #f0f0f0; padding: 2px 4px; border-radius: 3px; font-family: monospace; }
-    .markdown-preview pre { background-color: #f6f8fa; padding: 16px; border-radius: 6px; overflow: auto; margin-bottom: 1em; }
-    .markdown-preview blockquote { border-left: 4px solid #dfe2e5; color: #6a737d; padding-left: 16px; margin: 0 0 1em 0; }
-    .markdown-preview ul, .markdown-preview ol { padding-left: 2em; margin-bottom: 1em; }
-    .markdown-preview img { max-width: 100%; }
+    .markdown-input-area, .markdown-preview-area {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+    .markdown-input-area {
+        border-right: 1px solid #e6e6e6;
+        background-color: #f8f9fa;
+    }
+    .area-header {
+        padding: 10px 15px;
+        background-color: #f1f2f6;
+        border-bottom: 1px solid #e6e6e6;
+        font-weight: bold;
+        color: #555;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .md-textarea {
+        flex: 1;
+        width: 100%;
+        border: none;
+        padding: 15px;
+        font-family: 'Fira Code', Consolas, Monaco, monospace;
+        font-size: 14px;
+        line-height: 1.6;
+        resize: none;
+        outline: none;
+        background-color: #fafafa;
+        box-sizing: border-box;
+    }
+    .md-preview {
+        flex: 1;
+        padding: 20px;
+        overflow-y: auto;
+        background-color: #fff;
+    }
+    
+    /* Markdown Preview Styles */
+    .md-preview h1, .md-preview h2, .md-preview h3 { margin-top: 1em; margin-bottom: 0.5em; font-weight: 600; line-height: 1.25; }
+    .md-preview h1 { font-size: 2em; border-bottom: 1px solid #eaecef; padding-bottom: 0.3em; }
+    .md-preview h2 { font-size: 1.5em; border-bottom: 1px solid #eaecef; padding-bottom: 0.3em; }
+    .md-preview p { margin-bottom: 1em; line-height: 1.6; }
+    .md-preview code { padding: 0.2em 0.4em; margin: 0; font-size: 85%; background-color: #f6f8fa; border-radius: 3px; font-family: monospace; }
+    .md-preview pre { padding: 16px; overflow: auto; line-height: 1.45; background-color: #f6f8fa; border-radius: 3px; margin-bottom: 1em; }
+    .md-preview pre code { display: inline; padding: 0; margin: 0; overflow: visible; line-height: inherit; word-wrap: normal; background-color: initial; border: 0; font-size: 100%; word-break: normal; white-space: pre; background: transparent; }
+    .md-preview blockquote { padding: 0 1em; color: #6a737d; border-left: 0.25em solid #dfe2e5; margin: 0 0 1em 0; }
+    .md-preview ul, .md-preview ol { padding-left: 2em; margin-bottom: 1em; }
+    .md-preview img { max-width: 100%; box-sizing: content-box; background-color: #fff; }
+    .md-preview table { display: block; width: 100%; overflow: auto; margin-bottom: 1em; border-spacing: 0; border-collapse: collapse; }
+    .md-preview table tr { background-color: #fff; border-top: 1px solid #c6cbd1; }
+    .md-preview table tr:nth-child(2n) { background-color: #f6f8fa; }
+    .md-preview table th, .md-preview table td { padding: 6px 13px; border: 1px solid #dfe2e5; }
+    .md-preview hr { height: 0.25em; padding: 0; margin: 24px 0; background-color: #e1e4e8; border: 0; }
 </style>
 {/block}
 
@@ -29,16 +74,21 @@
 <div class="layui-card">
     <div class="layui-card-header">Markdown 编辑 / 预览</div>
     <div class="layui-card-body">
-        <div class="layui-row layui-col-space15">
-            <div class="layui-col-md6">
-                <textarea id="md-input" placeholder="在此输入 Markdown 内容..." class="layui-textarea" style="height: 500px; font-family: monospace; font-size: 14px;"></textarea>
-            </div>
-            <div class="layui-col-md6">
-                <div id="md-preview" class="markdown-preview"></div>
-            </div>
+        <div class="layui-btn-container" style="margin-bottom: 15px;">
+             <button class="layui-btn layui-btn-sm layui-btn-normal" id="btn-copy-html">复制 HTML</button>
+             <button class="layui-btn layui-btn-sm layui-btn-primary" id="btn-example">加载示例</button>
+             <button class="layui-btn layui-btn-sm layui-btn-danger" id="btn-clear">清空</button>
         </div>
-        <div class="layui-form-item" style="margin-top: 15px; text-align: right;">
-             <button class="layui-btn layui-btn-danger" id="btn-clear">清空</button>
+        
+        <div class="markdown-editor-container">
+            <div class="markdown-input-area">
+                <div class="area-header">Markdown 编辑区</div>
+                <textarea id="md-input" class="md-textarea" placeholder="在此输入 Markdown 内容..."></textarea>
+            </div>
+            <div class="markdown-preview-area">
+                <div class="area-header">实时预览</div>
+                <div id="md-preview" class="md-preview"></div>
+            </div>
         </div>
     </div>
 </div>
@@ -54,10 +104,17 @@ layui.use(['layer', 'jquery'], function(){
     var input = $('#md-input');
     var preview = $('#md-preview');
 
+    // 示例内容
+    var exampleContent = "# Hello Markdown\n\n这是一个 **Markdown** 在线预览工具。\n\n## 功能特点\n\n- 实时预览\n- 支持标准语法\n- 代码高亮支持\n\n### 代码示例\n\n```javascript\nfunction hello() {\n  console.log('Hello World!');\n}\n```\n\n### 表格示例\n\n| 表头1 | 表头2 |\n| --- | --- |\n| 内容1 | 内容2 |\n\n> 引用内容：Markdown 是一种轻量级标记语言。";
+
     function updatePreview() {
         var text = input.val();
-        var html = marked.parse(text);
-        preview.html(html);
+        try {
+            var html = marked.parse(text);
+            preview.html(html);
+        } catch(e) {
+            preview.html('<p style="color:red">解析错误: ' + e.message + '</p>');
+        }
     }
 
     input.on('input', function(){
@@ -68,10 +125,27 @@ layui.use(['layer', 'jquery'], function(){
         input.val('');
         updatePreview();
     });
+    
+    $('#btn-example').click(function(){
+        input.val(exampleContent);
+        updatePreview();
+    });
+    
+    $('#btn-copy-html').click(function(){
+        var htmlContent = marked.parse(input.val());
+        var $temp = $("<textarea>");
+        $("body").append($temp);
+        $temp.val(htmlContent).select();
+        document.execCommand("copy");
+        $temp.remove();
+        layer.msg('HTML 代码已复制到剪贴板');
+    });
 
-    // Initial example
-    input.val("# Hello Markdown\n\nThis is a **bold** text and this is *italic*.\n\n- List item 1\n- List item 2\n\n```javascript\nconsole.log('Hello World');\n```");
-    updatePreview();
+    // 初始化加载
+    if(!input.val()) {
+        input.val(exampleContent);
+        updatePreview();
+    }
 });
 </script>
 {/block}

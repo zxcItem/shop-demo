@@ -168,6 +168,24 @@ class Tools extends Controller
     }
 
     /**
+     * CSS 格式化
+     */
+    public function css()
+    {
+        $this->title = 'CSS 格式化';
+        $this->fetch();
+    }
+
+    /**
+     * Markdown 预览
+     */
+    public function markdown()
+    {
+        $this->title = 'Markdown 预览';
+        $this->fetch();
+    }
+
+    /**
      * IP 地址查询
      */
     public function ip()
