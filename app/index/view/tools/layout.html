@@ -25,7 +25,7 @@
             <i class="layui-icon layui-icon-component"></i> 在线工具箱
         </a>
         <div class="nav-menu">
-            <a href="{:url('index')}" class="{if !isset($title) || $title=='在线工具箱'}active{/if}">首页</a>
+            <a href="/" class="{if !isset($title) || $title=='在线工具箱'}active{/if}">首页</a>
             <a href="javascript:layer.msg('开发中...');">API文档</a>
             <a href="javascript:layer.msg('开发中...');">开源地址</a>
             <a href="javascript:layer.msg('开发中...');">关于我们</a>
@@ -37,11 +37,11 @@
     {if isset($title) && $title != '在线工具箱'}
     <div class="tool-nav layui-anim layui-anim-downbit">
         <span class="breadcrumb">
-            <a href="{:url('index')}"><i class="layui-icon layui-icon-home"></i> 首页</a> 
+            <a href="/"><i class="layui-icon layui-icon-home"></i> 首页</a> 
             <span class="separator">/</span> 
             <cite>{$title}</cite>
         </span>
-        <a href="{:url('index')}" class="layui-btn layui-btn-sm layui-btn-primary" style="background: #fff;">
+        <a href="/" class="layui-btn layui-btn-sm layui-btn-primary" style="background: #fff;">
             <i class="layui-icon layui-icon-return"></i> 返回列表
         </a>
     </div>
