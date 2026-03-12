@@ -8,19 +8,19 @@
     <div class="layui-card-header">颜色格式转换</div>
     <div class="layui-card-body">
         
-        <div class="layui-form-item">
-            <div class="layui-inline">
-                <label class="layui-form-label">输入颜色</label>
-                <div class="layui-input-inline">
-                    <input type="text" id="color-input" placeholder="#00b894 或 rgb(0,184,148)" class="layui-input">
+        <div class="layui-form-item" style="margin-bottom: 30px;">
+            <div class="layui-inline" style="margin-bottom: 0;">
+                <label class="layui-form-label" style="padding: 10px 0;">输入颜色</label>
+                <div class="layui-input-inline" style="width: 250px; margin-right: 15px;">
+                    <input type="text" id="color-input" placeholder="#00b894 或 rgb(0,184,148)" class="layui-input" style="font-family: 'JetBrains Mono', monospace; font-size: 15px;">
                 </div>
             </div>
-            <div class="layui-inline">
-                <div id="color-preview" style="width: 38px; height: 38px; border-radius: 4px; background-color: #fff; border: 1px solid #dfe6e9; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.1);" title="点击选择颜色"></div>
-                <input type="color" id="color-picker" style="opacity: 0; position: absolute; left: 0; top: 0; width: 0; height: 0;">
+            <div class="layui-inline" style="margin-bottom: 0; position: relative;">
+                <div id="color-preview" style="width: 44px; height: 44px; border-radius: 8px; background-color: #fff; border: 2px solid #e2e8f0; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.05);" title="点击选择颜色"></div>
+                <input type="color" id="color-picker" style="opacity: 0; position: absolute; left: 0; top: 0; width: 44px; height: 44px; cursor: pointer;">
             </div>
-            <div class="layui-inline">
-                <button class="layui-btn layui-btn-normal" id="btn-convert">转换</button>
+            <div class="layui-inline" style="margin-bottom: 0;">
+                <button class="layui-btn layui-btn-normal" id="btn-convert" style="height: 44px; line-height: 44px; margin-left: 10px;"><i class="layui-icon layui-icon-theme"></i> 转换一下</button>
             </div>
         </div>
 
@@ -29,19 +29,19 @@
         <div class="layui-form-item">
             <label class="layui-form-label">HEX</label>
             <div class="layui-input-block">
-                <input type="text" id="res-hex" class="layui-input" readonly>
+                <input type="text" id="res-hex" class="layui-input code-box" readonly style="border: 1px solid #e2e8f0; padding: 0 15px; height: 44px; line-height: 44px;">
             </div>
         </div>
         <div class="layui-form-item">
             <label class="layui-form-label">RGB</label>
             <div class="layui-input-block">
-                <input type="text" id="res-rgb" class="layui-input" readonly>
+                <input type="text" id="res-rgb" class="layui-input code-box" readonly style="border: 1px solid #e2e8f0; padding: 0 15px; height: 44px; line-height: 44px;">
             </div>
         </div>
         <div class="layui-form-item">
             <label class="layui-form-label">RGBA</label>
             <div class="layui-input-block">
-                <input type="text" id="res-rgba" class="layui-input" readonly>
+                <input type="text" id="res-rgba" class="layui-input code-box" readonly style="border: 1px solid #e2e8f0; padding: 0 15px; height: 44px; line-height: 44px;">
             </div>
         </div>
 

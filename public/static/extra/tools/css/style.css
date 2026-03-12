@@ -210,3 +210,45 @@ body {
 .md-preview table tr:nth-child(2n) { background-color: #f8fafc; }
 .md-preview table th, .md-preview table td { padding: 10px 15px; border: 1px solid #e2e8f0; }
 .md-preview hr { height: 1px; padding: 0; margin: 30px 0; background-color: #e2e8f0; border: 0; }
+
+/* 统一优化的全局工具表单及按钮组排版 */
+.layui-form-item {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-bottom: 25px;
+}
+.layui-form-item .layui-form-label {
+    width: auto;
+    padding-left: 0;
+    font-size: 15px;
+    font-weight: 600;
+}
+.layui-btn-group {
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+    border-radius: 8px;
+    overflow: hidden;
+    display: inline-flex;
+    margin-bottom: 5px;
+}
+.layui-btn-group .layui-btn {
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    position: relative;
+}
+.layui-btn-group .layui-btn:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 20%;
+    bottom: 20%;
+    width: 1px;
+    background: rgba(255,255,255,0.2);
+}
+.layui-btn-group .layui-btn-primary:not(:last-child)::after {
+    background: #e2e8f0;
+}
+.layui-btn-group .layui-btn:hover {
+    transform: none; /* 防止在 group 里抖动 */
+    filter: brightness(1.05);
+}

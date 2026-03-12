@@ -9,15 +9,15 @@
 <div class="layui-card">
     <div class="layui-card-header">JSON 格式化 / 校验 / 压缩</div>
     <div class="layui-card-body">
-        <div class="layui-form-item">
-            <div class="layui-btn-group">
-                <button class="layui-btn layui-btn-normal" id="btn-format">格式化</button>
-                <button class="layui-btn layui-btn-primary" id="btn-compress">压缩</button>
-                <button class="layui-btn layui-btn-primary" id="btn-escape">转义</button>
-                <button class="layui-btn layui-btn-primary" id="btn-unescape">去转义</button>
-                <button class="layui-btn layui-btn-danger" id="btn-clear">清空</button>
+        <div class="layui-form-item" style="display: flex; align-items: center; margin-bottom: 25px;">
+            <div class="layui-btn-group" style="box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border-radius: 8px; overflow: hidden; display: flex;">
+                <button class="layui-btn layui-btn-normal" id="btn-format" style="border-radius: 0; box-shadow: none;"><i class="layui-icon layui-icon-list"></i> 格式化</button>
+                <button class="layui-btn layui-btn-primary" id="btn-compress" style="border-radius: 0; border: none; border-left: 1px solid #e2e8f0;"><i class="layui-icon layui-icon-shrink-right"></i> 压缩</button>
+                <button class="layui-btn layui-btn-primary" id="btn-escape" style="border-radius: 0; border: none; border-left: 1px solid #e2e8f0;">转义</button>
+                <button class="layui-btn layui-btn-primary" id="btn-unescape" style="border-radius: 0; border: none; border-left: 1px solid #e2e8f0;">去转义</button>
+                <button class="layui-btn layui-btn-danger" id="btn-clear" style="border-radius: 0; box-shadow: none;"><i class="layui-icon layui-icon-delete"></i> 清空</button>
             </div>
-            <span class="error-msg" id="msg-box"></span>
+            <span class="error-msg" id="msg-box" style="margin-left: 20px; font-size: 14px; display: none;"></span>
         </div>
         
         <div class="layui-row layui-col-space15">

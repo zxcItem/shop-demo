@@ -22,8 +22,8 @@
                 <input type="text" id="now-date" class="layui-input" readonly>
             </div>
             <div class="layui-col-md2 layui-col-sm12">
-                 <span class="label-text">&nbsp;</span>
-                 <button class="layui-btn layui-btn-primary layui-btn-fluid" id="btn-pause">暂停</button>
+                 <span class="label-text" style="display:block;height:21px;">&nbsp;</span>
+                 <button class="layui-btn layui-btn-primary layui-btn-fluid" id="btn-pause" style="height: 44px;"><i class="layui-icon layui-icon-pause"></i> 暂停</button>
             </div>
         </div>
 
@@ -41,7 +41,7 @@
                 </select>
             </div>
             <div class="layui-col-md2 layui-col-xs6">
-                <button class="layui-btn layui-btn-normal layui-btn-fluid" id="btn-ts2date">转换 &rarr;</button>
+                <button class="layui-btn layui-btn-normal layui-btn-fluid" id="btn-ts2date" style="height: 44px;"><i class="layui-icon layui-icon-next"></i> 转换</button>
             </div>
             <div class="layui-col-md4 layui-col-sm12">
                 <input type="text" id="date-result" class="layui-input" readonly placeholder="结果日期">
@@ -56,7 +56,7 @@
                 <input type="text" id="date-input" class="layui-input" placeholder="YYYY-MM-DD HH:mm:ss">
             </div>
             <div class="layui-col-md2 layui-col-xs6">
-                <button class="layui-btn layui-btn-normal layui-btn-fluid" id="btn-date2ts">转换 &rarr;</button>
+                <button class="layui-btn layui-btn-normal layui-btn-fluid" id="btn-date2ts" style="height: 44px;"><i class="layui-icon layui-icon-next"></i> 转换</button>
             </div>
             <div class="layui-col-md4 layui-col-sm12">
                 <input type="text" id="ts-result" class="layui-input" readonly placeholder="结果时间戳">
@@ -68,6 +68,17 @@
                 </select>
             </div>
         </div>
+        
+        <script>
+            // 自动填充日期
+            window.onload = function() {
+                layui.use('util', function(){
+                    var now = new Date();
+                    document.getElementById('ts-input').value = Math.floor(now.getTime()/1000);
+                    document.getElementById('date-input').value = layui.util.toDateString(now);
+                });
+            };
+        </script>
     </div>
 </div>
 {/block}
