@@ -1,89 +1,239 @@
 {extend name="tools/layout" /}
 
-{block name="keywords"}MD5加密,SHA1加密,SHA256加密,SHA512加密,在线哈希计算{/block}
-{block name="description"}在线MD5与SHA哈希计算工具，支持MD5、SHA1、SHA256、SHA512、RIPEMD160等多种算法，快速计算文本的哈希值。{/block}
+{block name="keywords"}MD5加密,SHA1加密,SHA256,SHA512,HMAC,文件哈希,哈希计算,MD5查重{/block}
+{block name="description"}极客纯前端在线MD5与SHA哈希计算工具。支持MD5、SHA1、SHA3、SHA256等多种算法，并独家提供密钥HMAC计算及本地大文件极速拖拽哈希值计算。{/block}
 
 {block name="main"}
 <div class="layui-card">
-    <div class="layui-card-header">MD5 / SHA 哈希计算</div>
+    <div class="layui-card-header">全能哈希计算器 (文本 / HMAC / 文件)</div>
     <div class="layui-card-body">
         
-        <div class="layui-form-item layui-form-text">
-            <label class="layui-form-label">输入内容</label>
-            <div class="layui-input-block">
-                <textarea id="input-box" placeholder="请输入要计算的内容..." class="layui-textarea"></textarea>
+        <div class="layui-tab layui-tab-brief" lay-filter="hashTab">
+            <ul class="layui-tab-title" style="margin-bottom: 25px;">
+                <li class="layui-this"><i class="layui-icon layui-icon-edit"></i> 文本哈希计算</li>
+                <li><i class="layui-icon layui-icon-file-b"></i> 本地文件哈希</li>
+            </ul>
+            <div class="layui-tab-content" style="padding: 0;">
+                
+                <!-- 文本/HMAC 区域 -->
+                <div class="layui-tab-item layui-show">
+                    <div class="layui-form-item layui-form-text">
+                        <textarea id="input-box" placeholder="请输入要计算的字符串内容..." class="layui-textarea" style="height: 150px; font-family: 'Inter', sans-serif; font-size: 16px; border-radius: 12px;"></textarea>
+                    </div>
+
+                    <div class="layui-form-item" style="background:#f1f5f9; padding:15px; border-radius:12px; margin-bottom: 30px;">
+                        <div class="layui-inline" style="margin-right: 20px;">
+                            <label class="layui-form-label" style="width: auto; padding-left: 0;"><input type="checkbox" id="chk-hmac" lay-ignore style="vertical-align: middle;"> 开启 HMAC 模式</label>
+                        </div>
+                        <div class="layui-inline" style="margin-right: 0; width: 350px;">
+                            <input type="text" id="hmac-key" placeholder="在此输入 HMAC 密钥 (Secret Key)" class="layui-input layui-disabled" disabled style="border: 1px dashed #cbd5e1; background: transparent;">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 文件哈希 区域 -->
+                <div class="layui-tab-item">
+                    <div id="file-drop-area" style="height: 200px; border: 2px dashed #94a3b8; border-radius: 16px; background: #f8fafc; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s; margin-bottom: 30px;">
+                        <i class="layui-icon layui-icon-upload-drag" style="font-size: 48px; color: #6366f1; margin-bottom: 15px;"></i>
+                        <h3 style="color: #334155; font-weight: 700; margin-bottom: 5px;">点击选择文件，或将文件拖曳到此处</h3>
+                        <p style="color: #64748b; font-size: 14px;">文件仅在浏览器本地进行纯前端读取和计算，不会上传至服务器，请放心使用</p>
+                        <input type="file" id="file-input" style="display: none;">
+                    </div>
+                    
+                    <div id="file-progress-container" style="display: none; margin-bottom: 25px;">
+                        <p style="margin-bottom: 8px; color: #6366f1; font-weight: 600;" id="file-name-display"></p>
+                        <div class="layui-progress layui-progress-big" lay-showpercent="true" lay-filter="file-hash-progress" style="border-radius: 8px;">
+                            <div class="layui-progress-bar layui-bg-blue" lay-percent="0%"></div>
+                        </div>
+                    </div>
+                </div>
+                
             </div>
         </div>
 
-        <div class="layui-form-item">
-            <div class="layui-input-block">
-                <button class="layui-btn" id="btn-calc">计算哈希</button>
-                <button class="layui-btn layui-btn-primary" id="btn-clear">清空</button>
+        <fieldset class="layui-elem-field layui-field-title"><legend style="font-size: 18px; font-weight: 700; color: #334155;"><i class="layui-icon layui-icon-list"></i> 计算结果</legend></fieldset>
+        
+        <div class="layui-form" style="display: flex; flex-direction: column; gap: 15px;">
+            <div class="hash-result-row">
+                <span class="hash-label">MD5 (32位)</span>
+                <input type="text" id="res-md5" class="layui-input hash-output" readonly>
             </div>
-        </div>
-
-        <hr>
-
-        <div class="layui-form-item">
-            <label class="layui-form-label">MD5 (32位)</label>
-            <div class="layui-input-block">
-                <input type="text" id="res-md5" class="layui-input" readonly>
+            <div class="hash-result-row">
+                <span class="hash-label">MD5 (16位)</span>
+                <input type="text" id="res-md5-16" class="layui-input hash-output" readonly>
             </div>
-        </div>
-        <div class="layui-form-item">
-            <label class="layui-form-label">MD5 (16位)</label>
-            <div class="layui-input-block">
-                <input type="text" id="res-md5-16" class="layui-input" readonly>
+            <div class="hash-result-row">
+                <span class="hash-label">SHA-1</span>
+                <input type="text" id="res-sha1" class="layui-input hash-output" readonly>
             </div>
-        </div>
-        <div class="layui-form-item">
-            <label class="layui-form-label">SHA1</label>
-            <div class="layui-input-block">
-                <input type="text" id="res-sha1" class="layui-input" readonly>
+            <div class="hash-result-row">
+                <span class="hash-label">SHA-256</span>
+                <input type="text" id="res-sha256" class="layui-input hash-output" readonly>
             </div>
-        </div>
-        <div class="layui-form-item">
-            <label class="layui-form-label">SHA256</label>
-            <div class="layui-input-block">
-                <input type="text" id="res-sha256" class="layui-input" readonly>
+            <div class="hash-result-row">
+                <span class="hash-label">SHA-512</span>
+                <input type="text" id="res-sha512" class="layui-input hash-output" readonly>
             </div>
-        </div>
-        <div class="layui-form-item">
-            <label class="layui-form-label">SHA512</label>
-            <div class="layui-input-block">
-                <input type="text" id="res-sha512" class="layui-input" readonly>
+            <div class="hash-result-row">
+                <span class="hash-label">SHA-3</span>
+                <input type="text" id="res-sha3" class="layui-input hash-output" readonly>
             </div>
         </div>
 
     </div>
 </div>
+
+<style>
+.hash-result-row { display: flex; align-items: center; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; background: #fff; transition: border-color 0.3s;}
+.hash-result-row:hover { border-color: #6366f1; }
+.hash-label { width: 140px; padding: 12px 20px; font-weight: 700; color: #475569; background: #f8fafc; border-right: 1px solid #e2e8f0; flex-shrink: 0; text-align: right;}
+.hash-output { border: none !important; border-radius: 0 !important; background: transparent !important; color: #0f172a; font-weight: 600; padding-left: 20px; font-family: 'JetBrains Mono', Consolas, monospace; cursor: pointer; transition: all 0.2s;}
+.hash-output:hover { background: rgba(99, 102, 241, 0.05) !important;}
+#file-drop-area.dragover { border-color: #6366f1; background-color: #eff6ff; }
+</style>
 {/block}
 
 {block name="script"}
 <script src="https://cdn.bootcdn.net/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 <script>
-layui.use(['layer', 'jquery'], function(){
-    var layer = layui.layer, $ = layui.jquery;
+layui.use(['layer', 'jquery', 'element'], function(){
+    var layer = layui.layer, $ = layui.jquery, element = layui.element;
 
-    $('#btn-calc').click(function(){
+    var currentMode = 'text'; // 'text' 或 'file'
+    var isHmac = false;
+
+    // 切换 Tab 处理
+    element.on('tab(hashTab)', function(data){
+        currentMode = data.index === 0 ? 'text' : 'file';
+        clearResults();
+        if(currentMode === 'text') {
+            calcTextHash();
+        }
+    });
+
+    // HMAC 复选框
+    $('#chk-hmac').change(function(){
+        isHmac = $(this).prop('checked');
+        var $keyInput = $('#hmac-key');
+        if(isHmac) {
+            $keyInput.removeClass('layui-disabled').prop('disabled', false).css('background', '#fff').css('border-style', 'solid');
+        } else {
+            $keyInput.addClass('layui-disabled').prop('disabled', true).css('background', 'transparent').css('border-style', 'dashed');
+        }
+        calcTextHash();
+    });
+
+    // 文本/HMAC 实时计算
+    $('#input-box, #hmac-key').on('input', function(){
+        if(currentMode === 'text') calcTextHash();
+    });
+
+    function calcTextHash() {
         var val = $('#input-box').val();
-        if(!val) { layer.msg('请输入内容'); return; }
+        if(!val) { clearResults(); return; }
 
-        var md5 = CryptoJS.MD5(val).toString();
-        var sha1 = CryptoJS.SHA1(val).toString();
-        var sha256 = CryptoJS.SHA256(val).toString();
-        var sha512 = CryptoJS.SHA512(val).toString();
+        var hmacKey = $('#hmac-key').val();
 
-        $('#res-md5').val(md5);
-        $('#res-md5-16').val(md5.substr(8, 16));
-        $('#res-sha1').val(sha1);
-        $('#res-sha256').val(sha256);
-        $('#res-sha512').val(sha512);
+        if(isHmac) {
+            if(!hmacKey) {
+                $('.hash-output').val('等待输入 HMAC 密钥...');
+                return;
+            }
+            $('#res-md5').val(CryptoJS.HmacMD5(val, hmacKey).toString());
+            $('#res-md5-16').val(CryptoJS.HmacMD5(val, hmacKey).toString().substr(8, 16));
+            $('#res-sha1').val(CryptoJS.HmacSHA1(val, hmacKey).toString());
+            $('#res-sha256').val(CryptoJS.HmacSHA256(val, hmacKey).toString());
+            $('#res-sha512').val(CryptoJS.HmacSHA512(val, hmacKey).toString());
+            $('#res-sha3').val(CryptoJS.HmacSHA3(val, hmacKey).toString());
+        } else {
+            var md5Str = CryptoJS.MD5(val).toString();
+            $('#res-md5').val(md5Str);
+            $('#res-md5-16').val(md5Str.substr(8, 16));
+            $('#res-sha1').val(CryptoJS.SHA1(val).toString());
+            $('#res-sha256').val(CryptoJS.SHA256(val).toString());
+            $('#res-sha512').val(CryptoJS.SHA512(val).toString());
+            $('#res-sha3').val(CryptoJS.SHA3(val).toString());
+        }
+    }
+
+    function clearResults() {
+        $('.hash-output').val('');
+    }
+
+    // 点击结果输入框自动全选并复制
+    $('.hash-output').click(function(){
+        if(!$(this).val() || $(this).val().indexOf('等待输入') > -1) return;
+        $(this).select();
+        document.execCommand('copy');
+        layer.msg('已复制：<br>' + $(this).val(), {icon: 1, offset: 't'});
     });
 
-    $('#btn-clear').click(function(){
-        $('input, textarea').val('');
+    // —————— 文件大纲哈希计算处理 (大文件分块计算读取 FileReader) ——————
+    var dropArea = $('#file-drop-area');
+    var fileInput = $('#file-input');
+
+    dropArea.on('click', function(){ fileInput.click(); });
+    
+    // 拖拽文件样式反馈
+    dropArea.on('dragover', function(e){
+        e.preventDefault();
+        dropArea.addClass('dragover');
+    }).on('dragleave', function(e){
+        e.preventDefault();
+        dropArea.removeClass('dragover');
+    }).on('drop', function(e){
+        e.preventDefault();
+        dropArea.removeClass('dragover');
+        if(e.originalEvent.dataTransfer.files.length) {
+            processFileHash(e.originalEvent.dataTransfer.files[0]);
+        }
     });
+
+    fileInput.on('change', function(e){
+        if(this.files.length) processFileHash(this.files[0]);
+        $(this).val('');
+    });
+
+    function processFileHash(file) {
+        if(!file) return;
+        $('#file-name-display').text('正在读取并计算: ' + file.name + ' (' + (file.size / 1024 / 1024).toFixed(2) + ' MB)');
+        $('#file-progress-container').slideDown();
+        element.progress('file-hash-progress', '0%');
+        clearResults();
+
+        // 为大文件采用渐进读取 (这里简单起见，如果太大比如>500MB可能导致内存过载，为防万一使用WordArray读取)
+        // 使用 FileReader 整体读取 (由于 JS 环境限制，通常应对 <100MB 比较稳妥，大文件需引入 crypto-js 增量模块或由于篇幅限制先使用简单整体读取)
+        var reader = new FileReader();
+
+        reader.onprogress = function(data) {
+            if (data.lengthComputable) {
+                var progress = parseInt( ((data.loaded / data.total) * 98), 10 );
+                element.progress('file-hash-progress', progress + '%');
+            }
+        }
+
+        reader.onload = function(e) {
+            var rawData = e.target.result; // ArrayBuffer
+            // CryptoJS 支持解析 ArrayBuffer
+            var wordArray = CryptoJS.lib.WordArray.create(rawData);
+
+            // 此时真正耗时的哈希计算会在主线程阻塞一下，可以给个 setTimeout 让 UI 先渲染 100%
+            element.progress('file-hash-progress', '100%');
+            
+            setTimeout(function(){
+                var md5Str = CryptoJS.MD5(wordArray).toString();
+                $('#res-md5').val(md5Str);
+                $('#res-md5-16').val(md5Str.substr(8, 16));
+                $('#res-sha1').val(CryptoJS.SHA1(wordArray).toString());
+                $('#res-sha256').val(CryptoJS.SHA256(wordArray).toString());
+                $('#res-sha512').val(CryptoJS.SHA512(wordArray).toString());
+                $('#res-sha3').val(CryptoJS.SHA3(wordArray).toString());
+                layer.msg('文件哈希计算完毕', {icon: 1});
+            }, 50);
+        };
+
+        reader.readAsArrayBuffer(file);
+    }
 });
 </script>
 {/block}

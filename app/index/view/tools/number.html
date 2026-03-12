@@ -1,97 +1,142 @@
 {extend name="tools/layout" /}
 
-{block name="keywords"}进制转换,二进制转换,十进制转换,十六进制转换,在线进制计算{/block}
-{block name="description"}在线进制转换工具，支持二进制、八进制、十进制、十六进制以及任意2-36进制之间的互相转换。{/block}
+{block name="keywords"}进制转换,在线进制转换,二进制转换,十六进制转换,进制计算器{/block}
+{block name="description"}极客版在线全能进制转换工具。支持2进制、8进制、10进制、16进制、32进制以及36进制之间的互相极速转换，支持大数和即时运算渲染。{/block}
 
 {block name="main"}
 <div class="layui-card">
-    <div class="layui-card-header">进制转换 (2 ~ 36进制)</div>
+    <div class="layui-card-header">程序员专用进制换算中心</div>
     <div class="layui-card-body">
         
-        <div class="layui-form-item">
-            <div class="layui-inline">
-                <label class="layui-form-label">输入数值</label>
-                <div class="layui-input-inline" style="width: 300px;">
-                    <input type="text" id="num-input" placeholder="输入数字..." class="layui-input">
+        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 25px; margin-bottom: 30px;">
+            <div class="layui-form-item" style="margin-bottom: 0; display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
+                <div style="flex: 1; min-width: 300px;">
+                    <label style="font-weight: 700; color: #334155; margin-bottom: 10px; display: block;"><i class="layui-icon layui-icon-engine" style="color: #6366f1;"></i> 输入数值</label>
+                    <input type="text" id="num-input" placeholder="请在此输入需要转换的数字..." class="layui-input" style="height: 54px; font-size: 20px; font-family: 'JetBrains Mono', Consolas, monospace; border: 2px solid #cbd5e1; border-radius: 8px;">
                 </div>
-            </div>
-            <div class="layui-inline">
-                <label class="layui-form-label">源进制</label>
-                <div class="layui-input-inline" style="width: 100px;">
-                    <select id="base-from" class="layui-input" style="display:block;">
-                        <option value="2">2 (二进制)</option>
-                        <option value="8">8 (八进制)</option>
-                        <option value="10" selected>10 (十进制)</option>
-                        <option value="16">16 (十六进制)</option>
-                        <option value="32">32</option>
-                        <option value="36">36</option>
+                <div style="width: 200px;">
+                    <label style="font-weight: 700; color: #334155; margin-bottom: 10px; display: block;"><i class="layui-icon layui-icon-set" style="color: #10b981;"></i> 当前数据的源进制</label>
+                    <select id="base-from" class="layui-input" style="display:block; height: 54px; font-size: 16px; border: 2px solid #cbd5e1; border-radius: 8px; cursor: pointer;">
+                        <option value="2">2 (二进制 / BIN)</option>
+                        <option value="8">8 (八进制 / OCT)</option>
+                        <option value="10" selected>10 (十进制 / DEC)</option>
+                        <option value="16">16 (十六进制 / HEX)</option>
+                        <option value="32">32 进制</option>
+                        <option value="36">36 进制</option>
                     </select>
+                </div>
+                <div style="width: 120px; padding-top: 30px;">
+                    <button class="layui-btn layui-btn-danger" id="btn-clear" style="height: 54px; width: 100%; border-radius: 8px;"><i class="layui-icon layui-icon-delete"></i> 清空</button>
                 </div>
             </div>
         </div>
 
-        <hr>
+        <fieldset class="layui-elem-field layui-field-title"><legend style="font-size: 18px; font-weight: 700; color: #475569;"><i class="layui-icon layui-icon-form"></i> 换算结果矩阵 (点击结果即可一键复制)</legend></fieldset>
         
-        <div class="layui-row layui-col-space15" id="result-area">
-            <!-- 结果动态生成 -->
+        <div class="layui-row layui-col-space20" id="result-area">
+            
             <div class="layui-col-md6">
-                <div class="layui-form-item">
-                    <label class="layui-form-label">二进制</label>
-                    <div class="layui-input-block">
-                        <input type="text" readonly class="layui-input res-item" data-base="2">
-                    </div>
+                <div class="base-result-card">
+                    <div class="base-label"><span class="base-tag">BIN</span> 2 进制</div>
+                    <input type="text" readonly class="layui-input res-item code-textarea" data-base="2" placeholder="...">
                 </div>
             </div>
+
             <div class="layui-col-md6">
-                <div class="layui-form-item">
-                    <label class="layui-form-label">八进制</label>
-                    <div class="layui-input-block">
-                        <input type="text" readonly class="layui-input res-item" data-base="8">
-                    </div>
+                <div class="base-result-card">
+                    <div class="base-label"><span class="base-tag" style="background: #f59e0b;">OCT</span> 8 进制</div>
+                    <input type="text" readonly class="layui-input res-item code-textarea" data-base="8" placeholder="...">
                 </div>
             </div>
+
             <div class="layui-col-md6">
-                <div class="layui-form-item">
-                    <label class="layui-form-label">十进制</label>
-                    <div class="layui-input-block">
-                        <input type="text" readonly class="layui-input res-item" data-base="10">
-                    </div>
+                <div class="base-result-card">
+                    <div class="base-label"><span class="base-tag" style="background: #10b981;">DEC</span> 10 进制</div>
+                    <input type="text" readonly class="layui-input res-item code-textarea" data-base="10" placeholder="...">
                 </div>
             </div>
+
             <div class="layui-col-md6">
-                <div class="layui-form-item">
-                    <label class="layui-form-label">十六进制</label>
-                    <div class="layui-input-block">
-                        <input type="text" readonly class="layui-input res-item" data-base="16">
-                    </div>
+                <div class="base-result-card">
+                    <div class="base-label"><span class="base-tag" style="background: #ec4899;">HEX</span> 16 进制</div>
+                    <input type="text" readonly class="layui-input res-item code-textarea" data-base="16" placeholder="...">
                 </div>
             </div>
+
             <div class="layui-col-md6">
-                <div class="layui-form-item">
-                    <label class="layui-form-label">32进制</label>
-                    <div class="layui-input-block">
-                        <input type="text" readonly class="layui-input res-item" data-base="32">
-                    </div>
+                <div class="base-result-card">
+                    <div class="base-label"><span class="base-tag" style="background: #64748b;">32</span> 32 进制</div>
+                    <input type="text" readonly class="layui-input res-item code-textarea" data-base="32" placeholder="...">
                 </div>
             </div>
+
             <div class="layui-col-md6">
-                <div class="layui-form-item">
-                    <label class="layui-form-label">36进制</label>
-                    <div class="layui-input-block">
-                        <input type="text" readonly class="layui-input res-item" data-base="36">
-                    </div>
+                <div class="base-result-card">
+                    <div class="base-label"><span class="base-tag" style="background: #334155;">36</span> 36 进制</div>
+                    <input type="text" readonly class="layui-input res-item code-textarea" data-base="36" placeholder="...">
                 </div>
             </div>
+
         </div>
 
     </div>
 </div>
+
+<style>
+.base-result-card {
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    background: #fff;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+.base-result-card:hover {
+    border-color: #6366f1;
+    box-shadow: 0 4px 12px rgba(99,102,241,0.1);
+}
+.base-result-card .base-label {
+    background: #f8fafc;
+    padding: 12px 20px;
+    font-weight: 700;
+    color: #475569;
+    font-size: 15px;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+}
+.base-result-card .base-tag {
+    background: #6366f1;
+    color: #fff;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    margin-right: 10px;
+    font-weight: 600;
+}
+.base-result-card .res-item {
+    border: none;
+    height: 60px;
+    line-height: 60px;
+    padding: 0 20px;
+    font-size: 20px;
+    color: #0f172a;
+    font-weight: 600;
+    background: transparent !important;
+    cursor: pointer;
+}
+.base-result-card:hover .res-item {
+    background: rgba(99, 102, 241, 0.03) !important;
+}
+.code-textarea {
+    font-family: 'JetBrains Mono', Consolas, monospace;
+}
+</style>
 {/block}
 
 {block name="script"}
 <script>
 layui.use(['layer', 'jquery'], function(){
-    var $ = layui.jquery;
+    var $ = layui.jquery, layer = layui.layer;
 
     function convert() {
         var val = $('#num-input').val().trim();
@@ -102,31 +147,75 @@ layui.use(['layer', 'jquery'], function(){
             return;
         }
 
-        // Parse to decimal first
-        var decimal;
+        // JS 内置 parseInt 对于超大数字精度丢失问题，如果有需要可引入 bignumber.js。
+        // 由于环境纯原生，这里我们用 BigInt 做个简单的增强处理支持超大整型换算
+        
+        var decimalStr = '';
         try {
-            decimal = parseInt(val, from);
+            if (from === 10) {
+                // Check valid dec
+                if (!/^[0-9]+$/.test(val)) throw new Error('Invalid DEC');
+                var bigNum = BigInt(val);
+                decimalStr = bigNum.toString(10);
+            } else if (from === 16) {
+                if (!/^[0-9A-Fa-f]+$/.test(val)) throw new Error('Invalid HEX');
+                var bigNum = BigInt("0x" + val);
+                decimalStr = bigNum.toString(10);
+            } else if (from === 8) {
+                if (!/^[0-7]+$/.test(val)) throw new Error('Invalid OCT');
+                var bigNum = BigInt("0o" + val);
+                decimalStr = bigNum.toString(10);
+            } else if (from === 2) {
+                if (!/^[01]+$/.test(val)) throw new Error('Invalid BIN');
+                var bigNum = BigInt("0b" + val);
+                decimalStr = bigNum.toString(10);
+            } else {
+                // 32, 36 简单的用 parseInt 处理，超大数丢失一点精度
+                var parsed = parseInt(val, from);
+                if (isNaN(parsed)) throw new Error('Invalid');
+                decimalStr = parsed.toString(10);
+            }
         } catch(e) {
-            decimal = NaN;
+            $('.res-item').val('⛔ 无效的输入字符');
+            return;
         }
 
-        if(isNaN(decimal)) {
-            // Check if valid for the base
-            // Simple check: if parseInt returns NaN or if converting back doesn't match roughly
-            // For now just clear if invalid
-             $('.res-item').val('无效输入');
-             return;
+        var bigDec;
+        try {
+            bigDec = BigInt(decimalStr);
+        } catch(e) {
+            // fallback for 32/36 which could be normal Int
+            bigDec = BigInt(parseInt(decimalStr, 10));
         }
 
         $('.res-item').each(function(){
             var toBase = parseInt($(this).data('base'));
-            var res = decimal.toString(toBase).toUpperCase();
+            var res = '';
+            try {
+                res = bigDec.toString(toBase).toUpperCase();
+            } catch(e) {
+                res = parseInt(decimalStr).toString(toBase).toUpperCase();
+            }
             $(this).val(res);
         });
     }
 
-    $('#num-input').on('input', convert);
+    $('#num-input').on('input focus', convert);
     $('#base-from').on('change', convert);
+
+    $('#btn-clear').click(function(){
+        $('#num-input').val('').focus();
+        $('.res-item').val('');
+    });
+
+    // 点击结果一键复制
+    $('.res-item').click(function(){
+        var text = $(this).val();
+        if(!text || text.indexOf('⛔') > -1) return;
+        $(this).select();
+        document.execCommand('copy');
+        layer.msg('成功复制数值', {icon: 1, offset: 't'});
+    });
 });
 </script>
 {/block}

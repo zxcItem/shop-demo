@@ -1,101 +1,224 @@
 {extend name="tools/layout" /}
 
-{block name="keywords"}UserAgent分析,UA解析,浏览器检测,设备检测,在线UA工具{/block}
-{block name="description"}在线User-Agent分析工具，可解析UA字符串中的浏览器、操作系统、设备型号、引擎版本等详细信息。{/block}
-
-{block name="style"}
-<style>
-    .ua-info-table {
-        width: 100%;
-        margin-top: 15px;
-    }
-    .ua-info-table td {
-        padding: 10px;
-        border-bottom: 1px solid #eee;
-    }
-    .ua-info-table td:first-child {
-        width: 120px;
-        font-weight: bold;
-        color: #666;
-    }
-    .ua-icon {
-        font-size: 18px;
-        margin-right: 5px;
-        color: #009688;
-    }
-</style>
-{/block}
+{block name="keywords"}UserAgent分析,UA解析,浏览器检测,设备检测,操作系统探测,浏览器标识分析{/block}
+{block name="description"}极客专业级 User-Agent (UA) 字符串在线分析解析雷达系统。为您深度剖析客户端浏览器型号、内核引擎结构、操作系统架构与设备终端类别型号的详细探针参数数据。{/block}
 
 {block name="main"}
 <div class="layui-card">
-    <div class="layui-card-header">User-Agent 分析</div>
+    <div class="layui-card-header">客户端 User-Agent (浏览器标识) 解析雷达</div>
     <div class="layui-card-body">
-        <div class="layui-form-item">
-            <textarea id="ua-input" placeholder="输入 User-Agent 字符串..." class="layui-textarea" style="height: 100px;"></textarea>
-        </div>
-        <div class="layui-form-item">
-            <button class="layui-btn layui-btn-normal" id="btn-parse">分析</button>
-            <button class="layui-btn layui-btn-primary" id="btn-use-my">使用本机 UA</button>
-            <button class="layui-btn layui-btn-danger" id="btn-clear">清空</button>
+        
+        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 25px; margin-bottom: 25px;">
+            <label style="font-weight: 700; color: #334155; margin-bottom: 12px; display: block; font-size: 16px;"><i class="layui-icon layui-icon-component" style="color: #6366f1;"></i> 填写目标 User-Agent 标头参数 / 或获取本机暴露 UA</label>
+            <div class="layui-form-item" style="margin-bottom: 15px;">
+                <textarea id="ua-input" placeholder="请粘贴杂乱的 HTTP User-Agent 或者任意包含设备指纹的报文字符串..." class="layui-textarea" style="height: 120px; font-family: 'JetBrains Mono', Consolas, monospace; font-size: 15px; border: 2px solid #cbd5e1; border-radius: 8px; resize: vertical;"></textarea>
+            </div>
+            
+            <div class="layui-form-item" style="display: flex; gap: 15px; margin-bottom: 0;">
+                <button class="layui-btn layui-btn-normal" id="btn-parse" style="height: 48px; border-radius: 8px; font-weight: 700; font-size: 16px; padding: 0 40px;"><i class="layui-icon layui-icon-set-fill" style="animation: layui-rotate 3s linear infinite;"></i> 提交分析核心</button>
+                <button class="layui-btn layui-btn-warm" id="btn-use-my" style="height: 48px; border-radius: 8px; background: #f59e0b;"><i class="layui-icon layui-icon-find-fill"></i> 一键抓取本地本浏览器数据</button>
+                <button class="layui-btn layui-btn-danger" id="btn-clear" style="height: 48px; border-radius: 8px; margin-left: auto;"><i class="layui-icon layui-icon-delete"></i></button>
+            </div>
         </div>
 
-        <div id="result-container" style="display:none; margin-top: 20px;">
-            <blockquote class="layui-elem-quote layui-quote-nm">
-                <table class="ua-info-table">
-                    <tr><td><i class="layui-icon layui-icon-website ua-icon"></i>浏览器</td><td id="res-browser">-</td></tr>
-                    <tr><td><i class="layui-icon layui-icon-engine ua-icon"></i>引擎</td><td id="res-engine">-</td></tr>
-                    <tr><td><i class="layui-icon layui-icon-hardware ua-icon"></i>操作系统</td><td id="res-os">-</td></tr>
-                    <tr><td><i class="layui-icon layui-icon-cellphone ua-icon"></i>设备</td><td id="res-device">-</td></tr>
-                    <tr><td><i class="layui-icon layui-icon-cpu ua-icon"></i>CPU</td><td id="res-cpu">-</td></tr>
-                </table>
-            </blockquote>
+        <fieldset class="layui-elem-field layui-field-title" id="title-res" style="display:none;"><legend style="font-size: 18px; font-weight: 700; color: #475569;">终端解密指纹结果面板</legend></fieldset>
+
+        <!-- 分析结果展示仪表板 -->
+        <div id="result-container" style="display:none;">
+            <div class="layui-row layui-col-space20">
+                
+                <div class="layui-col-md4 layui-col-sm6">
+                    <div class="ua-stat-card">
+                        <div class="ua-header">
+                            <div class="ua-icon-wrap" style="background:#eff6ff; color:#3b82f6;"><i class="layui-icon layui-icon-website"></i></div>
+                            <div class="ua-title">浏览器解析指纹</div>
+                        </div>
+                        <div class="ua-data">型号名称: <strong id="res-browser" class="hl-text text-blue">Unknown</strong></div>
+                        <div class="ua-data">版本编号: <span id="res-browser-v" class="mono-text">-</span></div>
+                        <div class="ua-data">大写标识: <span id="res-browser-m" class="mono-text">-</span></div>
+                    </div>
+                </div>
+
+                <div class="layui-col-md4 layui-col-sm6">
+                    <div class="ua-stat-card">
+                        <div class="ua-header">
+                            <div class="ua-icon-wrap" style="background:#f0fdf4; color:#22c55e;"><i class="layui-icon layui-icon-hardware"></i></div>
+                            <div class="ua-title">主机操作系统内核</div>
+                        </div>
+                        <div class="ua-data">运行环境: <strong id="res-os" class="hl-text text-green">Unknown</strong></div>
+                        <div class="ua-data">内核版本: <span id="res-os-v" class="mono-text">-</span></div>
+                    </div>
+                </div>
+
+                <div class="layui-col-md4 layui-col-sm6">
+                    <div class="ua-stat-card">
+                        <div class="ua-header">
+                            <div class="ua-icon-wrap" style="background:#fefce8; color:#eab308;"><i class="layui-icon layui-icon-cellphone"></i></div>
+                            <div class="ua-title">物理终端设备矩阵</div>
+                        </div>
+                        <div class="ua-data">终端大类: <strong id="res-device-type" class="hl-text text-yellow">Desktop (桌面端)</strong></div>
+                        <div class="ua-data">厂商品牌: <span id="res-device-vendor" class="mono-text">-</span></div>
+                        <div class="ua-data">设备型号: <span id="res-device-model" class="mono-text">-</span></div>
+                    </div>
+                </div>
+
+                <div class="layui-col-md6">
+                    <div class="ua-stat-card">
+                        <div class="ua-header">
+                            <div class="ua-icon-wrap" style="background:#fdf2f8; color:#ec4899;"><i class="layui-icon layui-icon-engine"></i></div>
+                            <div class="ua-title">渲染引擎构架</div>
+                        </div>
+                        <div class="ua-data">引 擎 名 称: <strong id="res-engine" class="hl-text text-pink">Unknown</strong></div>
+                        <div class="ua-data">引擎构建号: <span id="res-engine-v" class="mono-text">-</span></div>
+                    </div>
+                </div>
+
+                <div class="layui-col-md6">
+                    <div class="ua-stat-card">
+                        <div class="ua-header">
+                            <div class="ua-icon-wrap" style="background:#f1f5f9; color:#64748b;"><i class="layui-icon layui-icon-cpu"></i></div>
+                            <div class="ua-title">CPU 与底层硬件</div>
+                        </div>
+                        <div class="ua-data">指令集架构: <strong id="res-cpu" class="hl-text text-gray">Unknown</strong></div>
+                    </div>
+                </div>
+
+            </div>
         </div>
+        
     </div>
 </div>
+
+<style>
+.ua-stat-card {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+    transition: all 0.3s ease;
+    height: 100%;
+    box-sizing: border-box;
+}
+.ua-stat-card:hover {
+    border-color: #cbd5e1;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05);
+}
+.ua-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+    border-bottom: 1px dashed #e2e8f0;
+}
+.ua-icon-wrap {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    margin-right: 15px;
+}
+.ua-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #334155;
+}
+.ua-data {
+    font-size: 14px;
+    color: #475569;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+}
+.hl-text {
+    font-size: 16px;
+    margin-left: 8px;
+}
+.mono-text {
+    font-family: 'JetBrains Mono', Consolas, monospace;
+    background: #f1f5f9;
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-left: 8px;
+    color: #0f172a;
+    font-weight: 600;
+}
+.text-blue { color: #2563eb; }
+.text-green { color: #16a34a; }
+.text-yellow { color: #d97706; }
+.text-pink { color: #db2777; }
+.text-gray { color: #475569; }
+</style>
 {/block}
 
 {block name="script"}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/UAParser.js/1.0.35/ua-parser.min.js"></script>
 <script>
 layui.use(['layer', 'jquery'], function(){
-    var layer = layui.layer,
-        $ = layui.jquery;
+    var layer = layui.layer, $ = layui.jquery;
 
     function parseUA(uaString) {
         if(!uaString) {
-            layer.msg('请输入 User-Agent', {icon: 0});
+            layer.msg('探测字符串不可为空，请重新输入', {icon: 0, anim: 6});
             return;
         }
 
-        var parser = new UAParser(uaString);
-        var result = parser.getResult();
+        var loading = layer.load(2, {time: 500});
 
-        $('#res-browser').text((result.browser.name || 'Unknown') + ' ' + (result.browser.version || ''));
-        $('#res-engine').text((result.engine.name || 'Unknown') + ' ' + (result.engine.version || ''));
-        $('#res-os').text((result.os.name || 'Unknown') + ' ' + (result.os.version || ''));
-        $('#res-device').text((result.device.vendor || '') + ' ' + (result.device.model || '') + ' (' + (result.device.type || 'Desktop') + ')');
-        $('#res-cpu').text(result.cpu.architecture || 'Unknown');
+        setTimeout(function(){
+            var parser = new UAParser(uaString);
+            var result = parser.getResult();
 
-        $('#result-container').show();
+            // Browser
+            $('#res-browser').text(result.browser.name || '无法检测识别');
+            $('#res-browser-v').text(result.browser.version || 'Unset');
+            $('#res-browser-m').text(result.browser.major || 'Unset');
+
+            // Engine
+            $('#res-engine').text(result.engine.name || '无法检测引擎');
+            $('#res-engine-v').text(result.engine.version || 'Unset');
+
+            // OS
+            $('#res-os').text(result.os.name || '未暴露环境系统');
+            $('#res-os-v').text(result.os.version || 'Unset');
+
+            // Device
+            $('#res-device-type').text(result.device.type ? result.device.type.toUpperCase() : 'Desktop (电脑桌面应用或爬虫)');
+            $('#res-device-vendor').text(result.device.vendor || '无厂家数据');
+            $('#res-device-model').text(result.device.model || '未透出具体型号');
+
+            // CPU
+            $('#res-cpu').text(result.cpu.architecture || '无架构元信息');
+
+            $('#title-res').fadeIn();
+            $('#result-container').slideDown(300);
+            layer.close(loading);
+        }, 300);
     }
 
-    $('#btn-parse').click(function(){
-        parseUA($('#ua-input').val());
-    });
+    $('#btn-parse').click(function(){ parseUA($('#ua-input').val().trim()); });
 
     $('#btn-use-my').click(function(){
+        layer.msg('已强行获取当前运行中浏览器的底层宿主环境包', {icon: 1, offset: 't'});
         var myUA = navigator.userAgent;
         $('#ua-input').val(myUA);
         parseUA(myUA);
     });
 
     $('#btn-clear').click(function(){
-        $('#ua-input').val('');
-        $('#result-container').hide();
+        $('#ua-input').val('').focus();
+        $('#title-res').fadeOut();
+        $('#result-container').slideUp(100);
     });
 
-    // Initial load
-    $('#ua-input').val(navigator.userAgent);
+    // Initial load auto-probe my device
+    setTimeout(function(){
+        $('#btn-use-my').click();
+    }, 100);
 });
 </script>
 {/block}

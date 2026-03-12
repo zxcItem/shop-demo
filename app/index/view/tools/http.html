@@ -1,88 +1,106 @@
 {extend name="tools/layout" /}
 
-{block name="keywords"}HTTP接口测试,GET请求,POST请求,API测试,在线接口测试{/block}
-{block name="description"}在线HTTP接口测试工具，支持GET、POST等多种请求方式，可自定义Header和Body，实时查看响应结果。{/block}
-
-{block name="style"}{/block}
+{block name="keywords"}HTTP接口测试,在线接口测试,在线Postman,API测试,GET请求,POST请求,模拟接口请求{/block}
+{block name="description"}轻量级在线 HTTP 接口调试工具 (类似 Postman)。支持 GET, POST 等常用请求协议，支持添加多组自定义请求 Header、模拟 JSON/Form 请求体及查看详细请求时长和格式化 JSON 响应。{/block}
 
 {block name="main"}
 <div class="layui-card">
-    <div class="layui-card-header">HTTP 请求测试</div>
+    <div class="layui-card-header">HTTP / API 接口调测环境</div>
     <div class="layui-card-body">
-        <blockquote class="layui-elem-quote layui-text" style="border-left: 5px solid #FF5722;">
-            注意：由于浏览器的同源策略（CORS）限制，此工具只能请求允许跨域的接口（Access-Control-Allow-Origin: *）。
+        
+        <blockquote class="layui-elem-quote layui-text" style="border-left: 5px solid #6366f1; background: #eff6ff; color: #1e293b; padding: 12px; border-radius: 4px; display: flex; align-items: center; gap: 10px;">
+            <i class="layui-icon layui-icon-about" style="font-size: 20px; color: #6366f1;"></i> 
+            提示：现代浏览器自带跨域（CORS）限制，当前工具环境只能测试开启了 <code style="background:#e2e8f0; color:#db2777; padding:2px 5px;">Access-Control-Allow-Origin: *</code> 的第三方公开接口或您本地同域接口。
         </blockquote>
 
-        <div class="layui-form">
-            <div class="layui-row layui-col-space10">
-                <div class="layui-col-md2 layui-col-xs4">
-                    <select id="http-method">
-                        <option value="GET">GET</option>
-                        <option value="POST">POST</option>
-                        <option value="PUT">PUT</option>
-                        <option value="DELETE">DELETE</option>
-                        <option value="PATCH">PATCH</option>
-                        <option value="HEAD">HEAD</option>
-                        <option value="OPTIONS">OPTIONS</option>
-                    </select>
-                </div>
-                <div class="layui-col-md8 layui-col-xs8">
-                    <input type="text" id="http-url" placeholder="https://api.example.com/v1/users" class="layui-input">
-                </div>
-                <div class="layui-col-md2 layui-col-xs12">
-                    <button class="layui-btn layui-btn-normal layui-btn-fluid" id="btn-send">发送请求</button>
-                </div>
+        <!-- 核心 URL 输入区 -->
+        <div class="layui-form" style="margin-top: 25px; margin-bottom: 25px; display: flex; gap: 15px;">
+            <div style="width: 140px;">
+                <select id="http-method">
+                    <option value="GET">GET</option>
+                    <option value="POST">POST</option>
+                    <option value="PUT">PUT</option>
+                    <option value="DELETE">DELETE</option>
+                    <option value="PATCH">PATCH</option>
+                    <option value="OPTIONS">OPTIONS</option>
+                </select>
             </div>
-
-            <div class="layui-tab layui-tab-brief">
-                <ul class="layui-tab-title">
-                    <li class="layui-this">请求体 (Body)</li>
-                    <li>请求头 (Headers)</li>
-                </ul>
-                <div class="layui-tab-content">
-                    <div class="layui-tab-item layui-show">
-                        <textarea id="http-body" placeholder="JSON or Form Data..." class="layui-textarea" style="height: 150px; font-family: monospace;"></textarea>
-                    </div>
-                    <div class="layui-tab-item">
-                        <textarea id="http-headers" placeholder="Key: Value (每行一个)" class="layui-textarea" style="height: 150px; font-family: monospace;"></textarea>
-                    </div>
-                </div>
+            <div style="flex: 1;">
+                <input type="text" id="http-url" placeholder="https://api.github.com/users/octocat" class="layui-input" style="height: 48px; font-size: 16px; font-family: monospace; border: 2px solid #cbd5e1; border-radius: 8px;">
             </div>
-
-            <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
-                <legend>响应结果</legend>
-            </fieldset>
-            
-            <div class="layui-row layui-col-space15">
-                <div class="layui-col-md12">
-                    <div class="layui-card">
-                        <div class="layui-card-header">
-                            Status: <span id="res-status" class="layui-badge layui-bg-gray">-</span>
-                            <span style="float: right;">Time: <span id="res-time">-</span> ms</span>
-                        </div>
-                        <div class="layui-card-body">
-                            <div class="layui-tab layui-tab-brief">
-                                <ul class="layui-tab-title">
-                                    <li class="layui-this">Response Body</li>
-                                    <li>Response Headers</li>
-                                </ul>
-                                <div class="layui-tab-content">
-                                    <div class="layui-tab-item layui-show">
-                                        <div id="res-body" class="http-response"></div>
-                                    </div>
-                                    <div class="layui-tab-item">
-                                        <div id="res-headers" class="http-response"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <div style="width: 160px;">
+                <button class="layui-btn layui-btn-normal" id="btn-send" style="width: 100%; height: 48px; border-radius: 8px; font-weight: 700; font-size: 16px;"><i class="layui-icon layui-icon-release"></i> 发送请求</button>
             </div>
-
         </div>
+
+        <div class="layui-row layui-col-space20">
+            <!-- 左侧：请求参数配置 -->
+            <div class="layui-col-md6">
+                <fieldset class="layui-elem-field layui-field-title" style="margin-top: 5px;"><legend style="font-size: 16px; font-weight: 700; color: #475569;">Request 配置参数</legend></fieldset>
+                
+                <div class="layui-tab layui-tab-brief">
+                    <ul class="layui-tab-title" style="margin-bottom: 15px;">
+                        <li class="layui-this"><i class="layui-icon layui-icon-form"></i> 请求头 (Headers)</li>
+                        <li><i class="layui-icon layui-icon-component"></i> 请求体 (Body)</li>
+                    </ul>
+                    <div class="layui-tab-content" style="padding: 0;">
+                        <!-- Headers -->
+                        <div class="layui-tab-item layui-show">
+                            <textarea id="http-headers" placeholder="填写请求头，格式为 Key: Value（每行一个）&#10;例子:&#10;Authorization: Bearer YOUR_TOKEN&#10;Content-Type: application/json" class="layui-textarea code-textarea"></textarea>
+                        </div>
+                        <!-- Body -->
+                        <div class="layui-tab-item">
+                            <textarea id="http-body" placeholder="填写 POST / PUT 等请求类型的请求体数据(支持 JSON / XML 或 Form URL 格式)&#10;例如:&#10;{&#10;  &quot;email&quot;: &quot;demo@example.com&quot;&#10;}" class="layui-textarea code-textarea"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右侧：响应内容展示 -->
+            <div class="layui-col-md6">
+                <fieldset class="layui-elem-field layui-field-title" style="margin-top: 5px;"><legend style="font-size: 16px; font-weight: 700; color: #475569;">Response 结果信息</legend></fieldset>
+                
+                <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; height: 50px; box-sizing: border-box;">
+                    <div>状态码: <strong id="res-status" style="font-size: 16px; color: #94a3b8; font-family: monospace;">---</strong></div>
+                    <div>耗时: <strong id="res-time" style="font-size: 16px; color: #10b981; font-family: monospace;">-- ms</strong></div>
+                </div>
+
+                <div class="layui-tab layui-tab-brief">
+                    <ul class="layui-tab-title" style="margin-bottom: 15px;">
+                        <li class="layui-this"><i class="layui-icon layui-icon-read"></i> Body 内容</li>
+                        <li><i class="layui-icon layui-icon-tabs"></i> Headers</li>
+                    </ul>
+                    <div class="layui-tab-content" style="padding: 0;">
+                        <div class="layui-tab-item layui-show">
+                            <textarea id="res-body" class="layui-textarea code-textarea" style="background:#fff; cursor:text;" readonly placeholder="等待发送请求以获取响应体会在此自动格式化显示..."></textarea>
+                        </div>
+                        <div class="layui-tab-item">
+                            <textarea id="res-headers" class="layui-textarea code-textarea" style="background:#fff;" readonly placeholder="响应头字段..."></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 </div>
+
+<style>
+.code-textarea {
+    height: 350px !important;
+    font-family: 'JetBrains Mono', Consolas, monospace;
+    font-size: 15px;
+    line-height: 1.6;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    box-sizing: border-box;
+    white-space: pre-wrap;
+    word-break: break-all;
+}
+.code-textarea:focus {
+    border-color: #6366f1 !important;
+}
+</style>
 {/block}
 
 {block name="script"}
@@ -100,57 +118,66 @@ layui.use(['layer', 'jquery', 'form', 'element'], function(){
         var headersText = $('#http-headers').val();
 
         if(!url) {
-            layer.msg('请输入 URL', {icon: 0});
+            layer.msg('请输入合法的请求 URL，需包含 http:// 或 https://', {icon: 0, anim: 6});
+            $('#http-url').focus();
             return;
         }
 
-        // Parse headers
+        // 解析输入的头信息字符串
         var headers = {};
         if(headersText) {
             var lines = headersText.split('\n');
             for(var i=0; i<lines.length; i++) {
                 var line = lines[i].trim();
-                if(line) {
+                if(line && line.indexOf(':') > -1) {
                     var parts = line.split(':');
-                    if(parts.length >= 2) {
-                        var key = parts[0].trim();
-                        var val = parts.slice(1).join(':').trim();
-                        headers[key] = val;
-                    }
+                    var key = parts[0].trim();
+                    var val = line.substring(line.indexOf(':') + 1).trim();
+                    headers[key] = val;
                 }
             }
         }
 
         var startTime = new Date().getTime();
-        var loading = layer.load(2);
+        var loading = layer.load(2, {time: 15000}); // 等待15秒超时防卡死
         
-        $('#res-status').text('Loading...');
-        $('#res-time').text('-');
-        $('#res-body').text('');
-        $('#res-headers').text('');
+        $('#res-status').html('<span style="color:#f59e0b;">Fetching...</span>');
+        $('#res-time').text('-- ms');
+        $('#res-body').val('正在拼命请求数据中，请稍候...');
+        $('#res-headers').val('');
 
         $.ajax({
             url: url,
             type: method,
-            data: body,
+            data: (method === 'GET' || method === 'HEAD') ? null : body, // GET不能发 body 防止jQuery报错
             headers: headers,
+            timeout: 10000,
             complete: function(xhr, status) {
                 layer.close(loading);
                 var endTime = new Date().getTime();
                 var duration = endTime - startTime;
 
-                var statusColor = xhr.status >= 200 && xhr.status < 300 ? 'layui-bg-green' : (xhr.status >= 400 ? 'layui-bg-red' : 'layui-bg-orange');
-                $('#res-status').text(xhr.status + ' ' + xhr.statusText).attr('class', 'layui-badge ' + statusColor);
-                $('#res-time').text(duration);
+                var isSuccess = xhr.status >= 200 && xhr.status < 300;
+                var colorHtml = isSuccess ? '#10b981' : (xhr.status >= 400 ? '#ef4444' : '#f59e0b');
+                
+                if (xhr.status === 0) {
+                    $('#res-status').html('<span style="color:#ef4444;">0 Error (网络或跨域限制)</span>');
+                    $('#res-body').val('【请求失败被拦截】\n这通常是因为：\n1. 您的目标 URL 错误或拼写错误\n2. 目标服务器不可达或已宕机\n3. 浏览器的 CORS 跨域安全拦截 (最常见因素)，请确保您的接口支持全域名跨域或目标带有 Access-Control-Allow-Origin: * 头。');
+                } else {
+                    $('#res-status').html('<span style="color:' + colorHtml + ';">' + xhr.status + ' ' + xhr.statusText + '</span>');
+                    
+                    var resBody = xhr.responseText || '';
+                    // 尝试美化 JSON 渲染
+                    var contentType = xhr.getResponseHeader('content-type');
+                    if(contentType && contentType.indexOf('json') > -1) {
+                        try { resBody = JSON.stringify(JSON.parse(resBody), null, 4); } catch(e) {}
+                    }
+                    
+                    $('#res-body').val(resBody);
+                    $('#res-headers').val(xhr.getAllResponseHeaders());
+                }
 
-                // Format body if JSON
-                var resBody = xhr.responseText;
-                try {
-                    resBody = JSON.stringify(JSON.parse(resBody), null, 2);
-                } catch(e) {}
-                $('#res-body').text(resBody);
-
-                $('#res-headers').text(xhr.getAllResponseHeaders());
+                $('#res-time').text(duration + ' ms');
             }
         });
     });

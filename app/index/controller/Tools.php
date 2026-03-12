@@ -220,4 +220,40 @@ class Tools extends Controller
         $this->title = '图片 Base64';
         $this->fetch();
     }
+
+    /**
+     * JWT 解码与验证
+     */
+    public function jwt()
+    {
+        $this->title = 'JWT 调试器';
+        $this->fetch();
+    }
+
+    /**
+     * URL 解析构建器
+     */
+    public function url_parser()
+    {
+        $this->title = 'URL 解析构建器';
+        $this->fetch();
+    }
+
+    /**
+     * 文本字符串转换/处理工具
+     */
+    public function string()
+    {
+        $this->title = '字符串文本处理';
+        $this->fetch();
+    }
+
+    /**
+     * JS/HTML 代码格式化与压缩
+     */
+    public function js_fmt()
+    {
+        $this->title = 'JS/HTML 格式化';
+        $this->fetch();
+    }
 }

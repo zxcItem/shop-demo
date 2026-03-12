@@ -1,69 +1,136 @@
 {extend name="tools/layout" /}
 
-{block name="keywords"}SQL格式化,SQL压缩,SQL美化,在线SQL工具,数据库开发{/block}
-{block name="description"}在线SQL格式化与压缩工具，支持MySQL, PostgreSQL, SQL Server等多种方言，让杂乱的SQL语句变得整洁易读。{/block}
+{block name="keywords"}SQL格式化,在线SQL压缩,SQL美化代码,MySQL语法检查,SQL方言在线处理{/block}
+{block name="description"}极客专业级在线在线SQL数据库查询语言格式化与压缩工具。全本支持 MySQL, PostgreSQL, PL/SQL 及标准 SQL方言，提供多风格美化以及左源右果双屏预览，是数据库DBA与后端开发的高效帮手。{/block}
 
 {block name="main"}
 <div class="layui-card">
-    <div class="layui-card-header">SQL 格式化 / 压缩</div>
+    <div class="layui-card-header">SQL 方言智能分析与格式化工具</div>
     <div class="layui-card-body">
-        <div class="layui-form-item">
-            <div class="layui-btn-group">
-                <button class="layui-btn layui-btn-normal" id="btn-format">格式化</button>
-                <button class="layui-btn layui-btn-primary" id="btn-compress">压缩</button>
-                <button class="layui-btn layui-btn-danger" id="btn-clear">清空</button>
+        
+        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 25px; margin-bottom: 25px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap;">
+            
+            <div style="display: flex; gap: 15px; align-items: center;">
+                <div style="width: 250px;">
+                    <label style="font-weight: 700; color: #334155; margin-bottom: 8px; display: block;"><i class="layui-icon layui-icon-set-sm" style="color: #6366f1;"></i> 数据库方言引擎 (Dialect)</label>
+                    <select id="sql-dialect" class="layui-input" style="height: 48px; font-size: 15px; border: 2px solid #cbd5e1; border-radius: 8px; cursor: pointer;">
+                        <option value="sql">Standard SQL (标准语法)</option>
+                        <option value="mysql" selected>MySQL / MariaDB</option>
+                        <option value="postgresql">PostgreSQL / Redshift</option>
+                        <option value="plsql">PL/SQL (Oracle)</option>
+                    </select>
+                </div>
+                <!-- 预留的高级设置，如转换为大写等 -->
+                <div style="padding-top: 30px; margin-left: 10px;">
+                    <input type="checkbox" id="sql-uppercase" title="关键词大写转换 (PRO)" lay-skin="primary" checked>
+                </div>
             </div>
-            <div class="layui-inline" style="margin-left: 10px;">
-                <select id="sql-dialect" class="layui-input" style="height: 38px; display: inline-block; width: auto;">
-                    <option value="sql">Standard SQL</option>
-                    <option value="mysql">MySQL</option>
-                    <option value="postgresql">PostgreSQL</option>
-                    <option value="plsql">PL/SQL</option>
-                </select>
+
+            <div class="layui-btn-group" style="padding-top: 20px;">
+                <button class="layui-btn layui-btn-normal" id="btn-format" style="height: 48px; font-size: 16px; padding: 0 25px; border-radius: 8px 0 0 8px;"><i class="layui-icon layui-icon-app"></i> 解析格式化</button>
+                <button class="layui-btn layui-btn-primary" id="btn-compress" style="height: 48px; font-size: 16px; padding: 0 25px;"><i class="layui-icon layui-icon-shrink-right"></i> 紧凑压缩</button>
+                <button class="layui-btn layui-btn-danger" id="btn-clear" style="height: 48px; font-size: 16px; padding: 0 25px; border-radius: 0 8px 8px 0;"><i class="layui-icon layui-icon-delete"></i> 涂抹清空</button>
+            </div>
+            
+        </div>
+
+        <div class="layui-row layui-col-space20 text-diff-container">
+            <div class="layui-col-md6">
+                <div style="background: #fff; border: 1px solid #cbd5e1; border-radius: 8px 8px 0 0; padding: 12px 20px; font-weight: 700; color: #475569; display: flex; align-items: center; justify-content: space-between;">
+                    <div><i class="layui-icon layui-icon-code-circle" style="color: #ef4444;"></i> 源混乱 SQL 语句</div>
+                    <button class="layui-btn layui-btn-primary layui-btn-xs" style="border: none;" onclick="document.getElementById('input-box').value='SELECT a,b,c FROM users JOIN orders ON users.id=orders.uid WHERE status=1 GROUP BY a ORDER BY c DESC;'; document.getElementById('btn-format').click();"><i class="layui-icon layui-icon-play"></i> 填入测试用例</button>
+                </div>
+                <textarea id="input-box" placeholder="在此粘贴长串杂乱的 SQL 查询代码段..." class="layui-textarea code-textarea" style="border-top: none; border-radius: 0 0 8px 8px; background: #fafafa;"></textarea>
+            </div>
+            <div class="layui-col-md6">
+                <div style="background: #fff; border: 1px solid #cbd5e1; border-radius: 8px 8px 0 0; padding: 12px 20px; font-weight: 700; color: #475569; display: flex; align-items: center; justify-content: space-between;">
+                    <div><i class="layui-icon layui-icon-layouts" style="color: #10b981;"></i> 智能分析输出结果</div>
+                    <button class="layui-btn layui-btn-warm layui-btn-xs" id="btn-copy" style="border-radius: 4px;"><i class="layui-icon layui-icon-file"></i> 脱水复制</button>
+                </div>
+                <textarea id="output-box" placeholder="美化或压缩后的 SQL 将呈现于此..." class="layui-textarea code-textarea" style="border-top: none; border-radius: 0 0 8px 8px; background: #f8f9fa; cursor: pointer;" readonly></textarea>
             </div>
         </div>
 
-        <div class="layui-row layui-col-space15">
-            <div class="layui-col-md6">
-                <textarea id="input-box" placeholder="在此输入 SQL 语句..." class="layui-textarea" style="height: 400px;"></textarea>
-            </div>
-            <div class="layui-col-md6">
-                <textarea id="output-box" placeholder="处理结果..." class="layui-textarea" style="height: 400px; background-color: #f8f9fa;" readonly></textarea>
-            </div>
-        </div>
     </div>
 </div>
+
+<style>
+.code-textarea {
+    height: 500px !important;
+    font-family: 'JetBrains Mono', Consolas, monospace;
+    font-size: 15px;
+    line-height: 1.6;
+    border: 1px solid #cbd5e1;
+    box-sizing: border-box;
+    white-space: pre-wrap;
+    word-break: break-all;
+    resize: none;
+    transition: all 0.3s ease;
+}
+.code-textarea:focus { border-color: #6366f1 !important; background: #fff !important; box-shadow: 0 0 0 3px rgba(99,102,241,0.1) !important;}
+</style>
 {/block}
 
 {block name="script"}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.11/clipboard.min.js"></script>
 <script src="https://cdn.bootcdn.net/ajax/libs/sql-formatter/4.0.2/sql-formatter.min.js"></script>
 <script>
-layui.use(['layer', 'jquery'], function(){
-    var layer = layui.layer, $ = layui.jquery;
+layui.use(['layer', 'jquery', 'form'], function(){
+    var layer = layui.layer, $ = layui.jquery, form = layui.form;
 
     $('#btn-format').click(function(){
-        var sql = $('#input-box').val();
-        if(!sql) return;
+        var sql = $('#input-box').val().trim();
+        if(!sql) {
+            layer.msg('左侧似乎没有输入内容', {icon: 0, anim: 6});
+            return;
+        }
         var dialect = $('#sql-dialect').val();
+        var uppercase = $('#sql-uppercase').prop('checked');
+        
         try {
-            var formatted = sqlFormatter.format(sql, { language: dialect });
+            var formatted = sqlFormatter.format(sql, { 
+                language: dialect,
+                uppercase: uppercase,
+                linesBetweenQueries: 2
+            });
             $('#output-box').val(formatted);
+            layer.msg('分析并格式化成功', {icon: 1});
         } catch(e) {
-            layer.msg('格式化失败: ' + e.message, {icon: 2});
+            $('#output-box').val('/// FORMAT ERROR ///\n' + e.message + '\n\n/* 可能是源语法中包含部分特异扩展导致，请改用 Standard SQL 或检查代码。*/');
+            layer.msg('语法报错：无法完整格式化', {icon: 2});
         }
     });
 
     $('#btn-compress').click(function(){
-        var sql = $('#input-box').val();
+        var sql = $('#input-box').val().trim();
         if(!sql) return;
-        // Simple compress
-        var compressed = sql.replace(/\s+/g, ' ').trim();
+        var compressed = sql.replace(/\s+/g, ' ')
+                            .replace(/\s*(=|!=|<>|>|<|>=|<=)\s*/g, '$1')
+                            .replace(/\s*,\s*/g, ',')
+                            .replace(/\s*\(\s*/g, '(')
+                            .replace(/\s*\)\s*/g, ')')
+                            .trim();
         $('#output-box').val(compressed);
+        layer.msg('压缩完成', {icon: 1});
     });
 
     $('#btn-clear').click(function(){
-        $('#input-box').val('');
+        $('#input-box').val('').focus();
         $('#output-box').val('');
+    });
+
+    $('#output-box').click(function(){
+        if(!$(this).val() || $(this).val().indexOf('FORMAT ERROR') > -1) return;
+        $(this).select();
+    });
+
+    var clipboard = new ClipboardJS('#btn-copy', {
+        target: function() { return document.getElementById('output-box'); }
+    });
+    clipboard.on('success', function(e) {
+        if(!e.text) { layer.msg('空的一无所有，复制失败'); return; }
+        layer.msg('右侧解析结构已提取至剪贴板', {icon: 1, time: 2000});
+        e.clearSelection();
     });
 });
 </script>

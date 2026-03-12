@@ -1,68 +1,86 @@
 {extend name="tools/layout" /}
 
-{block name="keywords"}XML转JSON,JSON转XML,XML格式化,XML校验,在线XML工具{/block}
-{block name="description"}在线XML与JSON互转工具，支持XML格式化、校验以及XML与JSON数据格式的互相转换，开发调试必备。{/block}
-
-{block name="style"}
-<style>
-    .result-box {
-        background-color: #f8f9fa;
-        min-height: 400px;
-        padding: 10px;
-        border: 1px solid #e6e6e6;
-        border-radius: 4px;
-        white-space: pre-wrap;
-        font-family: monospace;
-    }
-</style>
-{/block}
+{block name="keywords"}XML转JSON,JSON转XML,在线XML格式化,XML转换器,数据互转{/block}
+{block name="description"}极速在线 XML/JSON 数据互转和压缩格式化工具。采用双屏左右对照布局，智能检测转换错误，为您提供现代化的数据解析体验。{/block}
 
 {block name="main"}
 <div class="layui-card">
-    <div class="layui-card-header">XML 格式化 / 压缩</div>
+    <div class="layui-card-header">XML / JSON 超清互换中心</div>
     <div class="layui-card-body">
-        <div class="layui-form-item">
-            <div class="layui-btn-group">
-                <button class="layui-btn layui-btn-normal" id="btn-format">格式化</button>
-                <button class="layui-btn layui-btn-primary" id="btn-compress">压缩</button>
-                <button class="layui-btn layui-btn-danger" id="btn-clear">清空</button>
-                <button class="layui-btn" id="btn-copy">复制结果</button>
+        
+        <!-- 操作中枢 -->
+        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-bottom: 25px; display: flex; align-items: center; justify-content: center; gap: 15px; flex-wrap: wrap;">
+            
+            <div class="layui-btn-group" style="box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-radius: 8px;">
+                <button class="layui-btn layui-btn-normal" id="btn-x2j" style="height: 50px; font-size: 16px; padding: 0 25px;"><i class="layui-icon layui-icon-next"></i> 提取 JSON</button>
+                <button class="layui-btn layui-btn-warm" id="btn-j2x" style="height: 50px; font-size: 16px; padding: 0 25px;"><i class="layui-icon layui-icon-prev"></i> 生成 XML</button>
             </div>
+
+            <div style="width: 2px; height: 30px; background: #cbd5e1; margin: 0 10px;"></div>
+
+            <button class="layui-btn layui-btn-primary" id="btn-format" style="height: 50px; border-radius: 8px;"><i class="layui-icon layui-icon-app"></i> 左侧格式化(XML)</button>
+            <button class="layui-btn layui-btn-primary" id="btn-compress" style="height: 50px; border-radius: 8px;"><i class="layui-icon layui-icon-shrink-right"></i> 左侧压缩</button>
+
+            <button class="layui-btn layui-btn-danger" id="btn-clear" style="height: 50px; border-radius: 8px; margin-left: auto;"><i class="layui-icon layui-icon-delete"></i> 彻底清空</button>
+            <button class="layui-btn" id="btn-copy" style="height: 50px; border-radius: 8px; background: #10b981;"><i class="layui-icon layui-icon-file"></i> 脱水复制右侧结果</button>
+            
         </div>
         
-        <div class="layui-row layui-col-space15">
+        <!-- 双列输入输出 -->
+        <div class="layui-row layui-col-space20 text-diff-container">
             <div class="layui-col-md6">
-                <textarea id="input-box" placeholder="在此输入 XML 代码..." class="layui-textarea" style="height: 450px; font-family: monospace;"></textarea>
+                <div style="background: #fff; border: 1px solid #cbd5e1; border-radius: 8px 8px 0 0; padding: 12px 20px; font-weight: 700; color: #475569; display: flex; align-items: center; justify-content: space-between;">
+                    <div><i class="layui-icon layui-icon-code-circle" style="color: #6366f1;"></i> 源数据 (XML / JSON 均可)</div>
+                </div>
+                <textarea id="input-box" placeholder="在此粘贴你需要解析的杂乱臃肿的 XML 片段或 JSON 文本..." class="layui-textarea code-textarea" style="border-top: none; border-radius: 0 0 8px 8px; background: #fafafa;"></textarea>
             </div>
             <div class="layui-col-md6">
-                <textarea id="output-box" placeholder="处理结果..." class="layui-textarea" style="height: 450px; background-color: #f8f9fa; font-family: monospace;" readonly></textarea>
+                <div style="background: #fff; border: 1px solid #cbd5e1; border-radius: 8px 8px 0 0; padding: 12px 20px; font-weight: 700; color: #475569; display: flex; align-items: center; justify-content: space-between;">
+                    <div><i class="layui-icon layui-icon-layouts" style="color: #10b981;"></i> 转换与格式结果</div>
+                </div>
+                <textarea id="output-box" placeholder="解析完成的无损结构树将呈现于此..." class="layui-textarea code-textarea" style="border-top: none; border-radius: 0 0 8px 8px; background: #f8f9fa; cursor: pointer;" readonly></textarea>
             </div>
         </div>
+
     </div>
 </div>
+
+<style>
+.code-textarea {
+    height: 550px !important;
+    font-family: 'JetBrains Mono', Consolas, monospace;
+    font-size: 15px;
+    line-height: 1.6;
+    border: 1px solid #cbd5e1;
+    box-sizing: border-box;
+    white-space: pre-wrap;
+    word-break: break-all;
+    resize: none;
+    transition: all 0.3s ease;
+}
+.code-textarea:focus { border-color: #6366f1 !important; background: #fff !important; box-shadow: 0 0 0 3px rgba(99,102,241,0.1) !important;}
+</style>
 {/block}
 
 {block name="script"}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.11/clipboard.min.js"></script>
+<!-- 引入更稳定的 xml2js 在线库或者编写小型解析器，为了无痛体验我们直接手写强健的前端转化正则和 DOMParser -->
 <script>
 layui.use(['layer', 'jquery'], function(){
-    var layer = layui.layer,
-        $ = layui.jquery;
+    var layer = layui.layer, $ = layui.jquery;
 
-    // XML Format Function
+    // --- XML Format Function ---
     function formatXml(xml) {
         var formatted = '';
         var reg = /(>)(<)(\/*)/g;
         xml = xml.replace(reg, '$1\r\n$2$3');
         var pad = 0;
-        jQuery.each(xml.split('\r\n'), function(index, node) {
+        $.each(xml.split('\r\n'), function(index, node) {
             var indent = 0;
             if (node.match( /.+<\/\w[^>]*>$/ )) {
                 indent = 0;
             } else if (node.match( /^<\/\w/ )) {
-                if (pad != 0) {
-                    pad -= 1;
-                }
+                if (pad != 0) pad -= 1;
             } else if (node.match( /^<\w[^>]*[^\/]>.*$/ )) {
                 indent = 1;
             } else {
@@ -70,40 +88,165 @@ layui.use(['layer', 'jquery'], function(){
             }
 
             var padding = '';
-            for (var i = 0; i < pad; i++) {
-                padding += '  ';
-            }
+            for (var i = 0; i < pad; i++) padding += '  ';
 
             formatted += padding + node + '\r\n';
             pad += indent;
         });
-
         return formatted;
     }
 
-    // Compress Function
+    // --- XML Compress ---
     function compressXml(xml) {
         return xml.replace(/>\s+</g, '><').replace(/\s{2,}/g, ' ').trim();
     }
 
-    $('#btn-format').click(function(){
-        var xml = $('#input-box').val();
-        if(!xml) return;
-        try {
-            // Simple validation check
-            if (xml.indexOf('<') === -1) {
-                throw new Error("Invalid XML");
+    // --- XML to JSON Parser (Browser DOMParser based) ---
+    function xmlToJson(xmlStr) {
+        var parser = new DOMParser();
+        var xmlDoc = parser.parseFromString(xmlStr, "text/xml");
+        
+        // Error handling in DOMParser
+        var errorNode = xmlDoc.querySelector("parsererror");
+        if (errorNode) throw new Error("无效的 XML 节点结构：" + errorNode.textContent);
+
+        function toObject(node) {
+            var obj = {};
+            if (node.nodeType === 1) { // element
+                if (node.attributes.length > 0) {
+                    obj["@attributes"] = {};
+                    for (var j = 0; j < node.attributes.length; j++) {
+                        var attribute = node.attributes.item(j);
+                        obj["@attributes"][attribute.nodeName] = attribute.nodeValue;
+                    }
+                }
+            } else if (node.nodeType === 3) { // text
+                var text = node.nodeValue.trim();
+                if(text) return text;
             }
-            $('#output-box').val(formatXml(xml));
+
+            if (node.hasChildNodes()) {
+                for(var i = 0; i < node.childNodes.length; i++) {
+                    var item = node.childNodes.item(i);
+                    var nodeName = item.nodeName;
+
+                    if(nodeName === '#text') {
+                        var t = item.nodeValue.trim();
+                        if(t) {
+                           if(Object.keys(obj).length === 0) return t; // plain text only
+                           else obj["#text"] = t;
+                        }
+                    } else {
+                        var o = toObject(item);
+                        if (typeof(obj[nodeName]) === "undefined") {
+                            obj[nodeName] = o;
+                        } else {
+                            if (typeof(obj[nodeName].push) === "undefined") {
+                                var old = obj[nodeName];
+                                obj[nodeName] = [];
+                                obj[nodeName].push(old);
+                            }
+                            obj[nodeName].push(o);
+                        }
+                    }
+                }
+            }
+            return obj;
+        }
+
+        return toObject(xmlDoc.documentElement);
+    }
+    
+    // --- JSON to XML (Simple recursive builder) ---
+    function jsonToXml(jsonObj, rootName) {
+        var xml = '';
+        for (var prop in jsonObj) {
+            if (jsonObj.hasOwnProperty(prop)) {
+                if(prop === '@attributes') continue; // attributes handled separately
+
+                var val = jsonObj[prop];
+                
+                if (Array.isArray(val)) {
+                    for (var i = 0; i < val.length; i++) {
+                        xml += "<" + prop + ">";
+                        if(typeof val[i] === 'object') xml += jsonToXml(val[i]);
+                        else xml += val[i];
+                        xml += "</" + prop + ">";
+                    }
+                } else if (typeof val === "object") {
+                    xml += "<" + prop;
+                    if(val['@attributes']) {
+                        for(var attr in val['@attributes']) {
+                            xml += ' ' + attr + '="' + val['@attributes'][attr] + '"';
+                        }
+                    }
+                    xml += ">";
+                    var inner = jsonToXml(val);
+                    if(val['#text']) inner += val['#text'];
+                    xml += inner;
+                    xml += "</" + prop + ">";
+                } else {
+                    xml += "<" + prop + ">" + val + "</" + prop + ">";
+                }
+            }
+        }
+        return xml;
+    }
+
+
+    /* Actions Binding */
+    $('#btn-format').click(function(){
+        var val = $('#input-box').val().trim();
+        if(!val) return;
+        try {
+            if(val.startsWith('<')) {
+                $('#output-box').val(formatXml(val));
+                layer.msg('XML格式化成功');
+            } else if(val.startsWith('{') || val.startsWith('[')) {
+                var j = JSON.parse(val);
+                $('#output-box').val(JSON.stringify(j, null, 4));
+                layer.msg('JSON格式化成功');
+            } else {
+                layer.msg('无法识别的输入主体', {icon: 2, anim: 6});
+            }
         } catch(e) {
-            layer.msg('XML 解析错误: ' + e.message, {icon: 2});
+            layer.msg('解析错误: ' + e.message, {icon: 2, time: 3000});
         }
     });
 
     $('#btn-compress').click(function(){
-        var xml = $('#input-box').val();
-        if(!xml) return;
-        $('#output-box').val(compressXml(xml));
+        var val = $('#input-box').val().trim();
+        if(!val) return;
+        if(val.startsWith('<')) {
+            $('#output-box').val(compressXml(val));
+        } else {
+            try { $('#output-box').val(JSON.stringify(JSON.parse(val))); } catch(e) { layer.msg('JSON 错误', {icon: 2}); }
+        }
+    });
+
+    $('#btn-x2j').click(function(){
+        var val = $('#input-box').val().trim();
+        if(!val || !val.startsWith('<')) { layer.msg('请在左侧填入合法的 XML', {icon: 0, anim: 6}); return; }
+        try {
+            var j = xmlToJson(val);
+            $('#output-box').val(JSON.stringify(j, null, 4));
+            layer.msg('XML -> JSON 提取成功', {icon: 1});
+        } catch(e) {
+            layer.msg(e.message, {icon: 2});
+        }
+    });
+
+    $('#btn-j2x').click(function(){
+        var val = $('#input-box').val().trim();
+        if(!val || (!val.startsWith('{') && !val.startsWith('['))) { layer.msg('请在左侧填入合法的 JSON 对象', {icon: 0, anim: 6}); return; }
+        try {
+            var j = JSON.parse(val);
+            var x = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<root>\n" + jsonToXml(j) + "\n</root>";
+            $('#output-box').val(formatXml(x));
+            layer.msg('JSON -> XML 生成成功', {icon: 1});
+        } catch(e) {
+            layer.msg('JSON 语法错误: ' + e.message, {icon: 2});
+        }
     });
 
     $('#btn-clear').click(function(){
@@ -111,20 +254,20 @@ layui.use(['layer', 'jquery'], function(){
         $('#output-box').val('');
     });
 
-    // Copy
+    // 右栏单击一键全选
+    $('#output-box').click(function(){
+        if(!$(this).val()) return;
+        $(this).select();
+    });
+
+    // 复制结果功能
     var clipboard = new ClipboardJS('#btn-copy', {
-        target: function(trigger) {
-            return document.getElementById('output-box');
-        }
+        target: function() { return document.getElementById('output-box'); }
     });
-
     clipboard.on('success', function(e) {
-        layer.msg('复制成功', {icon: 1, time: 1500});
+        if(!e.text) { layer.msg('空的一无所有，复制失败'); return; }
+        layer.msg('右侧解析结构已提取至剪贴板', {icon: 1, time: 2000});
         e.clearSelection();
-    });
-
-    clipboard.on('error', function(e) {
-        layer.msg('复制失败', {icon: 2});
     });
 });
 </script>
