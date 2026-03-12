@@ -252,3 +252,85 @@ body {
     transform: none; /* 防止在 group 里抖动 */
     filter: brightness(1.05);
 }
+
+/* =========================================
+   全局预留高级广告位区块样式 (Premium AD Slot)
+   ========================================= */
+.ad-banner-slot {
+    display: flex;
+    align-items: center;
+    background: linear-gradient(to right, #ffffff, #f8fafc);
+    border: 1px dashed #cbd5e1;
+    border-radius: 12px;
+    padding: 18px 25px;
+    position: relative;
+    text-decoration: none !important;
+    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+    color: var(--text-main);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.01);
+}
+.ad-banner-slot:hover {
+    border-color: #a855f7;
+    border-style: solid;
+    background: #faf5ff;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(168, 85, 247, 0.15);
+}
+.ad-banner-slot.hover-pink:hover {
+    border-color: #ec4899;
+    background: #fdf2f8 !important;
+    box-shadow: 0 10px 15px -3px rgba(236, 72, 153, 0.15);
+}
+.ad-badge {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: rgba(203, 213, 225, 0.35);
+    color: #64748b;
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 0 12px 0 12px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+}
+.ad-banner-slot:hover .ad-badge {
+    background: rgba(168, 85, 247, 0.15);
+    color: #a855f7;
+}
+.ad-banner-slot.hover-pink:hover .ad-badge {
+    background: rgba(236, 72, 153, 0.15);
+    color: #ec4899;
+}
+.ad-icon-circle {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 20px;
+    flex-shrink: 0;
+    font-size: 24px;
+    transition: all 0.3s ease;
+}
+.ad-banner-slot:hover .ad-icon-circle {
+    transform: scale(1.1) rotate(5deg);
+}
+.ad-text-content {
+    flex: 1;
+}
+.ad-text-content strong {
+    font-size: 16px;
+    color: var(--primary-color);
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 800;
+}
+.ad-text-content p {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin: 0;
+    line-height: 1.5;
+}

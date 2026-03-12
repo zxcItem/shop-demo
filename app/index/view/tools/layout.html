@@ -47,15 +47,41 @@
     </div>
     {/if}
     
-    <!-- 顶部广告位 -->
-    {block name="ad_top"}{/block}
+    <!-- 顶部广告位 (默认保留样式，可在具体工具被重写去除) -->
+    {block name="ad_top"}
+    <div class="layui-anim layui-anim-fadein" style="margin-bottom: 25px;">
+        <a href="javascript:layer.msg('优质横幅广告位正在招募中...');" class="ad-banner-slot">
+            <span class="ad-badge">赞助商 (AD)</span>
+            <div class="ad-icon-circle" style="background: rgba(168, 85, 247, 0.1); color: #a855f7;">
+                <i class="layui-icon layui-icon-diamond"></i>
+            </div>
+            <div class="ad-text-content">
+                <strong>高性能企业级云主机大促 · 开发者护航计划</strong>
+                <p>新人专享超管通道：云端 2核4G 基础云服务器买一赠一，点击以极低成本立即部署实验站方案 &rarr;</p>
+            </div>
+        </a>
+    </div>
+    {/block}
     
     <div class="layui-anim layui-anim-upbit" style="min-height: 400px;">
         {block name="main"}{/block}
     </div>
     
-    <!-- 底部广告位 -->
-    {block name="ad_bottom"}{/block}
+    <!-- 底部广告位 (图文混合类占位示例) -->
+    {block name="ad_bottom"}
+    <div class="layui-anim layui-anim-fadein" style="margin-top: 25px;">
+        <a href="javascript:layer.msg('底栏焦点广告位招募中...');" class="ad-banner-slot hover-pink" style="background: linear-gradient(to right, #fff, #fdf2f8); border-color: #fce7f3;">
+            <span class="ad-badge">品牌赞助</span>
+            <div class="ad-icon-circle" style="background: rgba(236, 72, 153, 0.1); color: #ec4899;">
+                <i class="layui-icon layui-icon-fire"></i>
+            </div>
+            <div class="ad-text-content">
+                <strong style="color: #be185d;">系统级架构师面试真题题库与内部进阶资料集 (限期入群免费)</strong>
+                <p>已收录覆盖国内外大厂面经、主流中间件原理突击剖析与源码解读。加入私域池即刻获得全部打包下载权限...</p>
+            </div>
+        </a>
+    </div>
+    {/block}
     
     <!-- 页面内容/说明 -->
     <div class="layui-row layui-col-space15" style="margin-top: 30px;">
