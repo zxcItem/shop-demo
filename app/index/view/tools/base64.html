@@ -1,40 +1,253 @@
 {extend name="tools/layout" /}
 
-{block name="keywords"}Base64编码,Base64解码,Base64转换,在线Base64,加密解密{/block}
-{block name="description"}在线Base64编码和解码工具，支持文本和Base64格式的互相转换，简单快速，支持中文。{/block}
+{block name="title"}Base64 编解码 - 在线神仙工具箱{/block}
+{block name="keywords"}Base64编码,Base64解码,Base64转换,在线Base64,加密解密,URL Safe Base64{/block}
+{block name="description"}高颜值、快速响应的在线Base64编码和解码工具。支持文本和Base64格式互相转换，自动识别并支持中文字符，提供深浅色兼容的高级面板，一键轻松复制！{/block}
+
+{block name="style"}
+<style>
+/* Modern Base64 Page Styles */
+.hero-glass {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05), 0 5px 15px rgba(0,0,0,0.03);
+    overflow: hidden;
+    margin-bottom: 25px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.hero-glass:hover {
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08), 0 8px 20px rgba(0,0,0,0.04);
+}
+.hero-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 22px 35px;
+    font-size: 1.35rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    letter-spacing: 0.5px;
+}
+.hero-body {
+    padding: 35px;
+}
+.action-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 30px;
+    background: #f8fafc;
+    padding: 18px 25px;
+    border-radius: 16px;
+    border: 1px solid #e2e8f0;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+}
+.btn-modern {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 15px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: none;
+    cursor: pointer;
+    color: #fff;
+    letter-spacing: 0.5px;
+}
+.btn-encode {
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+}
+.btn-encode:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(99, 102, 241, 0.5);
+}
+.btn-decode {
+    background: linear-gradient(135deg, #0ea5e9 0%, #059669 100%);
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+}
+.btn-decode:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(16, 185, 129, 0.5);
+}
+.btn-clear {
+    background: white;
+    color: #ef4444;
+    border: 1px solid #fca5a5;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+.btn-clear:hover {
+    background: #fef2f2;
+    transform: translateY(-2px);
+    border-color: #ef4444;
+}
+.checkbox-modern {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    color: #475569;
+    font-weight: 500;
+    font-size: 14px;
+    user-select: none;
+    padding: 8px 12px;
+    border-radius: 8px;
+    transition: background 0.3s ease;
+}
+.checkbox-modern:hover {
+    background: rgba(0,0,0,0.03);
+}
+.checkbox-modern input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: #7c3aed;
+    cursor: pointer;
+}
+.io-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+}
+@media(max-width: 768px) {
+    .io-container { grid-template-columns: 1fr; }
+}
+.io-box {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.io-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #334155;
+    font-weight: 600;
+    font-size: 16px;
+    padding-bottom: 5px;
+    border-bottom: 2px solid #e2e8f0;
+}
+.io-header i.title-icon {
+    color: #6366f1;
+    margin-right: 5px;
+}
+.io-header .copy-btn {
+    font-size: 13px;
+    color: #6366f1;
+    cursor: pointer;
+    background: rgba(99, 102, 241, 0.1);
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+.io-header .copy-btn:hover {
+    background: rgba(99, 102, 241, 0.2);
+    transform: scale(1.05);
+}
+.custom-textarea {
+    width: 100%;
+    height: 380px;
+    padding: 20px;
+    border: 2px solid #e2e8f0;
+    border-radius: 16px;
+    font-family: 'Fira Code', 'Consolas', monospace;
+    font-size: 15px;
+    line-height: 1.6;
+    color: #1e293b;
+    background: #ffffff;
+    transition: all 0.3s ease;
+    resize: none;
+    box-sizing: border-box;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.01);
+}
+.custom-textarea:focus {
+    outline: none;
+    border-color: #8b5cf6;
+    box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.15), inset 0 2px 4px rgba(0,0,0,0.01);
+}
+.custom-textarea::placeholder {
+    color: #cbd5e1;
+    font-weight: 300;
+}
+.custom-textarea.readonly {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+    color: #475569;
+}
+.custom-textarea.readonly:focus {
+    border-color: #94a3b8;
+    box-shadow: 0 0 0 4px rgba(148, 163, 184, 0.15);
+}
+.custom-textarea::-webkit-scrollbar {
+    width: 8px;
+}
+.custom-textarea::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+}
+.custom-textarea::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+.custom-textarea::-webkit-scrollbar-track {
+    background: transparent;
+}
+</style>
+{/block}
 
 {block name="main"}
-<div class="layui-card">
-    <div class="layui-card-header">Base64 编码 / 解码</div>
-    <div class="layui-card-body">
-        <div class="layui-form-item" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap;">
-            <div class="layui-btn-group">
-                <button class="layui-btn layui-btn-normal" id="btn-encode"><i class="layui-icon layui-icon-next"></i> Base64 编码</button>
-                <button class="layui-btn layui-btn-warm" id="btn-decode"><i class="layui-icon layui-icon-prev"></i> Base64 解码</button>
-                <button class="layui-btn layui-btn-danger" id="btn-clear"><i class="layui-icon layui-icon-delete"></i> 清空</button>
+<div class="hero-glass layui-anim layui-anim-upbit">
+    <div class="hero-header">
+        <i class="layui-icon layui-icon-layer"></i> 
+        <span>Base64 编码 / 解码神器</span>
+    </div>
+    <div class="hero-body">
+        <div class="action-toolbar">
+            <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                <button class="btn-modern btn-encode" id="btn-encode">
+                    <i class="layui-icon layui-icon-next"></i> 
+                    一键编码 (Encode)
+                </button>
+                <button class="btn-modern btn-decode" id="btn-decode">
+                    <i class="layui-icon layui-icon-prev"></i> 
+                    一键解码 (Decode)
+                </button>
+                <button class="btn-modern btn-clear" id="btn-clear">
+                    <i class="layui-icon layui-icon-delete"></i> 
+                    清空重置
+                </button>
             </div>
-            <div style="margin-left: 10px; display: flex; align-items: center;">
-                <input type="checkbox" id="chk-urlsafe" style="width: 16px; height: 16px; margin-right: 5px;"> 
-                <label for="chk-urlsafe" style="cursor: pointer; color: #666; user-select: none;">URL Safe 模式 (使用 -_ 替换 +/)</label>
-            </div>
+            <label class="checkbox-modern" for="chk-urlsafe">
+                <input type="checkbox" id="chk-urlsafe">
+                <span>URL Safe 模式 (使用 -_ 替换 +/)</span>
+            </label>
         </div>
 
-        <div class="layui-row layui-col-space15">
-            <div class="layui-col-md6">
-                <div class="layui-form-item layui-form-text">
-                    <label class="layui-form-label" style="text-align: left; padding-left: 0;">原始内容</label>
-                    <div class="layui-input-block" style="margin-left: 0;">
-                        <textarea id="input-box" placeholder="请输入要编码的文本，或Base64字符串..." class="layui-textarea" style="height: 300px;"></textarea>
-                    </div>
+        <div class="io-container">
+            <div class="io-box">
+                <div class="io-header">
+                    <span><i class="layui-icon layui-icon-edit title-icon"></i> 原始数据区</span>
+                    <span class="copy-btn" id="copy-input" title="复制输入框内容"><i class="layui-icon layui-icon-file"></i> 复制</span>
                 </div>
+                <textarea id="input-box" class="custom-textarea" placeholder="在此输入要进行编码的文本内容，或者输入待解码的 Base64 字符串。&#10;&#10;✨ 支持中英文完美混合解析&#10;✨ 支持 URL Safe 模式解析" spellcheck="false"></textarea>
             </div>
-            <div class="layui-col-md6">
-                <div class="layui-form-item layui-form-text">
-                    <label class="layui-form-label" style="text-align: left; padding-left: 0;">处理结果</label>
-                    <div class="layui-input-block" style="margin-left: 0;">
-                        <textarea id="output-box" placeholder="结果显示区域" class="layui-textarea" style="height: 300px; background-color: #f8f9fa;" readonly></textarea>
-                    </div>
+            
+            <div class="io-box">
+                <div class="io-header">
+                    <span><i class="layui-icon layui-icon-console title-icon"></i> 处理结果区</span>
+                    <span class="copy-btn" id="copy-output" title="复制结果框内容"><i class="layui-icon layui-icon-file"></i> 复制</span>
                 </div>
+                <textarea id="output-box" class="custom-textarea readonly" placeholder="变幻莫测的结果将在这里闪亮登场..." readonly spellcheck="false"></textarea>
             </div>
         </div>
     </div>
@@ -55,23 +268,111 @@ layui.use(['layer', 'jquery'], function(){
         return decodeURIComponent(escape(window.atob(str)));
     }
 
+    // 添加动画效果反馈
+    function bounceEffect(elem) {
+        $(elem).css('transform', 'scale(0.98)').css('opacity', '0.7');
+        setTimeout(function() {
+            $(elem).css('transform', 'scale(1)').css('opacity', '1');
+        }, 150);
+    }
+
+    // 复制功能
+    function copyToClipboard(text, elem) {
+        if (!text) {
+            layer.msg('内容为空，没有可复制的数据', {icon: 0, anim: 6});
+            bounceEffect(elem);
+            return;
+        }
+        var doCopyFallback = function() {
+            var textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.position = "fixed";  // avoiding scrolling to bottom
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            try {
+                var successful = document.execCommand('copy');
+                if(successful) {
+                    showCopySuccess(elem);
+                } else {
+                    layer.msg('复制失败，请手动选取复制', {icon: 2});
+                }
+            } catch (err) {
+                layer.msg('复制失败！', {icon: 2});
+            }
+            document.body.removeChild(textArea);
+        };
+
+        var showCopySuccess = function(elem) {
+            var $icon = $(elem).find('i');
+            var $text = $(elem).contents().filter(function(){ return this.nodeType == 3; });
+            var originalHtml = $(elem).html();
+            
+            $(elem).css('background', 'rgba(16, 185, 129, 0.1)').css('color', '#10b981');
+            $icon.removeClass('layui-icon-file').addClass('layui-icon-ok');
+            $text[0].nodeValue = ' 已复制';
+            
+            layer.msg('复制成功！', {
+                icon: 1, 
+                time: 1000, 
+                offset: 't', 
+                anim: 5
+            });
+            
+            setTimeout(function() {
+                $(elem).css('background', '').css('color', '');
+                $(elem).html(originalHtml);
+            }, 2000);
+        };
+
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(text).then(function() {
+                showCopySuccess(elem);
+            }).catch(function(err) {
+                doCopyFallback();
+            });
+        } else {
+            doCopyFallback();
+        }
+    }
+
+    $('#copy-input').click(function(){
+        copyToClipboard($('#input-box').val(), this);
+        bounceEffect(this);
+    });
+
+    $('#copy-output').click(function(){
+        copyToClipboard($('#output-box').val(), this);
+        bounceEffect(this);
+    });
+
     $('#btn-encode').click(function(){
         var str = $('#input-box').val();
-        if(!str) return;
+        if(!str) {
+            layer.msg('请输入需要强力发动的编码内容！', {icon: 0, anim: 6});
+            $('#input-box').focus();
+            return;
+        }
         try {
             var res = utf8_to_b64(str);
             if($('#chk-urlsafe').prop('checked')) {
                 res = res.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
             }
             $('#output-box').val(res);
+            bounceEffect('#output-box');
+            layer.msg('Base64 编码完美完成', {icon: 1, time: 1000, offset: 't'});
         } catch(e) {
-            layer.msg('编码失败: ' + e.message, {icon: 2});
+            layer.msg('编码遭遇结界阻挡: ' + e.message, {icon: 2, anim: 6});
         }
     });
 
     $('#btn-decode').click(function(){
         var str = $('#input-box').val().trim();
-        if(!str) return;
+        if(!str) {
+            layer.msg('请输入神秘的 Base64 字符串解码！', {icon: 0, anim: 6});
+            $('#input-box').focus();
+            return;
+        }
         try {
             if($('#chk-urlsafe').prop('checked') || str.indexOf('-') > -1 || str.indexOf('_') > -1) {
                 str = str.replace(/-/g, '+').replace(/_/g, '/');
@@ -79,14 +380,18 @@ layui.use(['layer', 'jquery'], function(){
             }
             var res = b64_to_utf8(str);
             $('#output-box').val(res);
+            bounceEffect('#output-box');
+            layer.msg('解码成功，真面目已浮现', {icon: 1, time: 1000, offset: 't'});
         } catch(e) {
-            layer.msg('解码失败，请检查输入是否为有效的Base64字符串', {icon: 2});
+            layer.msg('解码失败，似乎这不是真正的 Base64 字符串', {icon: 2, anim: 6, time: 2000});
         }
     });
 
     $('#btn-clear').click(function(){
         $('#input-box').val('');
         $('#output-box').val('');
+        $('#input-box').focus();
+        layer.msg('世界清静了 ✨', {time: 800});
     });
 });
 </script>
