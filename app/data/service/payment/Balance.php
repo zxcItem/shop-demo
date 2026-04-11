@@ -1,0 +1,159 @@
+<?php
+
+declare(strict_types=1);
+
+namespace app\data\service\payment;
+
+use app\data\model\account\DataAccountUser;
+use app\data\model\payment\DataPaymentBalance;
+use think\admin\Exception;
+
+/**
+ * 用户余额调度器.
+ * @class Balance
+ */
+abstract class Balance
+{
+    /**
+     * 创建余额变更操作.
+     * @param int $unid 账号编号
+     * @param string $code 交易标识
+     * @param string $name 交易标题
+     * @param string $amount 变更金额
+     * @param string $remark 变更描述
+     * @param bool $unlock 解锁状态
+     * @throws Exception
+     */
+    public static function create(int $unid, string $code, string $name, string $amount, string $remark = '', bool $unlock = false): DataPaymentBalance
+    {
+        $user = DataAccountUser::mk()->findOrEmpty($unid);
+        if ($user->isEmpty()) {
+            throw new Exception('账号不存在！');
+        }
+
+        // 扣减余额检查
+        $map = ['unid' => $unid, 'cancel' => 0, 'deleted' => 0];
+        $usable = DataPaymentBalance::mk()->where($map)->sum('amount');
+        if ($amount < 0 && abs($amount) > $usable) {
+            throw new Exception('扣减余额不足！');
+        }
+
+        // 余额标准字段
+        $data = ['unid' => $unid, 'code' => $code, 'name' => $name, 'amount' => strval($amount), 'remark' => $remark];
+
+        // 锁定状态处理
+        $data['unlock'] = intval($unlock);
+        if ($data['unlock']) {
+            $data['unlock_time'] = date('Y-m-d H:i:s');
+        }
+
+        // 统计操作前的金额
+        $data['amount_prev'] = $usable;
+        $data['amount_next'] = bcadd(strval($usable), strval($amount), 2);
+
+        // 检查编号是否重复
+        $map = ['unid' => $unid, 'code' => $code, 'deleted' => 0];
+        $model = DataPaymentBalance::mk()->where($map)->findOrEmpty();
+
+        // 更新或写入余额变更
+        if ($model->save($data)) {
+            self::recount($unid);
+            return $model->refresh();
+        }
+        throw new Exception('余额变更失败！');
+    }
+
+    /**
+     * 解锁余额变更操作.
+     * @param string $code 交易订单
+     * @param int $unlock 锁定状态
+     * @throws Exception
+     */
+    public static function unlock(string $code, int $unlock = 1): DataPaymentBalance
+    {
+        return self::set($code, ['unlock' => $unlock, 'unlock_time' => date('Y-m-d H:i:s')]);
+    }
+
+    /**
+     * 作废余额变更操作.
+     * @param string $code 交易订单
+     * @param int $cancel 取消状态
+     * @throws Exception
+     */
+    public static function cancel(string $code, int $cancel = 1): DataPaymentBalance
+    {
+        return self::set($code, ['cancel' => $cancel, 'cancel_time' => date('Y-m-d H:i:s')]);
+    }
+
+    /**
+     * 删除余额记录.
+     * @throws Exception
+     */
+    public static function remove(string $code): DataPaymentBalance
+    {
+        return self::set($code, ['deleted' => 1, 'deleted_time' => date('Y-m-d H:i:s')]);
+    }
+
+    /**
+     * 刷新用户余额.
+     * @param int $unid 指定用户编号
+     * @param null|array &$data 非数组时更新数据
+     * @return array [lock,used,total,usable]
+     * @throws Exception
+     */
+    public static function recount(int $unid, ?array &$data = null): array
+    {
+        $isUpdate = !is_array($data);
+        if ($isUpdate) {
+            $data = [];
+        }
+
+        if ($isUpdate) {
+            $user = DataAccountUser::mk()->findOrEmpty($unid);
+            if ($user->isEmpty()) {
+                throw new Exception('账号不存在！');
+            }
+        }
+
+        // 统计用户余额数据
+        $map = ['unid' => $unid, 'cancel' => 0, 'deleted' => 0];
+        $lock = DataPaymentBalance::mk()->where($map)->where('unlock', '=', '0')->sum('amount');
+        $used = DataPaymentBalance::mk()->where($map)->where('amount', '<', '0')->sum('amount');
+        $total = DataPaymentBalance::mk()->where($map)->where('amount', '>', '0')->sum('amount');
+
+        // 更新余额统计
+        $data['balance_lock'] = strval($lock);
+        $data['balance_used'] = bcmul(strval($used), '-1', 2);
+        $data['balance_total'] = strval($total);
+        $data['balance_usable'] = bcsub($data['balance_total'], $data['balance_used'], 2);
+        if ($isUpdate) {
+            $user->save(['extra' => array_merge($user->getAttr('extra'), $data)]);
+        }
+        return ['lock' => $lock, 'used' => abs($used), 'total' => $total, 'usable' => $data['balance_usable']];
+    }
+
+    /**
+     * 获取余额模型.
+     * @throws Exception
+     */
+    public static function get(string $code): DataPaymentBalance
+    {
+        $map = ['code' => $code, 'deleted' => 0];
+        $model = DataPaymentBalance::mk()->where($map)->findOrEmpty();
+        if ($model->isEmpty()) {
+            throw new Exception('无效的操作编号！');
+        }
+        return $model;
+    }
+
+    /**
+     * 更新余额记录.
+     * @throws Exception
+     */
+    public static function set(string $code, array $data): DataPaymentBalance
+    {
+        ($model = self::get($code))->save($data);
+        self::recount($model->getAttr('unid'));
+        return $model->refresh();
+    }
+}
