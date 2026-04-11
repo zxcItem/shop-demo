@@ -478,20 +478,105 @@ class AccountAccess implements AccountInterface
     {
         if (empty($data)) throw new Exception('资料不能为空！');
         
-        // 自动通过 UnionId 关联主账号
+        // 收集所有可能的关联ID，统一处理避免冲突
+        $candidateUnid = null;
+        
+        // 1. 通过 UnionId 查找可能的主账号 (微信体系、QQ等)
         if (empty($this->bind->getAttr('unid')) && !empty($data['unionid'])) {
-            $map = ['unionid' => $data['unionid'], 'deleted' => 0];
-            // 1. 优先查找主账号
-            $user = DataAccountUser::mk()->where($map)->findOrEmpty();
-            if ($user->isExists()) {
-                $data['unid'] = $user->getAttr('id');
-            } else {
-                // 2. 查找其他已绑定的终端账号
-                $bind = DataAccountBind::mk()->where($map)->where('unid', '>', 0)->findOrEmpty();
-                if ($bind->isExists()) {
-                    $data['unid'] = $bind->getAttr('unid');
+            $lockKey = "account:bind:unionid:{$data['unionid']}";
+            $lockAcquired = $this->app->cache->add($lockKey, 1, 10);
+            if (!$lockAcquired) {
+                throw new Exception('账号关联处理中，请稍后重试！');
+            }
+            
+            try {
+                // 查找主账号
+                $user = DataAccountUser::mk()->where(['unionid' => $data['unionid'], 'deleted' => 0])->findOrEmpty();
+                if ($user->isExists()) {
+                    $candidateUnid = $user->getAttr('id');
+                } else {
+                    // 查找其他已绑定的终端账号
+                    $bind = DataAccountBind::mk()->where(['unionid' => $data['unionid'], 'deleted' => 0])->where('unid', '>', 0)->findOrEmpty();
+                    if ($bind->isExists()) {
+                        $candidateUnid = $bind->getAttr('unid');
+                    }
+                }
+            } finally {
+                $this->app->cache->delete($lockKey);
+            }
+        }
+        
+        // 2. 通过 Email 查找可能的主账号 (Apple/Google/Facebook/邮箱登录等)
+        // 仅当未通过unionid找到关联时才继续
+        if (empty($candidateUnid) && empty($this->bind->getAttr('unid')) && !empty($data['email'])) {
+            $email = filter_var($data['email'], FILTER_VALIDATE_EMAIL);
+            if ($email !== false) {
+                $lockKey = "account:bind:email:" . md5($email);
+                $lockAcquired = $this->app->cache->add($lockKey, 1, 10);
+                if (!$lockAcquired) {
+                    throw new Exception('账号关联处理中，请稍后重试！');
+                }
+                
+                try {
+                    // 查找已绑定该邮箱的主账号
+                    $user = DataAccountUser::mk()->where(['email' => $email, 'deleted' => 0])->findOrEmpty();
+                    if ($user->isExists()) {
+                        $candidateUnid = $user->getAttr('id');
+                    } else {
+                        // 查找其他终端是否已用此邮箱关联了主账号
+                        $bind = DataAccountBind::mk()
+                            ->where('email', $email)
+                            ->where('unid', '>', 0)
+                            ->where('deleted', 0)
+                            ->findOrEmpty();
+                        if ($bind->isExists()) {
+                            $candidateUnid = $bind->getAttr('unid');
+                        }
+                    }
+                } finally {
+                    $this->app->cache->delete($lockKey);
                 }
             }
+        }
+        
+        // 3. 通过手机号查找可能的主账号 (仅当用户主动绑定时)
+        // 注意：手机号绑定通常在 bind() 方法中处理，这里只处理自动关联场景
+        // 如果传入了phone字段且当前终端未绑定，尝试关联
+        if (empty($candidateUnid) && empty($this->bind->getAttr('unid')) && !empty($data['phone'])) {
+            $phone = $data['phone'];
+            if (preg_match("/^1[3-9]\d{9}$/", $phone)) {
+                $lockKey = "account:bind:phone:{$phone}";
+                $lockAcquired = $this->app->cache->add($lockKey, 1, 10);
+                if (!$lockAcquired) {
+                    throw new Exception('账号关联处理中，请稍后重试！');
+                }
+                
+                try {
+                    // 查找已绑定该手机号的主账号
+                    $user = DataAccountUser::mk()->where(['phone' => $phone, 'deleted' => 0])->findOrEmpty();
+                    if ($user->isExists()) {
+                        $candidateUnid = $user->getAttr('id');
+                    }
+                } finally {
+                    $this->app->cache->delete($lockKey);
+                }
+            }
+        }
+        
+        // 4. 统一处理关联结果
+        if (!empty($candidateUnid)) {
+            // 检查该主账号是否已被同类型终端绑定
+            $existBind = DataAccountBind::mk()->where([
+                'unid' => $candidateUnid,
+                'type' => $this->type,
+                'deleted' => 0,
+            ])->where('id', '<>', $this->bind->getAttr('id'))->findOrEmpty();
+            
+            if (!$existBind->isExists()) {
+                // 该类型终端未被绑定，可以自动关联
+                $data['unid'] = $candidateUnid;
+            }
+            // 如果已被绑定，不报错，继续作为独立账号存在
         }
         
         $data['extra'] = array_merge($this->bind->getAttr('extra'), $data['extra'] ?? []);

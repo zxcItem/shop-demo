@@ -100,6 +100,21 @@ class Center extends Auth
             ]);
             if (Message::checkVerifyCode($data['verify'], $data['phone'])) {
                 Message::clearVerifyCode($data['phone']);
+                
+                // 检查手机号是否已被其他用户绑定
+                $existUser = \app\data\model\account\DataAccountUser::mk()
+                    ->where(['phone' => $data['phone'], 'deleted' => 0])
+                    ->findOrEmpty();
+                if ($existUser->isExists() && $existUser->getAttr('id') !== $this->unid) {
+                    // 检查是否已通过其他终端绑定到当前用户
+                    $existBind = \app\data\model\account\DataAccountBind::mk()
+                        ->where(['unid' => $existUser->getAttr('id'), 'deleted' => 0])
+                        ->findOrEmpty();
+                    if ($existBind->isExists()) {
+                        $this->error('该手机号已被其他用户绑定');
+                    }
+                }
+                
                 $map = $bind = ['phone' => $data['phone']];
                 if (!$this->account->isBind()) {
                     $user = $this->account->get();

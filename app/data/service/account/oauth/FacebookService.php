@@ -111,14 +111,15 @@ class FacebookService extends Contract
                 throw new \Exception('Facebook User ID 不匹配');
             }
             
-            // 获取用户信息 (可选，补充昵称头像)
-            // https://graph.facebook.com/me?fields=id,name,picture&access_token=TOKEN
-            $infoUrl = "https://graph.facebook.com/me?fields=id,name,picture.type(large)&access_token={$token}";
+            // 获取用户信息 (可选，补充昵称头像、邮箱)
+            // https://graph.facebook.com/me?fields=id,name,picture,email&access_token=TOKEN
+            $infoUrl = "https://graph.facebook.com/me?fields=id,name,picture.type(large),email&access_token={$token}";
             $infoResponse = file_get_contents($infoUrl, false, $context);
             $userInfo = $infoResponse ? json_decode($infoResponse, true) : [];
 
             return [
                 'openid'   => $openid,
+                'email'    => $userInfo['email'] ?? '',
                 'nickname' => $userInfo['name'] ?? '',
                 'headimg'  => $userInfo['picture']['data']['url'] ?? '',
                 'unionid'  => '', // Facebook 通常不返回 unionid，除非 Business 账号

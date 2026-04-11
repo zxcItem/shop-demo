@@ -78,6 +78,7 @@ class DataAccount20260411 extends Migrator
             ['unid', 'biginteger', ['limit' => 20, 'default' => 0, 'null' => true, 'comment' => '账号编号']],
             ['type', 'string', ['limit' => 20, 'default' => '', 'null' => true, 'comment' => '终端类型']],
             ['phone', 'string', ['limit' => 30, 'default' => '', 'null' => true, 'comment' => '绑定手机']],
+            ['email', 'string', ['limit' => 99, 'default' => '', 'null' => true, 'comment' => '绑定邮箱']],
             ['appid', 'string', ['limit' => 30, 'default' => '', 'null' => true, 'comment' => 'APPID']],
             ['openid', 'string', ['limit' => 128, 'default' => '', 'null' => true, 'comment' => 'OPENID']],
             ['unionid', 'string', ['limit' => 50, 'default' => '', 'null' => true, 'comment' => 'UnionID']],
@@ -92,7 +93,7 @@ class DataAccount20260411 extends Migrator
             ['create_time', 'datetime', ['default' => NULL, 'null' => true, 'comment' => '注册时间']],
             ['update_time', 'datetime', ['default' => NULL, 'null' => true, 'comment' => '更新时间']],
         ], [
-            'type', 'unid', 'sort', 'phone', 'appid', 'status', 'openid', 'unionid', 'deleted', 'create_time',
+            'type', 'unid', 'sort', 'phone', 'email', 'appid', 'status', 'openid', 'unionid', 'deleted', 'create_time',
         ], true);
     }
 

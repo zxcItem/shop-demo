@@ -127,6 +127,7 @@ class GoogleService extends Contract
 
             return [
                 'openid'   => $payload['sub'],
+                'email'    => $payload['email'] ?? '',
                 'nickname' => $payload['name'] ?? '',
                 'headimg'  => $payload['picture'] ?? '',
                 'unionid'  => '', 

@@ -90,7 +90,7 @@ abstract class Account
         self::QQ       => ['name' => 'QQ登录', 'field' => 'openid', 'status' => 1],
         self::TIKTOK   => ['name' => '抖音登录', 'field' => 'openid', 'status' => 1],
 
-        // 国际第三方
+        // 国际第三方 (使用email作为关联字段，便于多端关联)
         self::APPLE    => ['name' => '苹果登录', 'field' => 'openid', 'status' => 1],
         self::GOOGLE   => ['name' => '谷歌登录', 'field' => 'openid', 'status' => 1],
         self::FACEBOOK => ['name' => '脸书登录', 'field' => 'openid', 'status' => 1],

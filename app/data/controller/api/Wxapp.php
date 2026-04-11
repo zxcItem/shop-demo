@@ -99,6 +99,17 @@ class Wxapp extends Controller
                 if (!empty($result['phoneNumber'])) {
                     $data = ['appid' => $this->params['appid'], 'openid' => $openid, 'unionid' => $unionid];
                     ($account = Account::mk($this->type))->set($data);
+                    // 绑定手机号时检查是否已被其他用户使用
+                    $existUser = \app\data\model\account\DataAccountUser::mk()
+                        ->where(['phone' => $result['phoneNumber'], 'deleted' => 0])
+                        ->findOrEmpty();
+                    if ($existUser->isExists()) {
+                        // 手机号已被使用，检查是否绑定到当前终端对应的主账号
+                        $currentUnid = $account->getUnid();
+                        if ($existUser->getAttr('id') !== $currentUnid) {
+                            $this->error('该手机号已被其他用户绑定');
+                        }
+                    }
                     $account->bind(['phone' => $result['phoneNumber']], $data);
                     $this->success('绑定成功', $account->get(true));
                 } else {
@@ -127,11 +138,21 @@ class Wxapp extends Controller
                 'openid.require' => '用户编号为空'
             ]);
             $result = Crypt::instance($this->params)->getPhoneNumber($input['code']);
-//            if (is_array($result)) {
-//                $this->success('解密成功', $result);
             if (is_array($result) && !empty($result['phoneNumber'])) {
                 $data = ['appid' => $this->params['appid'], 'openid' => $input['openid']];
                 ($account = Account::mk($this->type))->set($data);
+                
+                // 绑定手机号时检查是否已被其他用户使用
+                $existUser = \app\data\model\account\DataAccountUser::mk()
+                    ->where(['phone' => $result['phoneNumber'], 'deleted' => 0])
+                    ->findOrEmpty();
+                if ($existUser->isExists()) {
+                    $currentUnid = $account->getUnid();
+                    if ($currentUnid > 0 && $existUser->getAttr('id') !== $currentUnid) {
+                        $this->error('该手机号已被其他用户绑定');
+                    }
+                }
+                
                 $account->bind(['phone' => $result['phoneNumber']]);
                 $this->success('绑定成功', $account->get(true));
             } else {

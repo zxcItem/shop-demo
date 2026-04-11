@@ -48,9 +48,10 @@ class Facebook extends Controller
                 $token
             );
 
-            // 构建账号数据
+            // 构建账号数据 - 包含email用于自动关联
             $authData = [
                 'openid'  => $oauthUser['openid'],
+                'email'   => $oauthUser['email'] ?? ($data['email'] ?? ''),
                 'unionid' => $this->request->post('unionid', $oauthUser['unionid'] ?? ''),
                 'nickname'=> $this->request->post('nickname', $oauthUser['nickname'] ?? ''),
                 'headimg' => $this->request->post('headimg', $oauthUser['headimg'] ?? ''),
@@ -59,7 +60,7 @@ class Facebook extends Controller
             // 实例化账号服务
             $account = Account::mk(Account::FACEBOOK);
             
-            // 设置账号资料 (会自动处理注册/绑定/更新)
+            // 设置账号资料 (会自动处理注册/绑定/更新，包括通过email自动关联)
             $account->set($authData);
 
             // 返回登录结果 (包含 token)
