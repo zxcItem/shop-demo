@@ -3,7 +3,7 @@
 
 namespace app\data\controller\account;
 
-use app\data\model\account\DataAccountMsm;
+use app\data\model\account\DataAccountMsms;
 use app\data\service\account\Message as MessageService;
 use app\data\service\account\message\Alisms;
 use think\admin\Controller;
@@ -44,7 +44,7 @@ class Message extends Controller
      */
     public function index()
     {
-        DataAccountMsm::mQuery()->layTable(function () {
+        DataAccountMsms::mQuery()->layTable(function () {
             $this->title = '手机短信管理';
             $this->scenes = MessageService::$scenes;
         }, static function (QueryHelper $query) {
