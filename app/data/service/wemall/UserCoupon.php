@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace app\data\service\wemall;
 
-use plugin\wemall\model\PluginWemallConfigCoupon;
-use plugin\wemall\model\PluginWemallUserCoupon;
-use plugin\wemall\model\PluginWemallUserRelation;
+use app\data\model\wemall\DataWemallConfigCoupon;
+use app\data\model\wemall\DataWemallUserCoupon;
+use app\data\model\wemall\DataWemallUserRelation;
 use think\admin\Exception;
 use think\admin\extend\CodeExtend;
 use think\db\exception\DataNotFoundException;
@@ -27,12 +27,12 @@ abstract class UserCoupon
      * @throws DbException
      * @throws ModelNotFoundException
      */
-    public static function create($unid, int $coid): PluginWemallUserCoupon
+    public static function create($unid, int $coid): DataWemallUserCoupon
     {
-        [$rela, $unid] = PluginWemallUserRelation::withRelation($unid);
+        [$rela, $unid] = DataWemallUserRelation::withRelation($unid);
         // 检查卡券
         $where = ['id' => $coid, 'status' => 1, 'deleted' => 0];
-        $coupon = PluginWemallConfigCoupon::mk()->where($where)->findOrEmpty();
+        $coupon = DataWemallConfigCoupon::mk()->where($where)->findOrEmpty();
         if ($coupon->isEmpty()) {
             throw new Exception('无效卡券');
         }
@@ -47,7 +47,7 @@ abstract class UserCoupon
         // 领取数量检查
         if (($limitTimes = $coupon->getAttr('limit_times')) > 0) {
             $map = ['deleted' => 0, 'unid' => $unid, 'coid' => $coupon->getAttr('id')];
-            if (PluginWemallUserCoupon::mk()->where($map)->count() > $limitTimes) {
+            if (DataWemallUserCoupon::mk()->where($map)->count() > $limitTimes) {
                 throw new Exception('已超出领取数量！');
             }
         }
@@ -59,7 +59,7 @@ abstract class UserCoupon
         }
         do {
             $data['code'] = $code = CodeExtend::uniqidNumber(16, 'C');
-        } while (($model = PluginWemallUserCoupon::mk()->where(['code' => $code])->findOrEmpty())->isExists());
+        } while (($model = DataWemallUserCoupon::mk()->where(['code' => $code])->findOrEmpty())->isExists());
         // 保存及返回模型
         if ($model->save($data) && self::recount($coupon)) {
             return $model;
@@ -77,16 +77,16 @@ abstract class UserCoupon
         $model = self::withModel($coid);
         $where = ['coid' => $model->getAttr('id'), 'deleted' => 0];
         $field = ['sum(used)' => 'total_used', 'count(1)' => 'total_sales'];
-        $total = PluginWemallUserCoupon::mk()->field($field)->where($where)->findOrEmpty()->toArray();
+        $total = DataWemallUserCoupon::mk()->field($field)->where($where)->findOrEmpty()->toArray();
         return $model->save($total);
     }
 
     /**
      * 恢复优惠券.
      */
-    public static function resume(string $code): PluginWemallUserCoupon
+    public static function resume(string $code): DataWemallUserCoupon
     {
-        $coupon = PluginWemallUserCoupon::mk()->where(['code' => $code, 'status' => 2])->findOrEmpty();
+        $coupon = DataWemallUserCoupon::mk()->where(['code' => $code, 'status' => 2])->findOrEmpty();
         if ($coupon->isExists()) {
             $coupon->save(['used' => 0, 'used_time' => null, 'status' => 1]);
         }
@@ -97,10 +97,10 @@ abstract class UserCoupon
      * 确认使用优惠券.
      * @throws Exception
      */
-    public static function confirm(string $code): PluginWemallUserCoupon
+    public static function confirm(string $code): DataWemallUserCoupon
     {
         $map = ['code' => $code, 'status' => 1];
-        if (($coupon = PluginWemallUserCoupon::mk()->where($map)->findOrEmpty())->isExists()) {
+        if (($coupon = DataWemallUserCoupon::mk()->where($map)->findOrEmpty())->isExists()) {
             if ($coupon->getAttr('expire') > 0 && $coupon->getAttr('expire') < time()) {
                 $coupon->save(['status' => 3, 'status_time' => date('Y-m-d H:i:s'), 'status_desc' => '优惠券已过期！']);
                 throw new Exception('优惠券已过期');
@@ -116,12 +116,12 @@ abstract class UserCoupon
      * @param int|PluginWemallConfigCoupon $model
      * @throws Exception
      */
-    public static function withModel($model): PluginWemallConfigCoupon
+    public static function withModel($model): DataWemallConfigCoupon
     {
         if (is_numeric($model)) {
-            $model = PluginWemallConfigCoupon::mk()->where(['id' => $model])->findOrEmpty();
+            $model = DataWemallConfigCoupon::mk()->where(['id' => $model])->findOrEmpty();
         }
-        if ($model instanceof PluginWemallConfigCoupon) {
+        if ($model instanceof DataWemallConfigCoupon) {
             if ($model->isExists()) {
                 return $model;
             }

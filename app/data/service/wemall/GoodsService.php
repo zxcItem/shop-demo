@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace app\data\service\wemall;
 
-use plugin\wemall\model\PluginWemallGoods;
-use plugin\wemall\model\PluginWemallGoodsItem;
-use plugin\wemall\model\PluginWemallGoodsStock;
-use plugin\wemall\model\PluginWemallOrder;
-use plugin\wemall\model\PluginWemallOrderCart;
-use plugin\wemall\model\PluginWemallOrderItem;
+use app\data\model\wemall\DataWemallGoods;
+use app\data\model\wemall\DataWemallGoodsItem;
+use app\data\model\wemall\DataWemallGoodsStock;
+use app\data\model\wemall\DataWemallOrder;
+use app\data\model\wemall\DataWemallOrderCart;
+use app\data\model\wemall\DataWemallOrderItem;
 use think\admin\Exception;
 use think\db\exception\DataNotFoundException;
 use think\db\exception\DbException;
@@ -31,11 +31,11 @@ abstract class GoodsService
     public static function stock(string $code): bool
     {
         // 入库统计
-        $query = PluginWemallGoodsStock::mk()->field('ghash,ifnull(sum(gstock),0) stock_total');
+        $query = DataWemallGoodsStock::mk()->field('ghash,ifnull(sum(gstock),0) stock_total');
         $stockList = $query->where(['gcode' => $code])->group('gcode,ghash')->select()->toArray();
         // 销量统计
-        $query = PluginWemallOrder::mk()->alias('a')->field('b.ghash,ifnull(sum(b.stock_sales),0) stock_sales');
-        $query->join([PluginWemallOrderItem::mk()->getTable() => 'b'], 'a.order_no=b.order_no', 'left');
+        $query = DataWemallOrder::mk()->alias('a')->field('b.ghash,ifnull(sum(b.stock_sales),0) stock_sales');
+        $query->join([DataWemallOrderItem::mk()->getTable() => 'b'], 'a.order_no=b.order_no', 'left');
         $query->where([['b.gcode', '=', $code], ['a.status', '>', 0], ['a.deleted_status', '=', 0]]);
         $salesList = $query->group('b.ghash')->select()->toArray();
         // 组装数据
@@ -53,15 +53,15 @@ abstract class GoodsService
         unset($salesList, $stockList);
         // 更新商品规格销量及库存
         foreach ($items as $hash => $item) {
-            PluginWemallGoodsItem::mk()->where(['ghash' => $hash])->update([
+            DataWemallGoodsItem::mk()->where(['ghash' => $hash])->update([
                 'stock_total' => $item['stock_total'], 'stock_sales' => $item['stock_sales'],
             ]);
         }
         // 更新商品主体销量及库存
-        PluginWemallGoods::mk()->where(['code' => $code])->update([
+        DataWemallGoods::mk()->where(['code' => $code])->update([
             'stock_total' => intval(array_sum(array_column($items, 'stock_total'))),
             'stock_sales' => intval(array_sum(array_column($items, 'stock_sales'))),
-            'stock_virtual' => PluginWemallGoodsItem::mk()->where(['gcode' => $code])->sum('number_virtual'),
+            'stock_virtual' => DataWemallGoodsItem::mk()->where(['gcode' => $code])->sum('number_virtual'),
         ]);
         return true;
     }
@@ -83,7 +83,7 @@ abstract class GoodsService
         if (!empty($carts)) {
             $where = [['unid', '=', $unid], ['id', 'in', $carts]];
             $field = ['ghash' => 'ghash', 'gcode' => 'gcode', 'gspec' => 'gspec', 'number' => 'count'];
-            PluginWemallOrderCart::mk()->field($field)->where($where)->with([
+            DataWemallOrderCart::mk()->field($field)->where($where)->with([
                 'goods' => function ($query) {
                     $query->where(['status' => 1, 'deleted' => 0]);
                     $query->withoutField(['specs', 'content', 'status', 'deleted', 'create_time', 'update_time']);
@@ -110,7 +110,7 @@ abstract class GoodsService
             }
             // 读取规格数据
             $map1 = [['status', '=', 1], ['ghash', 'in', array_column($lines, 'ghash')]];
-            foreach (PluginWemallGoodsItem::mk()->where($map1)->select()->toArray() as $item) {
+            foreach (DataWemallGoodsItem::mk()->where($map1)->select()->toArray() as $item) {
                 foreach ($lines as &$line) {
                     if ($line['ghash'] === $item['ghash']) {
                         [$line['gcode'], $line['gspec'], $line['specs']] = [$item['gcode'], $item['gspec'], $item];
@@ -119,7 +119,7 @@ abstract class GoodsService
             }
             // 读取商品数据
             $map2 = [['status', '=', 1], ['deleted', '=', 0], ['code', 'in', array_unique(array_column($lines, 'gcode'))]];
-            foreach (PluginWemallGoods::mk()->where($map2)->withoutField(['specs', 'content'])->select()->toArray() as $goods) {
+            foreach (DataWemallGoods::mk()->where($map2)->withoutField(['specs', 'content'])->select()->toArray() as $goods) {
                 foreach ($lines as &$line) {
                     if ($line['gcode'] === $goods['code']) {
                         $line['goods'] = $goods;

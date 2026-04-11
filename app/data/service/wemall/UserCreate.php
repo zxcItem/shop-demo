@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace app\data\service\wemall;
 
-use plugin\account\model\PluginAccountUser;
-use plugin\account\service\Account;
-use plugin\wemall\model\PluginWemallUserCreate;
-use plugin\wemall\model\PluginWemallUserRebate;
-use plugin\wemall\model\PluginWemallUserRelation;
-use plugin\wemall\model\PluginWemallUserTransfer;
+use app\data\model\account\DataAccountUser;
+use app\data\service\account\Account;
+use app\data\model\wemall\DataWemallUserCreate;
+use app\data\model\wemall\DataWemallUserRebate;
+use app\data\model\wemall\DataWemallUserRelation;
+use app\data\model\wemall\DataWemallUserTransfer;
 use think\admin\Exception;
 use think\admin\extend\CodeExtend;
 use think\admin\Library;
@@ -34,8 +34,8 @@ abstract class UserCreate
                     // 检查代理权限
                     if (!empty($data['agent_phone'])) {
                         $where = ['phone' => $data['agent_phone'], 'deleted' => 0];
-                        $parent = PluginAccountUser::mk()->where($where)->findOrEmpty();
-                        $relation = PluginWemallUserRelation::mk()->where(['unid' => $parent->getAttr('id')])->findOrEmpty();
+                        $parent = DataAccountUser::mk()->where($where)->findOrEmpty();
+                        $relation = DataWemallUserRelation::mk()->where(['unid' => $parent->getAttr('id')])->findOrEmpty();
                         if ($parent->isEmpty() || $relation->isEmpty()) {
                             throw new Exception('无效推荐人！');
                         }
@@ -53,7 +53,7 @@ abstract class UserCreate
                     }
                     // 创建返佣记录及提现记录
                     $map = ['code' => $data['rebate_total_code'] ?: CodeExtend::uniqidDate(16, 'R'), 'unid' => $account->getUnid()];
-                    ($rebate = PluginWemallUserRebate::mk()->where($map)->findOrEmpty())->save([
+                    ($rebate = DataWemallUserRebate::mk()->where($map)->findOrEmpty())->save([
                         'unid' => $account->getUnid(),
                         'code' => $map['code'],
                         'hash' => md5($map['code']),
@@ -68,7 +68,7 @@ abstract class UserCreate
                     ]);
                     // 创建提现记录
                     $map = ['code' => $user->getAttr('rebate_usable_code') ?: CodeExtend::uniqidDate(16, 'T'), 'unid' => $account->getUnid()];
-                    ($transfer = PluginWemallUserTransfer::mk()->where($map)->findOrEmpty())->save([
+                    ($transfer = DataWemallUserTransfer::mk()->where($map)->findOrEmpty())->save([
                         'unid' => $account->getUnid(),
                         'type' => 'platform',
                         'date' => date('Y-m-d'),
@@ -111,12 +111,12 @@ abstract class UserCreate
                     // 取消返佣记录
                     if (!empty($rCode = $user->getAttr('rebate_total_code'))) {
                         $map = ['code' => $rCode, 'unid' => $user->getAttr('unid')];
-                        PluginWemallUserRebate::mk()->where($map)->delete();
+                        DataWemallUserRebate::mk()->where($map)->delete();
                     }
                     // 创建提现记录
                     if (!empty($tCode = $user->getAttr('rebate_usable_code'))) {
                         $map = ['code' => $tCode, 'unid' => $user->getAttr('unid')];
-                        PluginWemallUserTransfer::mk()->where($map)->delete();
+                        DataWemallUserTransfer::mk()->where($map)->delete();
                     }
                     // 更新代理身份及返佣记录
                     UserOrder::entry($user->getAttr('unid'));
@@ -135,12 +135,12 @@ abstract class UserCreate
      * @param int|PluginWemallUserCreate|string $model
      * @throws Exception
      */
-    public static function withModel($model): PluginWemallUserCreate
+    public static function withModel($model): DataWemallUserCreate
     {
         if (is_numeric($model)) {
-            return PluginWemallUserCreate::mk()->findOrEmpty($model);
+            return DataWemallUserCreate::mk()->findOrEmpty($model);
         }
-        if ($model instanceof PluginWemallUserCreate) {
+        if ($model instanceof DataWemallUserCreate) {
             return $model;
         }
         throw new Exception('无效参数类型！');

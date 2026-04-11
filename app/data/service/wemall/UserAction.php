@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace app\data\service\wemall;
 
-use plugin\account\model\PluginAccountUser;
-use plugin\wemall\model\PluginWemallOrderCart;
-use plugin\wemall\model\PluginWemallOrderItem;
-use plugin\wemall\model\PluginWemallUserActionCollect;
-use plugin\wemall\model\PluginWemallUserActionComment;
-use plugin\wemall\model\PluginWemallUserActionHistory;
+use app\data\model\account\DataAccountUser;
+use app\data\model\wemall\DataWemallOrderCart;
+use app\data\model\wemall\DataWemallOrderItem;
+use app\data\model\wemall\DataWemallUserActionCollect;
+use app\data\model\wemall\DataWemallUserActionComment;
+use app\data\model\wemall\DataWemallUserActionHistory;
 use think\admin\Exception;
 use think\admin\Storage;
 use think\db\exception\DbException;
@@ -31,9 +31,9 @@ abstract class UserAction
     {
         $data = ['unid' => $unid, 'gcode' => $gcode];
         if ($type === 'collect') {
-            $model = PluginWemallUserActionCollect::mk()->where($data)->findOrEmpty();
+            $model = DataWemallUserActionCollect::mk()->where($data)->findOrEmpty();
         } else {
-            $model = PluginWemallUserActionHistory::mk()->where($data)->findOrEmpty();
+            $model = DataWemallUserActionHistory::mk()->where($data)->findOrEmpty();
         }
         $data['sort'] = time();
         $data['times'] = $model->isExists() ? $model->getAttr('times') + 1 : 1;
@@ -52,9 +52,9 @@ abstract class UserAction
     {
         $data = [['unid', '=', $unid], ['gcode', 'in', str2arr($gcode)]];
         if ($type === 'collect') {
-            PluginWemallUserActionCollect::mk()->where($data)->delete();
+            DataWemallUserActionCollect::mk()->where($data)->delete();
         } else {
-            PluginWemallUserActionHistory::mk()->where($data)->delete();
+            DataWemallUserActionHistory::mk()->where($data)->delete();
         }
         self::recount($unid);
         return $data;
@@ -70,9 +70,9 @@ abstract class UserAction
     {
         $data = [['unid', '=', $unid]];
         if ($type === 'collect') {
-            PluginWemallUserActionCollect::mk()->where($data)->delete();
+            DataWemallUserActionCollect::mk()->where($data)->delete();
         } else {
-            PluginWemallUserActionHistory::mk()->where($data)->delete();
+            DataWemallUserActionHistory::mk()->where($data)->delete();
         }
         self::recount($unid);
         return $data;
@@ -93,10 +93,10 @@ abstract class UserAction
         }
         // 更新收藏及足迹数量和购物车
         $map = ['unid' => $unid];
-        $data['mycarts_total'] = PluginWemallOrderCart::mk()->where($map)->sum('number');
-        $data['collect_total'] = PluginWemallUserActionCollect::mk()->where($map)->count();
-        $data['history_total'] = PluginWemallUserActionHistory::mk()->where($map)->count();
-        if ($isUpdate && ($user = PluginAccountUser::mk()->findOrEmpty($unid))->isExists()) {
+        $data['mycarts_total'] = DataWemallOrderCart::mk()->where($map)->sum('number');
+        $data['collect_total'] = DataWemallUserActionCollect::mk()->where($map)->count();
+        $data['history_total'] = DataWemallUserActionHistory::mk()->where($map)->count();
+        if ($isUpdate && ($user = DataAccountUser::mk()->findOrEmpty($unid))->isExists()) {
             $user->save(['extra' => array_merge($user->getAttr('extra'), $data)]);
         }
         return [$data['collect_total'], $data['history_total'], $data['mycarts_total']];
@@ -107,7 +107,7 @@ abstract class UserAction
      * @param float|string $rate
      * @throws Exception
      */
-    public static function comment(PluginWemallOrderItem $item, $rate, string $content, string $images): bool
+    public static function comment(DataWemallOrderItem $item, $rate, string $content, string $images): bool
     {
         // 图片上传转存
         if (!empty($images)) {
@@ -119,7 +119,7 @@ abstract class UserAction
         }
         // 根据单号+商品规格查询评论
         $code = md5("{$item->getAttr('order_no')}#{$item->getAttr('ghash')}");
-        return PluginWemallUserActionComment::mk()->where(['code' => $code])->findOrEmpty()->save([
+        return DataWemallUserActionComment::mk()->where(['code' => $code])->findOrEmpty()->save([
             'code' => $code,
             'unid' => $item->getAttr('unid'),
             'gcode' => $item->getAttr('gcode'),

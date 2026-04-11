@@ -5,9 +5,9 @@ declare(strict_types=1);
 
 namespace app\data\controller\payment;
 
-use plugin\account\model\PluginAccountUser;
-use plugin\payment\model\PluginPaymentBalance;
-use plugin\payment\service\Balance as BalanceService;
+use app\data\model\account\DataAccountUser;
+use app\data\model\payment\DataPaymentBalance;
+use app\data\service\payment\Balance as BalanceService;
 use think\admin\Controller;
 use think\admin\helper\QueryHelper;
 use think\db\exception\DataNotFoundException;
@@ -32,15 +32,15 @@ class Balance extends Controller
     public function index()
     {
         $this->type = $this->get['type'] ?? 'index';
-        PluginPaymentBalance::mQuery()->layTable(function () {
+        DataPaymentBalance::mQuery()->layTable(function () {
             $this->title = '余额明细管理';
             $map = ['cancel' => 0, 'deleted' => 0];
-            $this->balanceTotal = PluginPaymentBalance::mk()->where($map)->whereRaw('amount>0')->sum('amount');
-            $this->balanceCount = PluginPaymentBalance::mk()->where($map)->whereRaw('amount<0')->sum('amount');
+            $this->balanceTotal = DataPaymentBalance::mk()->where($map)->whereRaw('amount>0')->sum('amount');
+            $this->balanceCount = DataPaymentBalance::mk()->where($map)->whereRaw('amount<0')->sum('amount');
         }, function (QueryHelper $query) {
             $query->with(['user'])->like('code,remark')->dateBetween('create_time');
             $query->where(['deleted' => 0, 'cancel' => intval($this->type !== 'index')]);
-            $db = PluginAccountUser::mQuery()->like('email|nickname|username|phone#user')->db();
+            $db = DataAccountUser::mQuery()->like('email|nickname|username|phone#user')->db();
             if ($db->getOptions('where')) {
                 $query->whereRaw("unid in {$db->field('id')->buildSql()}");
             }

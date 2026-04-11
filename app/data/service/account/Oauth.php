@@ -30,7 +30,7 @@ class Oauth
             return self::$drivers[$type];
         }
 
-        $class = "\\app\\data\\service\\oauth\\" . ucfirst(strtolower($type)) . "Service";
+        $class = "\\app\\data\\service\\account\\oauth\\" . ucfirst(strtolower($type)) . "Service";
         if (class_exists($class)) {
             return self::$drivers[$type] = new $class();
         }

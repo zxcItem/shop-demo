@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace app\data\service\wemall;
 
-use plugin\payment\model\PluginPaymentAddress;
-use plugin\payment\model\PluginPaymentRecord;
-use plugin\payment\service\Payment;
-use plugin\wemall\model\PluginWemallConfigDiscount;
-use plugin\wemall\model\PluginWemallOrder;
-use plugin\wemall\model\PluginWemallOrderItem;
-use plugin\wemall\model\PluginWemallOrderSender;
-use plugin\wemall\model\PluginWemallUserCreate;
-use plugin\wemall\model\PluginWemallUserRelation;
+use app\data\model\payment\DataPaymentAddress;
+use app\data\model\payment\DataPaymentRecord;
+use app\data\service\payment\Payment;
+use app\data\model\wemall\DataWemallConfigDiscount;
+use app\data\model\wemall\DataWemallOrder;
+use app\data\model\wemall\DataWemallOrderItem;
+use app\data\model\wemall\DataWemallOrderSender;
+use app\data\model\wemall\DataWemallUserCreate;
+use app\data\model\wemall\DataWemallUserRelation;
 use think\admin\Exception;
 use think\admin\Library;
 use think\db\exception\DataNotFoundException;
@@ -51,7 +51,7 @@ abstract class UserOrder
     public static function stock(string $orderNo): bool
     {
         $map = ['order_no' => $orderNo];
-        $codes = PluginWemallOrderItem::mk()->where($map)->column('gcode');
+        $codes = DataWemallOrderItem::mk()->where($map)->column('gcode');
         foreach (array_unique($codes) as $code) {
             GoodsService::stock($code);
         }
@@ -65,12 +65,12 @@ abstract class UserOrder
      * @param ?string $orderNo 动态绑定变量
      * @throws Exception
      */
-    public static function widthOrder($order, ?int &$unid = 0, ?string &$orderNo = ''): PluginWemallOrder
+    public static function widthOrder($order, ?int &$unid = 0, ?string &$orderNo = ''): DataWemallOrder
     {
         if (is_string($order)) {
-            $order = PluginWemallOrder::mk()->where(['order_no' => $order])->findOrEmpty();
+            $order = DataWemallOrder::mk()->where(['order_no' => $order])->findOrEmpty();
         }
-        if ($order instanceof PluginWemallOrder) {
+        if ($order instanceof DataWemallOrder) {
             [$unid, $orderNo] = [intval($order->getAttr('unid')), $order->getAttr('order_no')];
             return $order;
         }
@@ -95,7 +95,7 @@ abstract class UserOrder
         }
         // 会员用户数据
         $where = ['unid' => $order->getAttr('unid')];
-        $relation = PluginWemallUserRelation::mk()->where($where)->findOrEmpty();
+        $relation = DataWemallUserRelation::mk()->where($where)->findOrEmpty();
         if ($relation->isEmpty()) {
             return null;
         }
@@ -128,11 +128,11 @@ abstract class UserOrder
      * @throws DbException
      * @throws ModelNotFoundException
      */
-    public static function entry($unid): PluginWemallUserRelation
+    public static function entry($unid): DataWemallUserRelation
     {
-        [$relation, $unid] = PluginWemallUserRelation::withRelation($unid);
+        [$relation, $unid] = DataWemallUserRelation::withRelation($unid);
         // 订单升级等级
-        $query = PluginWemallOrder::mk()->whereRaw('status>3 and refund_status<4');
+        $query = DataWemallOrder::mk()->whereRaw('status>3 and refund_status<4');
         $query->field(['max(level_agent)' => 'agent', 'max(level_member)' => 'member']);
         $entry = $query->where(['unid' => $unid, 'payment_status' => 1])->findOrEmpty();
         // 更新用户入会
@@ -141,7 +141,7 @@ abstract class UserOrder
         // 代理权限还需要检查后台创建的用户表
         if (empty($enterAgent)) {
             $map = ['unid' => $unid, 'agent_entry' => 1, 'status' => 1, 'deleted' => 0];
-            if (PluginWemallUserCreate::mk()->where($map)->findOrEmpty()->isExists()) {
+            if (DataWemallUserCreate::mk()->where($map)->findOrEmpty()->isExists()) {
                 $enterAgent = 1;
             }
         }
@@ -164,7 +164,7 @@ abstract class UserOrder
     {
         if ($disId > 0) {
             $where = ['id' => $disId, 'status' => 1, 'deleted' => 0];
-            $discount = PluginWemallConfigDiscount::mk()->where($where)->findOrEmpty();
+            $discount = DataWemallConfigDiscount::mk()->where($where)->findOrEmpty();
             if ($discount->isExists()) {
                 foreach ($discount['items'] as $vo) {
                     if ($vo['level'] == $levelCode) {
@@ -180,7 +180,7 @@ abstract class UserOrder
      * 更新订单收货地址
      * @throws Exception
      */
-    public static function perfect(PluginWemallOrder $order, PluginPaymentAddress $address): bool
+    public static function perfect(DataWemallOrder $order, DataPaymentAddress $address): bool
     {
         $unid = $order->getAttr('unid');
         $orderNo = $order->getAttr('order_no');
@@ -188,10 +188,10 @@ abstract class UserOrder
         $map1 = ['order_no' => $orderNo, 'status' => 1, 'deleted' => 0];
         $map2 = ['order_no' => $order->getAttr('order_no'), 'unid' => $unid];
         [$amount, $tCount, $tCode, $remark] = ExpressService::amount(
-            PluginWemallOrderItem::mk()->where($map1)->column('delivery_code'),
+            DataWemallOrderItem::mk()->where($map1)->column('delivery_code'),
             $address->getAttr('region_prov'),
             $address->getAttr('region_city'),
-            (int)PluginWemallOrderItem::mk()->where($map2)->sum('delivery_count')
+            (int)DataWemallOrderItem::mk()->where($map2)->sum('delivery_count')
         );
         // 创建订单发货信息
         $data = [
@@ -213,7 +213,7 @@ abstract class UserOrder
         $data['region_addr'] = $address->getAttr('region_addr');
         // 记录原地址信息
         $data['extra'] = $data;
-        PluginWemallOrderSender::mk()->where(['order_no' => $orderNo])->findOrEmpty()->save($data);
+        DataWemallOrderSender::mk()->where(['order_no' => $orderNo])->findOrEmpty()->save($data);
         // 组装更新订单数据, 重新计算订单金额
         $update = ['status' => 2, 'amount_express' => $data['delivery_amount']];
         $amountReal = bcadd(strval($order->getAttr('amount_discount')), strval($amount), 2);
@@ -248,7 +248,7 @@ abstract class UserOrder
      * @throws ModelNotFoundException
      * @remark 订单状态(0已取消,1预订单,2待支付,3待审核,4待发货,5已发货,6已收货,7已评论)
      */
-    public static function change($order, PluginPaymentRecord $payment)
+    public static function change($order, DataPaymentRecord $payment)
     {
         $order = self::widthOrder($order);
         if ($order->isEmpty()) {

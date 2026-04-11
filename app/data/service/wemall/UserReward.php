@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace app\data\service\wemall;
 
-use plugin\payment\service\Balance;
-use plugin\payment\service\Integral;
-use plugin\wemall\model\PluginWemallOrder;
+use app\data\service\payment\Balance;
+use app\data\service\payment\Integral;
+use app\data\model\wemall\DataWemallOrder;
 use think\admin\Exception;
 
 /**
@@ -21,7 +21,7 @@ abstract class UserReward
      * @param null|string $code 奖励编号
      * @throws Exception
      */
-    public static function create($order, ?string &$code = ''): PluginWemallOrder
+    public static function create($order, ?string &$code = ''): DataWemallOrder
     {
         $order = UserOrder::widthOrder($order, $unid, $orderNo);
         if ($order->isEmpty() && $order->getAttr('status') < 4) {
@@ -49,7 +49,7 @@ abstract class UserReward
      * @param null|string $code 奖励编号
      * @throws Exception
      */
-    public static function confirm($order, ?string &$code = ''): PluginWemallOrder
+    public static function confirm($order, ?string &$code = ''): DataWemallOrder
     {
         $order = UserOrder::widthOrder($order, $unid, $orderNo);
         if ($order->isEmpty() && $order->getAttr('status') < 4) {
@@ -68,7 +68,7 @@ abstract class UserReward
      * @param null|string $code 奖励编号
      * @throws Exception
      */
-    public static function cancel($order, ?string &$code = ''): PluginWemallOrder
+    public static function cancel($order, ?string &$code = ''): DataWemallOrder
     {
         $order = UserOrder::widthOrder($order, $unid, $orderNo);
         if ($order->isEmpty() && $order->getAttr('status') > 0) {

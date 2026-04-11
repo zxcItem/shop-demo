@@ -18,11 +18,11 @@ declare(strict_types=1);
  * +----------------------------------------------------------------------
  */
 
-namespace plugin\payment\controller;
+namespace app\data\controller\payment;
 
-use plugin\account\service\Account;
-use plugin\payment\model\PluginPaymentConfig;
-use plugin\payment\service\Payment;
+use app\data\service\account\Account;
+use app\data\model\payment\DataPaymentConfig;
+use app\data\service\payment\Payment;
 use think\admin\Controller;
 use think\admin\Exception;
 use think\admin\extend\CodeExtend;
@@ -48,7 +48,7 @@ class Config extends Controller
     public function index()
     {
         $this->type = $this->get['type'] ?? 'index';
-        PluginPaymentConfig::mQuery()->layTable(function () {
+        DataPaymentConfig::mQuery()->layTable(function () {
             $this->title = '支付配置管理';
             $this->types = Payment::types(1);
         }, function (QueryHelper $query) {
@@ -65,7 +65,7 @@ class Config extends Controller
     public function add()
     {
         $this->title = '添加支付配置';
-        PluginPaymentConfig::mForm('form');
+        DataPaymentConfig::mForm('form');
     }
 
     /**
@@ -75,7 +75,7 @@ class Config extends Controller
     public function edit()
     {
         $this->title = '编辑支付配置';
-        PluginPaymentConfig::mForm('form');
+        DataPaymentConfig::mForm('form');
     }
 
     /**
@@ -84,7 +84,7 @@ class Config extends Controller
      */
     public function state()
     {
-        PluginPaymentConfig::mSave($this->_vali([
+        DataPaymentConfig::mSave($this->_vali([
             'status.in:0,1' => '状态值范围异常！',
             'status.require' => '状态值不能为空！',
         ]));
@@ -96,7 +96,7 @@ class Config extends Controller
      */
     public function remove()
     {
-        PluginPaymentConfig::mDelete();
+        DataPaymentConfig::mDelete();
     }
 
     /**
@@ -181,7 +181,7 @@ class Config extends Controller
             }
             // 保存配置参数
             $data['content'] = $this->request->post();
-            $fields = PluginPaymentConfig::mk()->getTableFields();
+            $fields = DataPaymentConfig::mk()->getTableFields();
             foreach ($data['content'] as $k => $v) {
                 if (in_array($k, $fields) || $v === '') {
                     unset($data['content'][$k]);

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace app\data\service\wemall;
 
-use plugin\wemall\model\PluginWemallOrderRefund;
+use app\data\model\wemall\DataWemallOrderRefund;
 use think\admin\Exception;
 
 /**
@@ -46,9 +46,9 @@ abstract class UserRefund
      * 动态获取售后模型.
      * @throws Exception
      */
-    public static function withRefund(array $map, callable $fn): PluginWemallOrderRefund
+    public static function withRefund(array $map, callable $fn): DataWemallOrderRefund
     {
-        $refund = PluginWemallOrderRefund::mk()->where($map)->findOrEmpty();
+        $refund = DataWemallOrderRefund::mk()->where($map)->findOrEmpty();
         if ($refund->isEmpty()) {
             throw new Exception('无效售后单！');
         }

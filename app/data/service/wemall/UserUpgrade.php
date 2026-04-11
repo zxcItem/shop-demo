@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace app\data\service\wemall;
 
-use plugin\account\model\PluginAccountUser;
-use plugin\payment\service\Balance;
-use plugin\payment\service\Integral;
-use plugin\wemall\model\PluginWemallConfigLevel;
-use plugin\wemall\model\PluginWemallOrder;
-use plugin\wemall\model\PluginWemallUserRelation;
+use app\data\model\account\DataAccountUser;
+use app\data\service\payment\Balance;
+use app\data\service\payment\Integral;
+use app\data\model\wemall\DataWemallConfigLevel;
+use app\data\model\wemall\DataWemallOrder;
+use app\data\model\wemall\DataWemallUserRelation;
 use think\admin\Exception;
 use think\admin\Library;
 use think\db\exception\DataNotFoundException;
@@ -33,7 +33,7 @@ abstract class UserUpgrade
      */
     public static function withAgent($unid, int $puid): array
     {
-        [$rela, $unid] = PluginWemallUserRelation::withRelation($unid);
+        [$rela, $unid] = DataWemallUserRelation::withRelation($unid);
         // 绑定代理数据
         $puid1 = $rela['puid1'] ?? 0; // 上1级代理
         $puid2 = $rela['puid2'] ?? 0; // 上2级代理
@@ -55,10 +55,10 @@ abstract class UserUpgrade
      * @param int $mode 操作类型（0临时绑定, 1永久绑定, 2强行绑定）
      * @throws Exception
      */
-    public static function bindAgent($unid, int $puid = 0, int $mode = 1): PluginWemallUserRelation
+    public static function bindAgent($unid, int $puid = 0, int $mode = 1): DataWemallUserRelation
     {
         try {
-            [$rela, $unid] = PluginWemallUserRelation::withRelation($unid);
+            [$rela, $unid] = DataWemallUserRelation::withRelation($unid);
             // 已经绑定不允许替换原代理信息
             $puid1 = intval($rela->getAttr('puid1'));
             if ($puid1 > 0 && $rela->getAttr('puids') > 0) {
@@ -77,7 +77,7 @@ abstract class UserUpgrade
                 throw new Exception('不能绑定自己！');
             }
             // 检查上级用户
-            $parent = PluginWemallUserRelation::withInit($puid);
+            $parent = DataWemallUserRelation::withInit($puid);
             if (strpos($parent->getAttr('path'), ",{$unid},") !== false) {
                 throw new Exception('不能绑下级！');
             }
@@ -99,7 +99,7 @@ abstract class UserUpgrade
      * 更替用户上级关系.
      * @param array $extra 扩展数据
      */
-    public static function forceReplaceParent(PluginWemallUserRelation $relation, PluginWemallUserRelation $parent, array $extra = []): PluginWemallUserRelation
+    public static function forceReplaceParent(DataWemallUserRelation $relation, DataWemallUserRelation $parent, array $extra = []): DataWemallUserRelation
     {
         $path1 = arr2str(str2arr("{$parent->getAttr('path')},{$parent->getAttr('unid')}"));
         $relation->save(array_merge([
@@ -109,9 +109,9 @@ abstract class UserUpgrade
             'puid3' => $parent->getAttr('puid2'),
             'layer' => substr_count($path1, ','),
         ], $extra));
-        /** 更新所有下级代理 @var PluginWemallUserRelation $item */
+        /** 更新所有下级代理 @var DataWemallUserRelation $item */
         $path2 = arr2str(str2arr("{$relation->getAttr('path')},{$relation->getAttr('unid')}"));
-        foreach (PluginWemallUserRelation::mk()->whereLike('path', "{$path2}%")->order('layer desc')->cursor() as $item) {
+        foreach (DataWemallUserRelation::mk()->whereLike('path', "{$path2}%")->order('layer desc')->cursor() as $item) {
             $text = arr2str(str2arr("{$relation->getAttr('path')},{$relation->getAttr('unid')}"));
             $attr = array_reverse(str2arr($path3 = preg_replace("#^{$path2}#", $text, $item->getAttr('path'))));
             $item->save([
@@ -132,20 +132,20 @@ abstract class UserUpgrade
      * @throws DbException
      * @throws ModelNotFoundException
      */
-    public static function upgrade($unid, bool $parent = true, ?string $orderNo = null): PluginWemallUserRelation
+    public static function upgrade($unid, bool $parent = true, ?string $orderNo = null): DataWemallUserRelation
     {
-        [$rela, $unid] = PluginWemallUserRelation::withRelation($unid);
+        [$rela, $unid] = DataWemallUserRelation::withRelation($unid);
         if ($rela->isEmpty()) {
             throw new Exception('无效用户账号！');
         }
         // 订单升级等级
         $map = ['unid' => $unid, 'payment_status' => 1];
-        $tmpCode = PluginWemallOrder::mk()->where($map)->where('status', '>', 4)->max('level_member');
+        $tmpCode = DataWemallOrder::mk()->where($map)->where('status', '>', 4)->max('level_member');
         // 统计订单金额
-        $orderAmount = PluginWemallOrder::mk()->where("unid={$unid} and status>=4")->sum('amount_total');
+        $orderAmount = DataWemallOrder::mk()->where("unid={$unid} and status>=4")->sum('amount_total');
         // 动态计算会员等级
         [$levelName, $levelCode, $levelCurr] = ['普通用户', 0, intval($rela->getAttr('level_code'))];
-        foreach (PluginWemallConfigLevel::mk()->where(['status' => 1])->order('number desc')->cursor() as $item) {
+        foreach (DataWemallConfigLevel::mk()->where(['status' => 1])->order('number desc')->cursor() as $item) {
             if ($item['number'] === intval($tmpCode) || empty($item['number'])) {
                 [$levelName, $levelCode] = [$item['name'], $item['number']];
                 break;
@@ -170,7 +170,7 @@ abstract class UserUpgrade
             $extra['level_change'] = date('Y-m-d H:i:s');
         }
         // 更新用户扩展数据
-        $user = PluginAccountUser::mk()->findOrEmpty($unid);
+        $user = DataAccountUser::mk()->findOrEmpty($unid);
         $user->isExists() && $user->save(['extra' => array_merge($user->getAttr('extra'), $extra)]);
         // 会员等级数据
         $rela->save(['level_name' => $levelName, 'level_code' => $levelCode]);
@@ -197,12 +197,12 @@ abstract class UserUpgrade
         $data = [];
         // 初始化用户
         if ($init) {
-            PluginWemallUserRelation::withInit($unid);
+            DataWemallUserRelation::withInit($unid);
         }
         // 重算余额 & 重算积分 & 重算行为 & 订单返佣
         Balance::recount($unid, $data) && Integral::recount($unid, $data);
         UserAction::recount($unid, $data) && UserRebate::recount($unid, $data);
-        if (($user = PluginAccountUser::mk()->findOrEmpty($unid))->isExists()) {
+        if (($user = DataAccountUser::mk()->findOrEmpty($unid))->isExists()) {
             $user->save(['extra' => array_merge($user->getAttr('extra'), $data)]);
         }
         return $data;

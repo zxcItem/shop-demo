@@ -18,12 +18,12 @@ declare(strict_types=1);
  * +----------------------------------------------------------------------
  */
 
-namespace plugin\wemall\command;
+namespace app\data\command;
 
-use plugin\account\model\PluginAccountUser;
-use plugin\wemall\service\UserAgent;
-use plugin\wemall\service\UserOrder;
-use plugin\wemall\service\UserUpgrade;
+use app\data\model\account\DataAccountUser;
+use app\data\service\wemall\UserAgent;
+use app\data\service\wemall\UserOrder;
+use app\data\service\wemall\UserUpgrade;
 use think\admin\Command;
 use think\console\Input;
 use think\console\Output;
@@ -50,8 +50,8 @@ class Users extends Command
      */
     protected function execute(Input $input, Output $output)
     {
-        [$total, $count] = [PluginAccountUser::mk()->count(), 0];
-        foreach (PluginAccountUser::mk()->field('id')->order('id desc')->cursor() as $user) {
+        [$total, $count] = [DataAccountUser::mk()->count(), 0];
+        foreach (DataAccountUser::mk()->field('id')->order('id desc')->cursor() as $user) {
             try {
                 $this->queue->message($total, ++$count, "刷新用户 [{$user['id']}] 数据...");
                 UserUpgrade::upgrade(UserAgent::upgrade(UserOrder::entry(intval($user['id']))));

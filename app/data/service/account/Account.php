@@ -53,6 +53,22 @@ abstract class Account
     public const TIKTOK = 'tiktok';
     
     // -----------------------------------------------------------------------------------------
+    // 终端类型常量定义
+    // -----------------------------------------------------------------------------------------
+    
+    // WAP端 (H5移动端)
+    public const WAP = 'wap';
+    
+    // WEB端 (PC网页端)
+    public const WEB = 'web';
+    
+    // iOS App端
+    public const IOSAPP = 'iosapp';
+    
+    // Android App端
+    public const ANDROID = 'android';
+    
+    // -----------------------------------------------------------------------------------------
 
     // 已禁用的账号通道
     private static $denys = null;

@@ -32,11 +32,11 @@ declare(strict_types=1);
  * +----------------------------------------------------------------------
  */
 
-namespace plugin\payment\controller;
+namespace app\data\controller\payment;
 
-use plugin\account\model\PluginAccountUser;
-use plugin\payment\model\PluginPaymentIntegral;
-use plugin\payment\service\Integral as IntegralService;
+use app\data\model\account\DataAccountUser;
+use app\data\model\payment\DataPaymentIntegral;
+use app\data\service\payment\Integral as IntegralService;
 use think\admin\Controller;
 use think\admin\helper\QueryHelper;
 use think\db\exception\DataNotFoundException;
@@ -61,13 +61,13 @@ class Integral extends Controller
     public function index()
     {
         $this->type = $this->get['type'] ?? 'index';
-        PluginPaymentIntegral::mQuery()->layTable(function () {
+        DataPaymentIntegral::mQuery()->layTable(function () {
             $this->title = '积分明细管理';
             $map = ['cancel' => 0, 'deleted' => 0];
-            $this->integralTotal = PluginPaymentIntegral::mk()->where($map)->whereRaw('amount>0')->sum('amount');
-            $this->integralCount = PluginPaymentIntegral::mk()->where($map)->whereRaw('amount<0')->sum('amount');
+            $this->integralTotal = DataPaymentIntegral::mk()->where($map)->whereRaw('amount>0')->sum('amount');
+            $this->integralCount = DataPaymentIntegral::mk()->where($map)->whereRaw('amount<0')->sum('amount');
         }, function (QueryHelper $query) {
-            $db = PluginAccountUser::mQuery()->like('email|nickname|username|phone#user')->db();
+            $db = DataAccountUser::mQuery()->like('email|nickname|username|phone#user')->db();
             if ($db->getOptions('where')) {
                 $query->whereRaw("unid in {$db->field('id')->buildSql()}");
             }

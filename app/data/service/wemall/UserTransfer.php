@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace app\data\service\wemall;
 
-use plugin\wemall\model\PluginWemallUserTransfer;
+use app\data\model\wemall\DataWemallUserTransfer;
 use think\admin\Exception;
 
 /**
@@ -30,15 +30,15 @@ abstract class UserTransfer
     public static function amount(int $unid): array
     {
         if ($unid > 0) {
-            $locks = abs(PluginWemallUserTransfer::mk()->whereRaw("unid='{$unid}' and status=3")->sum('amount'));
-            $total = abs(PluginWemallUserTransfer::mk()->whereRaw("unid='{$unid}' and status>=1")->sum('amount'));
-            $count = abs(PluginWemallUserTransfer::mk()->whereRaw("unid='{$unid}' and status>=4")->sum('amount'));
-            $audit = abs(PluginWemallUserTransfer::mk()->whereRaw("unid='{$unid}' and status>=1 and status<3")->sum('amount'));
+            $locks = abs(DataWemallUserTransfer::mk()->whereRaw("unid='{$unid}' and status=3")->sum('amount'));
+            $total = abs(DataWemallUserTransfer::mk()->whereRaw("unid='{$unid}' and status>=1")->sum('amount'));
+            $count = abs(DataWemallUserTransfer::mk()->whereRaw("unid='{$unid}' and status>=4")->sum('amount'));
+            $audit = abs(DataWemallUserTransfer::mk()->whereRaw("unid='{$unid}' and status>=1 and status<3")->sum('amount'));
         } else {
-            $locks = abs(PluginWemallUserTransfer::mk()->whereRaw('status=3')->sum('amount'));
-            $total = abs(PluginWemallUserTransfer::mk()->whereRaw('status>=1')->sum('amount'));
-            $count = abs(PluginWemallUserTransfer::mk()->whereRaw('status>=4')->sum('amount'));
-            $audit = abs(PluginWemallUserTransfer::mk()->whereRaw('status>=1 and status<3')->sum('amount'));
+            $locks = abs(DataWemallUserTransfer::mk()->whereRaw('status=3')->sum('amount'));
+            $total = abs(DataWemallUserTransfer::mk()->whereRaw('status>=1')->sum('amount'));
+            $count = abs(DataWemallUserTransfer::mk()->whereRaw('status>=4')->sum('amount'));
+            $audit = abs(DataWemallUserTransfer::mk()->whereRaw('status>=1 and status<3')->sum('amount'));
         }
         return [$total, $count, $audit, $locks];
     }

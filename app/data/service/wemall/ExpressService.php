@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace app\data\service\wemall;
 
-use plugin\wemall\model\PluginWemallExpressTemplate;
+use app\data\model\wemall\DataWemallExpressTemplate;
 use think\admin\Exception;
 use think\admin\service\InterfaceService;
 
@@ -35,7 +35,7 @@ abstract class ExpressService
             throw new Exception('邮费模板为空');
         }
         $where = [['status', '=', 1], ['deleted', '=', 0], ['code', 'in', $codes]];
-        $template = PluginWemallExpressTemplate::mk()->where($where)->order('sort desc,id desc')->findOrEmpty();
+        $template = DataWemallExpressTemplate::mk()->where($where)->order('sort desc,id desc')->findOrEmpty();
         if ($template->isEmpty()) {
             throw new Exception('邮费模板无效');
         }

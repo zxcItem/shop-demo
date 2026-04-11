@@ -48,7 +48,7 @@ class DataPaymentRefund extends Abs
      */
     public function record(): HasOne
     {
-        return $this->hasOne(PluginPaymentRecord::class, 'code', 'record_code');
+        return $this->hasOne(DataPaymentRecord::class, 'code', 'record_code');
     }
 
     /**
