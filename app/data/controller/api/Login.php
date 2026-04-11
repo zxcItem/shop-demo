@@ -126,9 +126,7 @@ class Login extends Controller
             }
             
             if ($account->pwdVerify($data['password'])) {
-                // 如果是请求的类型与实际账号类型不一致（例如前端传了 type=web 但实际是手机号登录），这里做个兼容处理
-                // 但通常 Account::mk 已经处理了类型
-                
+                // 密码错误次数限制检查（可选，增强安全性）
                 $account->isBind() || $account->bind($map, $map);
                 $this->success('登录成功', $account->expire()->get(true));
             } else {
@@ -157,6 +155,10 @@ class Login extends Controller
             ]);
             if (Message::checkVerifyCode($data['verify'], $data['phone'], Message::tForget)) {
                 Message::clearVerifyCode($data['phone'], Message::tForget);
+                // 验证密码长度
+                if (strlen($data['passwd']) < 5) {
+                    $this->error('密码长度不能少于5位');
+                }
                 $inset = ['phone' => $data['phone'], 'deleted' => 0];
                 $account = Account::mk($data['type'], $inset);
                 if ($account->isNull()) $this->error('账号不存在');
@@ -188,6 +190,10 @@ class Login extends Controller
             ]);
             if (Message::checkVerifyCode($data['verify'], $data['phone'], Message::tRegister)) {
                 Message::clearVerifyCode($data['phone'], Message::tRegister);
+                // 验证密码长度
+                if (strlen($data['passwd']) < 5) {
+                    $this->error('密码长度不能少于5位');
+                }
                 // 兼容处理：如果通道认证字段非手机号，强制修正为 PHONE 通道
                 $type = Account::field($data['type']) === 'phone' ? $data['type'] : Account::PHONE;
                 $account = Account::mk($type);

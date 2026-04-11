@@ -26,8 +26,8 @@ abstract class Message
      */
     public static $scenes = [
         self::tLogin    => '用户登录验证',
-//        self::tForget   => '找回用户密码',
-//        self::tRegister => '用户注册绑定',
+        self::tForget   => '找回用户密码',
+        self::tRegister => '用户注册绑定',
     ];
 
     /**

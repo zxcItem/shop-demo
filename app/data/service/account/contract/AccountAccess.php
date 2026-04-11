@@ -219,59 +219,63 @@ class AccountAccess implements AccountInterface
     public function bind(array $map, array $data = []): array
     {
         if ($this->bind->isEmpty()) throw new Exception('终端账号异常！');
-        $this->user = DataAccountUser::mk()->where(['deleted' => 0])->where($map)->findOrEmpty();
-        // 检查账号是否已被绑定
-        if (($unid = intval($this->bind->getAttr('unid'))) > 0) {
-            if ($this->user->isExists() && $unid !== intval($this->user->getAttr('id'))) {
-                throw new Exception('该账号已被其他用户绑定，请解绑后再试！');
+        
+        // 使用数据库事务确保绑定操作的原子性
+        return $this->app->db->transaction(function () use ($map, $data) {
+            $this->user = DataAccountUser::mk()->where(['deleted' => 0])->where($map)->findOrEmpty();
+            // 检查账号是否已被绑定
+            if (($unid = intval($this->bind->getAttr('unid'))) > 0) {
+                if ($this->user->isExists() && $unid !== intval($this->user->getAttr('id'))) {
+                    throw new Exception('该账号已被其他用户绑定，请解绑后再试！');
+                }
             }
-        }
-        // 检查用户是否已绑定同类账号
-        if ($this->user->isExists()) {
-            $count = DataAccountBind::mk()->where([
-                'unid'    => $this->user->getAttr('id'),
-                'type'    => $this->type,
-                'deleted' => 0,
-            ])->where('id', '<>', $this->bind->getAttr('id'))->count();
-            if ($count > 0) throw new Exception('您已绑定该类型的其他账号，请先解绑！');
-        }
-        if (!empty($data['extra'])) $this->user->setAttr('extra', array_merge($this->user->getAttr('extra'), $data['extra']));
-        unset($data['id'], $data['code'], $data['extra']);
-        // 生成新的用户编号
-        if ($this->user->isEmpty()) do $check = ['code' => $data['code'] = $this->userCode()];
-        while (DataAccountUser::mk()->master()->where($check)->findOrEmpty()->isExists());
-        // 自动绑定默认头像
-        if (empty($data['headimg']) && $this->user->isEmpty() || empty($this->user->getAttr('headimg'))) {
-            if (empty($data['headimg'] = $this->bind->getAttr('headimg'))) $data['headimg'] = Account::headimg();
-        }
-        if (empty($data['invite_code']) && $this->user->isEmpty() || empty($this->user->getAttr('invite_code'))) {
-            if (empty($data['invite_code'] = $this->bind->getAttr('invite_code'))) $data['invite_code'] = Account::invite_code();
-        }
-        // 自动生成用户昵称
-        if (empty($data['nickname']) && empty($this->user->getAttr('nickname'))) {
-            $prefix = Account::config('userPrefix') ?: (Account::get($this->type)['name'] ?? $this->type);
-            if ($phone = $data['phone'] ?? $this->user->getAttr('phone')) {
-                $data['nickname'] = $prefix . substr($phone, -4);
+            // 检查用户是否已绑定同类账号
+            if ($this->user->isExists()) {
+                $count = DataAccountBind::mk()->where([
+                    'unid'    => $this->user->getAttr('id'),
+                    'type'    => $this->type,
+                    'deleted' => 0,
+                ])->where('id', '<>', $this->bind->getAttr('id'))->count();
+                if ($count > 0) throw new Exception('您已绑定该类型的其他账号，请先解绑！');
+            }
+            if (!empty($data['extra'])) $this->user->setAttr('extra', array_merge($this->user->getAttr('extra'), $data['extra']));
+            unset($data['id'], $data['code'], $data['extra']);
+            // 生成新的用户编号
+            if ($this->user->isEmpty()) do $check = ['code' => $data['code'] = $this->userCode()];
+            while (DataAccountUser::mk()->master()->where($check)->findOrEmpty()->isExists());
+            // 自动绑定默认头像
+            if (empty($data['headimg']) && $this->user->isEmpty() || empty($this->user->getAttr('headimg'))) {
+                if (empty($data['headimg'] = $this->bind->getAttr('headimg'))) $data['headimg'] = Account::headimg();
+            }
+            if (empty($data['invite_code']) && $this->user->isEmpty() || empty($this->user->getAttr('invite_code'))) {
+                if (empty($data['invite_code'] = $this->bind->getAttr('invite_code'))) $data['invite_code'] = Account::invite_code();
+            }
+            // 自动生成用户昵称
+            if (empty($data['nickname']) && empty($this->user->getAttr('nickname'))) {
+                $prefix = Account::config('userPrefix') ?: (Account::get($this->type)['name'] ?? $this->type);
+                if ($phone = $data['phone'] ?? $this->user->getAttr('phone')) {
+                    $data['nickname'] = $prefix . substr($phone, -4);
+                } else {
+                    $data['nickname'] = "{$prefix}{$this->bind->getAttr('id')}";
+                }
+            }
+            // 同步用户登录密码
+            if (!empty($this->bind->getAttr('password'))) {
+                $data['password'] = $this->bind->getAttr('password');
+            }
+            // 保存更新用户数据
+            if ($this->user->save($data + $map)) {
+                $this->bind->save(['unid' => $this->user['id']]);
+                $this->app->event->trigger('DataAccountBind', [
+                    'type' => $this->type,
+                    'unid' => intval($this->user->getAttr('id')),
+                    'usid' => intval($this->bind->getAttr('id')),
+                ]);
+                return $this->get();
             } else {
-                $data['nickname'] = "{$prefix}{$this->bind->getAttr('id')}";
+                throw new Exception('绑定用户失败！');
             }
-        }
-        // 同步用户登录密码
-        if (!empty($this->bind->getAttr('password'))) {
-            $data['password'] = $this->bind->getAttr('password');
-        }
-        // 保存更新用户数据
-        if ($this->user->save($data + $map)) {
-            $this->bind->save(['unid' => $this->user['id']]);
-            $this->app->event->trigger('DataAccountBind', [
-                'type' => $this->type,
-                'unid' => intval($this->user->getAttr('id')),
-                'usid' => intval($this->bind->getAttr('id')),
-            ]);
-            return $this->get();
-        } else {
-            throw new Exception('绑定用户失败！');
-        }
+        });
     }
 
     /**
