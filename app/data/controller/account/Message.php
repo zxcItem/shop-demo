@@ -4,8 +4,8 @@
 namespace app\data\controller\account;
 
 use app\data\model\account\DataAccountMsm;
-use app\data\service\Message as MessageService;
-use app\data\service\message\Alisms;
+use app\data\service\account\Message as MessageService;
+use app\data\service\account\message\Alisms;
 use think\admin\Controller;
 use think\admin\helper\QueryHelper;
 

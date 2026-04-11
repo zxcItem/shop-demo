@@ -4,8 +4,8 @@ declare (strict_types=1);
 
 namespace app\data\controller\api;
 
+use app\data\service\account\Account;
 use app\data\service\ConfigService;
-use app\data\service\Account;
 use think\admin\Controller;
 use think\admin\Exception;
 use think\exception\HttpResponseException;

@@ -1,10 +1,10 @@
 <?php
 
 
-namespace app\data\service\message;
+namespace app\data\service\account\message;
 
-use app\data\service\contract\MessageInterface;
-use app\data\service\contract\MessageUsageTrait;
+use app\data\service\account\contract\MessageInterface;
+use app\data\service\account\contract\MessageUsageTrait;
 use think\admin\Exception;
 use think\admin\extend\CodeExtend;
 use think\admin\extend\HttpExtend;

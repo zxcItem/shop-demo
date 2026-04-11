@@ -1,6 +1,6 @@
 <?php
 
-namespace app\data\service\oauth;
+namespace app\data\service\account\oauth;
 
 /**
  * 苹果登录驱动

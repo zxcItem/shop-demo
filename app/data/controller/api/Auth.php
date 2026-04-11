@@ -3,11 +3,9 @@
 
 namespace app\data\controller\api;
 
-use app\data\model\account\DataAccountUser;
-use app\data\service\Account;
-use app\data\service\contract\AccountInterface;
+use app\data\service\account\Account;
+use app\data\service\account\contract\AccountInterface;
 use think\admin\Controller;
-use think\admin\Exception;
 use think\exception\HttpResponseException;
 
 /**

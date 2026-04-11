@@ -1,8 +1,8 @@
 <?php
 
-namespace app\data\service;
+namespace app\data\service\account;
 
-use app\data\service\oauth\Contract;
+use app\data\service\account\oauth\Contract;
 use think\admin\Exception;
 
 /**

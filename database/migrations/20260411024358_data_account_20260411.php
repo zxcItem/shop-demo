@@ -1,15 +1,37 @@
 <?php
 
-use think\admin\extend\PhinxExtend;
 use think\migration\Migrator;
+use think\migration\db\Column;
 
-class Data20251216 extends Migrator
+class DataAccount20260411 extends Migrator
 {
+    /**
+     * Change Method.
+     *
+     * Write your reversible migrations using this method.
+     *
+     * More information on writing migrations is available here:
+     * http://docs.phinx.org/en/latest/migrations.html#the-abstractmigration-class
+     *
+     * The following commands can be used in this method and Phinx will
+     * automatically reverse them when rolling back:
+     *
+     *    createTable
+     *    renameTable
+     *    addColumn
+     *    renameColumn
+     *    addIndex
+     *    addForeignKey
+     *
+     * Remember to call "create()" or "update()" and NOT "save()" when working
+     * with the Table class.
+     */
     public function change()
     {
         $this->_create_data_account_auth(); // 账号授权
         $this->_create_data_account_bind(); // 子账号
         $this->_create_data_account_user(); //
+        $this->_create_data_account_msms();
     }
 
     /**
@@ -56,7 +78,7 @@ class Data20251216 extends Migrator
             ['type', 'string', ['limit' => 20, 'default' => '', 'null' => true, 'comment' => '终端类型']],
             ['phone', 'string', ['limit' => 30, 'default' => '', 'null' => true, 'comment' => '绑定手机']],
             ['appid', 'string', ['limit' => 30, 'default' => '', 'null' => true, 'comment' => 'APPID']],
-            ['openid', 'string', ['limit' => 50, 'default' => '', 'null' => true, 'comment' => 'OPENID']],
+            ['openid', 'string', ['limit' => 128, 'default' => '', 'null' => true, 'comment' => 'OPENID']],
             ['unionid', 'string', ['limit' => 50, 'default' => '', 'null' => true, 'comment' => 'UnionID']],
             ['headimg', 'string', ['limit' => 500, 'default' => '', 'null' => true, 'comment' => '用户头像']],
             ['nickname', 'string', ['limit' => 99, 'default' => '', 'null' => true, 'comment' => '用户昵称']],
@@ -108,6 +130,35 @@ class Data20251216 extends Migrator
             ['update_time', 'datetime', ['default' => NULL, 'null' => true, 'comment' => '更新时间']],
         ], [
             'code', 'sort', 'phone', 'email', 'status', 'unionid', 'deleted', 'username', 'nickname', 'region_prov', 'region_city', 'region_area', 'create_time',
+        ], true);
+    }
+
+    /**
+     * 创建数据对象
+     * @class DataAccountMsms
+     * @table data_account_msms
+     */
+    private function _create_data_account_msms()
+    {
+        // 创建数据表对象
+        $table = $this->table('data_account_msms', [
+            'engine' => 'InnoDB', 'collation' => 'utf8mb4_general_ci', 'comment' => '账号-短信',
+        ]);
+        // 创建或更新数据表
+        PhinxExtend::upgrade($table, [
+            ['unid', 'biginteger', ['limit' => 20, 'default' => 0, 'null' => false, 'comment' => '账号编号']],
+            ['usid', 'biginteger', ['limit' => 20, 'default' => 0, 'null' => false, 'comment' => '终端编号']],
+            ['type', 'string', ['limit' => 100, 'default' => '', 'null' => true, 'comment' => '短信类型']],
+            ['scene', 'string', ['limit' => 100, 'default' => '', 'null' => true, 'comment' => '业务场景']],
+            ['smsid', 'string', ['limit' => 100, 'default' => '', 'null' => true, 'comment' => '消息编号']],
+            ['phone', 'string', ['limit' => 100, 'default' => '', 'null' => true, 'comment' => '目标手机']],
+            ['result', 'string', ['limit' => 512, 'default' => '', 'null' => true, 'comment' => '返回结果']],
+            ['params', 'string', ['limit' => 512, 'default' => '', 'null' => true, 'comment' => '短信内容']],
+            ['status', 'integer', ['limit' => 1, 'default' => 0, 'null' => true, 'comment' => '短信状态(0失败,1成功)']],
+            ['create_time', 'datetime', ['default' => null, 'null' => true, 'comment' => '创建时间']],
+            ['update_time', 'datetime', ['default' => null, 'null' => true, 'comment' => '更新时间']],
+        ], [
+            'type', 'usid', 'unid', 'phone', 'smsid', 'scene', 'status', 'create_time',
         ], true);
     }
 

@@ -1,10 +1,10 @@
 <?php
 
 
-namespace app\data\service;
+namespace app\data\service\account;
 
-use app\data\service\contract\MessageInterface;
-use app\data\service\message\Alisms;
+use app\data\service\account\contract\MessageInterface;
+use app\data\service\account\message\Alisms;
 use think\admin\Exception;
 use think\admin\Library;
 

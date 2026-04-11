@@ -4,7 +4,7 @@
 namespace app\data\model\account;
 
 use app\data\model\Abs;
-use app\data\service\Account;
+use app\data\service\account\Account;
 use think\model\relation\HasMany;
 use think\model\relation\HasOne;
 

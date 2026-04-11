@@ -1,7 +1,7 @@
 <?php
 
 
-namespace app\data\service\contract;
+namespace app\data\service\account\contract;
 
 /**
  * 通用短信接口类

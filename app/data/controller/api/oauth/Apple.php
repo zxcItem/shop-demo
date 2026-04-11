@@ -2,7 +2,7 @@
 
 namespace app\data\controller\api\oauth;
 
-use app\data\service\Account;
+use app\data\service\account\Account;
 use think\admin\Controller;
 use think\exception\HttpResponseException;
 
@@ -26,7 +26,7 @@ class Apple extends Controller
                 $this->error('登录通道未开通');
             }
 
-            $driver = \app\data\service\Oauth::mk(Account::APPLE);
+            $driver = \app\data\service\account\Oauth::mk(Account::APPLE);
 
             // 1. 如果有 Code，先换取 Token (适用于 Web/PC 服务端模式)
             $code = $this->request->post('code');

@@ -1,9 +1,9 @@
 <?php
 
 
-namespace app\data\service\contract;
+namespace app\data\service\account\contract;
 
-use app\data\model\account\DataAccountMsm;
+use app\data\model\account\DataAccountMsms;
 use think\admin\Exception;
 
 /**
@@ -44,7 +44,7 @@ trait MessageUsageTrait
             throw new Exception('业务场景未配置！');
         }
         $result = $this->send($scenes[strtolower($scene)], $phone, $params, $options);
-        DataAccountMsm::mk()->save([
+        DataAccountMsms::mk()->save([
             'unid'   => intval(sysvar('Data_account_user_unid')),
             'usid'   => intval(sysvar('Data_account_user_usid')),
             'type'   => class_basename(static::class),

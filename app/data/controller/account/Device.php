@@ -3,7 +3,7 @@
 namespace app\data\controller\account;
 
 use app\data\model\account\DataAccountBind;
-use app\data\service\Account;
+use app\data\service\account\Account;
 use think\admin\Controller;
 use think\admin\helper\QueryHelper;
 

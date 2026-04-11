@@ -2,8 +2,8 @@
 
 namespace app\data\controller\api\oauth;
 
-use app\data\service\Account;
-use app\data\service\Oauth;
+use app\data\service\account\Account;
+use app\data\service\account\Oauth;
 use think\admin\Controller;
 use think\exception\HttpResponseException;
 

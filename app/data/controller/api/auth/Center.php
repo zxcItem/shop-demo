@@ -7,9 +7,9 @@ namespace app\data\controller\api\auth;
 use app\data\controller\api\Auth;
 use app\data\model\account\DataAccountAuth;
 use app\data\model\account\DataAccountBind;
-use app\data\service\Account;
-use app\data\service\Message;
-use app\data\service\Oauth;
+use app\data\service\account\Account;
+use app\data\service\account\Message;
+use app\data\service\account\Oauth;
 use think\admin\Storage;
 use think\exception\HttpResponseException;
 

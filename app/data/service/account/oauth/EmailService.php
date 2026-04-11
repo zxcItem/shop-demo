@@ -1,6 +1,6 @@
 <?php
 
-namespace app\data\service\oauth;
+namespace app\data\service\account\oauth;
 
 use PHPMailer\PHPMailer\PHPMailer;
 use think\admin\Library;

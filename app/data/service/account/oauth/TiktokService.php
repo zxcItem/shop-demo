@@ -1,6 +1,6 @@
 <?php
 
-namespace app\data\service\oauth;
+namespace app\data\service\account\oauth;
 
 /**
  * 抖音/TikTok登录驱动

@@ -1,12 +1,12 @@
 <?php
 
 
-namespace app\data\service;
+namespace app\data\service\account;
 
 use app\data\model\account\DataAccountAuth;
 use app\data\model\account\DataAccountBind;
-use app\data\service\contract\AccountAccess;
-use app\data\service\contract\AccountInterface;
+use app\data\service\account\contract\AccountAccess;
+use app\data\service\account\contract\AccountInterface;
 use think\admin\Exception;
 use think\admin\extend\CodeExtend;
 use think\admin\extend\JwtExtend;

@@ -2,7 +2,7 @@
 
 namespace app\data\controller\api\oauth;
 
-use app\data\service\Account;
+use app\data\service\account\Account;
 use think\admin\Controller;
 use think\exception\HttpResponseException;
 
@@ -26,7 +26,7 @@ class Tiktok extends Controller
                 $this->error('登录通道未开通');
             }
 
-            $driver = \app\data\service\Oauth::mk(Account::TIKTOK);
+            $driver = \app\data\service\account\Oauth::mk(Account::TIKTOK);
 
             // 1. 如果有 Code，先换取 Token
             $code = $this->request->post('code');

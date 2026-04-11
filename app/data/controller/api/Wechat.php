@@ -4,7 +4,7 @@ declare (strict_types=1);
 
 namespace app\data\controller\api;
 
-use app\data\service\Account;
+use app\data\service\account\Account;
 use app\wechat\service\WechatService;
 use think\admin\Controller;
 use think\Response;
