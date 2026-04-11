@@ -149,7 +149,7 @@ class Order extends Auth
                     // 等级优惠方案
                     'discount_id' => $discountId,
                     'discount_rate' => $discountRate,
-                    'discount_amount' => $discountRate * $gspec['price_selling'] * $count / 100,
+                    'discount_amount' => bcmul(bcdiv(strval($discountRate), '100', 4), bcmul(strval($gspec['price_selling']), strval($count), 4), 2),
                 ];
             }
             // 默认使用销售销售
@@ -341,7 +341,7 @@ class Order extends Auth
             if (!empty($data['coupon_code']) && $data['coupon_code'] !== $order->getAttr('coupon_code')) {
                 try {
                     // 检查优惠券是否有效
-                    $where = ['unid' => $this->unid, 'status' => 1, 'deleted' => 0];
+                    $where = ['code' => $data['coupon_code'], 'unid' => $this->unid, 'status' => 1, 'deleted' => 0];
                     $coupon = DataWemallUserCoupon::mk()->where($where)->with('bindCoupon')->findOrEmpty();
                     if ($coupon->isEmpty() || empty($coupon->getAttr('coupon_status')) || $coupon->getAttr('coupon_deleted') > 0) {
                         $this->error('无限优惠券！');
@@ -349,7 +349,8 @@ class Order extends Auth
                     if ($coupon->getAttr('expire') > 0 && $coupon->getAttr('expire') < time()) {
                         $this->error('优惠券无效！');
                     }
-                    if (bccomp(strval($coupon->getAttr('limit_amount')), strval($orderAmount), 2) <= 0) {
+                    // 检查优惠券使用门槛：订单金额必须大于等于优惠券限额才能使用
+                    if (bccomp(strval($orderAmount), strval($coupon->getAttr('limit_amount')), 2) < 0) {
                         $this->error('未达到使用条件！');
                     }
                     [$couponCode, $couponAmount] = [strval($coupon->getAttr('code')), strval($coupon->getAttr('coupon_amount'))];

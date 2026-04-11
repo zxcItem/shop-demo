@@ -76,7 +76,7 @@ class Coupon extends Auth
         DataWemallConfigCoupon::mQuery(null, function (QueryHelper $query) use ($data, $gcodes) {
             $query->where(['status' => 1, 'deleted' => 0]);
             if (bccomp(strval($data['amount']), '0.00', 2) > 0) {
-                $query->where('limit_amount', '<=', $amount);
+                $query->where('limit_amount', '<=', $data['amount']);
             }
             $query->where(function (Query $query) use ($gcodes) {
                 $query->where(['type' => 0])->whereOr(function (Query $query) use ($gcodes) {

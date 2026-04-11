@@ -290,7 +290,7 @@ abstract class Account
      * @return boolean
      * @throws \think\admin\Exception
      */
-    public static function enableAutoReigster(): bool
+    public static function enableAutoRegister(): bool
     {
         return empty(self::config('disRegister'));
     }

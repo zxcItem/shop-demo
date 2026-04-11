@@ -24,7 +24,7 @@ abstract class UserReward
     public static function create($order, ?string &$code = ''): DataWemallOrder
     {
         $order = UserOrder::widthOrder($order, $unid, $orderNo);
-        if ($order->isEmpty() && $order->getAttr('status') < 4) {
+        if ($order->isEmpty() || $order->getAttr('status') < 4) {
             throw new Exception('订单状态异常');
         }
         // 生成奖励编号
@@ -52,7 +52,7 @@ abstract class UserReward
     public static function confirm($order, ?string &$code = ''): DataWemallOrder
     {
         $order = UserOrder::widthOrder($order, $unid, $orderNo);
-        if ($order->isEmpty() && $order->getAttr('status') < 4) {
+        if ($order->isEmpty() || $order->getAttr('status') < 4) {
             throw new Exception('订单状态异常');
         }
         // 生成奖励编号
@@ -71,7 +71,7 @@ abstract class UserReward
     public static function cancel($order, ?string &$code = ''): DataWemallOrder
     {
         $order = UserOrder::widthOrder($order, $unid, $orderNo);
-        if ($order->isEmpty() && $order->getAttr('status') > 0) {
+        if ($order->isEmpty() || $order->getAttr('status') <= 0) {
             throw new Exception('订单状态异常');
         }
         // 生成奖励编号

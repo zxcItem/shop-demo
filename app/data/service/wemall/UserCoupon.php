@@ -54,7 +54,7 @@ abstract class UserCoupon
         $data = ['unid' => $unid, 'coid' => $coid, 'type' => $coupon->getAttr('type')];
         // 有效时间处理
         if (($expireDays = $coupon->getAttr('expire_days')) > 0) {
-            $data['expire'] = time() + $expireDays * 3600;
+            $data['expire'] = time() + $expireDays * 86400;
             $data['expire_time'] = date('Y-m-d H:i:s', $data['expire']);
         }
         do {

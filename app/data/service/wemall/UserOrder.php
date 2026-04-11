@@ -271,7 +271,7 @@ abstract class UserOrder
         }
 
         // 订单已经支付完成
-        if ($order->getAttr('payment_amount') >= $order->getAttr('amount_real')) {
+        if (bccomp(strval($order->getAttr('payment_amount')), strval($order->getAttr('amount_real')), 2) >= 0) {
             // 已完成支付，更新订单状态
             $status = $order->getAttr('delivery_type') ? 4 : 5;
             $order->save(['status' => $status, 'payment_status' => 1]);

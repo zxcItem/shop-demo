@@ -308,6 +308,7 @@ abstract class UserRebate
                 ];
             }
         }
+        unset($level);
         return array_values($levels);
     }
 

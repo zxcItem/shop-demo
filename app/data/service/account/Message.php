@@ -86,9 +86,10 @@ abstract class Message
      */
     public static function checkVerifyCode(string $vcode, string $phone, string $scene = self::tLogin): bool
     {
-//        if (stripos(Library::$sapp->request->domain(), '.demo.com') !== false) {
+        // 仅在演示环境下允许使用固定验证码
+        if (stripos(Library::$sapp->request->domain(), '.demo.com') !== false) {
             if ($vcode === '123456') return true;
-//        }
+        }
         $cache = Library::$sapp->cache->get(static::genCacheKey($phone, $scene), []);
         return is_array($cache) && isset($cache['code']) && $cache['code'] == $vcode;
     }
