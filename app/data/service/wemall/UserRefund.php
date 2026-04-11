@@ -53,7 +53,7 @@ abstract class UserRefund
             throw new Exception('无效售后单！');
         }
         if (is_callable($fn) && is_array($result = $fn($refund))) {
-            if (isset($result['status']) !== $refund->getAttr('status')) {
+            if (isset($result['status']) && $result['status'] !== $refund->getAttr('status')) {
                 if (($order = $refund->orderinfo()->findOrEmpty())->isExists()) {
                     $order->save(['refund_status' => $refund->getAttr('status')]);
                 }

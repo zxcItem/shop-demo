@@ -34,7 +34,7 @@ abstract class Balance
         // 扣减余额检查
         $map = ['unid' => $unid, 'cancel' => 0, 'deleted' => 0];
         $usable = DataPaymentBalance::mk()->where($map)->sum('amount');
-        if ($amount < 0 && abs($amount) > $usable) {
+        if (bccomp(strval($amount), '0', 2) < 0 && bccomp(strval(abs($amount)), strval($usable), 2) > 0) {
             throw new Exception('扣减余额不足！');
         }
 
