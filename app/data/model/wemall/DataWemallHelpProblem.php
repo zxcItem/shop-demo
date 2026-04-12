@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace app\data\model\wemall;
 
+use app\data\model\AbsUser;
+
 /**
  * 常见问题数据模型.
  *

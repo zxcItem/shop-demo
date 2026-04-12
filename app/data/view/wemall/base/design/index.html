@@ -8,7 +8,7 @@
 {/block}
 
 {block name="content"}
-{include file="base/design/index-style"}
+{include file="wemall/base/design/index-style"}
 <form id="DesignForm" method="post" data-auto action="{:url('save')}" class="ta-p-20 layui-anim layui-anim-fadein">
     <div class="design-layout" id="TemplateApp">
         <div class="design-layout-menu shadow-mini">
@@ -71,9 +71,9 @@
         </div>
 
         <div class='design-layout-form shadow-mini'>
-            {include file='base/design/index-x-head-form'}
-            {include file='base/design/index-x-normal-form'}
-            {include file='base/design/index-x-navbar-form'}
+            {include file='wemall/base/design/index-x-head-form'}
+            {include file='wemall/base/design/index-x-normal-form'}
+            {include file='wemall/base/design/index-x-navbar-form'}
         </div>
 
         <label class="layui-hide layui-form-label">
@@ -86,6 +86,6 @@
 
 {/block}
 {block name='script'}
-{include file="base/design/index-init"}
-{include file="base/design/index-script"}
+{include file="wemall/base/design/index-init"}
+{include file="wemall/base/design/index-script"}
 {/block}

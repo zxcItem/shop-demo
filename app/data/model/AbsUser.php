@@ -5,7 +5,6 @@ declare (strict_types=1);
 namespace app\data\model;
 
 use app\data\model\account\DataAccountUser;
-use app\data\model\user\DataUserRelation;
 use think\model\relation\HasOne;
 
 /**

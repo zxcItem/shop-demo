@@ -4,7 +4,6 @@
 namespace app\data\model\account;
 
 use app\data\model\Abs;
-use app\data\model\user\DataUserStore;
 use think\model\relation\HasMany;
 
 /**
@@ -21,22 +20,5 @@ class DataAccountUser extends Abs
     public function clients(): HasMany
     {
         return $this->hasMany(DataAccountBind::class, 'unid', 'id');
-    }
-
-    public function store()
-    {
-        return $this->hasOne(DataUserStore::class, 'unid', 'id')->where('check_status',1);
-    }
-
-    public function storeStatus()
-    {
-        return $this->belongsTo(DataUserStore::class, 'id', 'unid')->bind(['store_status'=>'check_status']);
-    }
-
-    public function storeLevel()
-    {
-        return $this->belongsTo(DataUserStore::class, 'id', 'unid')->with(['level'=>function($level){
-//            $level->withOutfield('status,sort,create_time');
-        }])->where('check_status',2)->bind(['level_id'=>'level_id']);
     }
 }

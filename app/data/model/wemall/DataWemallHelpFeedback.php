@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\data\model\wemall;
 
+use app\data\model\AbsUser;
 use think\admin\model\SystemUser;
 use think\model\relation\HasOne;
 

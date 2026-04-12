@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\data\model\wemall;
 
+use app\data\model\AbsUser;
 use app\data\model\account\DataAccountUser;
 use app\data\model\payment\DataPaymentRecord;
 use think\model\relation\HasMany;

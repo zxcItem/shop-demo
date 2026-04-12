@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace app\data\controller\wemall\help;
+namespace app\data\controller\api\wemall\help;
 
 use app\data\model\wemall\DataWemallHelpProblem;
 use think\admin\Controller;
