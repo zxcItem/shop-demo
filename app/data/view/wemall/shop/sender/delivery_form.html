@@ -84,6 +84,6 @@
 
     $('[data-express-query]').on('click', function () {
         let code = $('[data-delivery-code]').val(), number = $('[data-delivery-number]').val();
-        $.form.modal('{:url("shop.sender/query")}', {code: code, number: number}, '{:lang("快递追踪查询")}')
+        $.form.modal('{:url("wemall.shop.sender/query")}', {code: code, number: number}, '{:lang("快递追踪查询")}')
     });
 </script>

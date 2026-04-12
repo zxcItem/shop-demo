@@ -149,7 +149,7 @@
                     },
                     // 商品选择器
                     choose() {
-                        $.form.modal('{:url("shop.goods/select")}')
+                        $.form.modal('{:url("wemall.shop.goods/select")}')
                         window.setItemValue = (data) => {
                             if (app.list.some(x => x.code === data.code)) {
                                 $.msg.error('{:lang("该商品已存在！")}')

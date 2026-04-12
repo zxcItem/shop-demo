@@ -265,7 +265,7 @@
     $(function () {
         $('[data-delivery-code]').on('click', function () {
             let code = this.dataset.deliveryCode || '', number = this.dataset.deliveryNumber || ''
-            $.form.modal('{:url("shop.sender/query")}', {code: code, number: number}, '{:lang("快递追踪查询")}')
+            $.form.modal('{:url("wemall.shop.sender/query")}', {code: code, number: number}, '{:lang("快递追踪查询")}')
         });
     })
 </script>

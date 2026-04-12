@@ -72,8 +72,8 @@
     <!--{if auth('edit')}-->
     <a class="layui-btn layui-btn-sm ta-mr-5 ta-ml-0" data-modal="{:url('edit')}?id={{d.id}}" data-title="{:lang('编辑用户')}">{:lang('编 辑')}</a>
     <!--{/if}-->
-    <!--{if auth('user.recharge/add')}-->
-    <a class="layui-btn layui-btn-sm ta-mr-5 ta-ml-0" data-modal="{:url('user.recharge/add')}" data-value="unid#{{d.id}}" data-title="{:lang('会员充值')}">{:lang('充 值')}</a>
+    <!--{if auth('wemall.user.recharge/add')}-->
+    <a class="layui-btn layui-btn-sm ta-mr-5 ta-ml-0" data-modal="{:url('wemall.user.recharge/add')}" data-value="unid#{{d.id}}" data-title="{:lang('会员充值')}">{:lang('充 值')}</a>
     <!--{/if}-->
     {if auth("remove")}
     <a class="layui-btn layui-btn-sm layui-btn-danger" data-confirm="确定要永久删除此账号吗？" data-action="{:url('remove')}" data-value="id#{{d.id}}">删 除</a>
