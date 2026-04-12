@@ -54,10 +54,10 @@ class Design extends Controller
     public function link()
     {
         $this->types = [
-            ['name' => '商品分类', 'link' => sysuri('plugin-wemall/shop.goods.cate/select')],
-            ['name' => '商品标签', 'link' => sysuri('plugin-wemall/shop.goods.mark/select')],
-            ['name' => '商品详情', 'link' => sysuri('plugin-wemall/shop.goods/select')],
-            ['name' => '其他链接', 'link' => sysuri('plugin-wemall/base.design/other')],
+            ['name' => '商品分类', 'link' => sysuri('wemall.shop.goods.cate/select')],
+            ['name' => '商品标签', 'link' => sysuri('wemall.shop.goods.mark/select')],
+            ['name' => '商品详情', 'link' => sysuri('wemall.shop.goods/select')],
+            ['name' => '其他链接', 'link' => sysuri('wemall.base.design/other')],
         ];
         $this->fetch();
     }
