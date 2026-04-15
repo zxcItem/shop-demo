@@ -22,7 +22,7 @@ abstract class UserCreate
 {
     /**
      * 创建账号及返佣.
-     * @param int|PluginWemallUserCreate|string $user
+     * @param int|DataWemallUserCreate|string $user
      * @throws Exception
      */
     public static function create($user)
@@ -132,7 +132,7 @@ abstract class UserCreate
 
     /**
      * 标准化模型.
-     * @param int|PluginWemallUserCreate|string $model
+     * @param int|DataWemallUserCreate|string $model
      * @throws Exception
      */
     public static function withModel($model): DataWemallUserCreate

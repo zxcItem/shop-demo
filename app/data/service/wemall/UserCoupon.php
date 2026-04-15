@@ -20,7 +20,7 @@ use think\db\exception\ModelNotFoundException;
 abstract class UserCoupon
 {
     /**
-     * @param int|PluginWemallUserRelation $unid
+     * @param int|DataWemallUserRelation $unid
      * @param int $coid 卡券编号
      * @throws Exception
      * @throws DataNotFoundException
@@ -69,7 +69,7 @@ abstract class UserCoupon
 
     /**
      * 重置卡券统计
-     * @param int|PluginWemallConfigCoupon $coid
+     * @param int|DataWemallConfigCoupon $coid
      * @throws Exception
      */
     public static function recount($coid): bool
@@ -113,7 +113,7 @@ abstract class UserCoupon
 
     /**
      * 获取优惠券模型.
-     * @param int|PluginWemallConfigCoupon $model
+     * @param int|DataWemallConfigCoupon $model
      * @throws Exception
      */
     public static function withModel($model): DataWemallConfigCoupon

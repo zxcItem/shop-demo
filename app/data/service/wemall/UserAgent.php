@@ -23,7 +23,7 @@ abstract class UserAgent
 {
     /**
      * 同步计算代理等级.
-     * @param int|PluginWemallUserRelation $unid 指定用户UID
+     * @param int|DataWemallUserRelation $unid 指定用户UID
      * @param bool $parent 同步计算上级
      * @param ?string $orderNo 升级触发订单
      * @throws Exception

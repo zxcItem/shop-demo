@@ -17,7 +17,7 @@ abstract class UserReward
 {
     /**
      * 创建用户奖励.
-     * @param PluginWemallOrder|string $order
+     * @param DataWemallOrder|string $order
      * @param null|string $code 奖励编号
      * @throws Exception
      */
@@ -45,7 +45,7 @@ abstract class UserReward
 
     /**
      * 确认发放奖励.
-     * @param PluginWemallOrder|string $order
+     * @param DataWemallOrder|string $order
      * @param null|string $code 奖励编号
      * @throws Exception
      */
@@ -64,7 +64,7 @@ abstract class UserReward
 
     /**
      * 取消订单奖励.
-     * @param PluginWemallOrder|string $order
+     * @param DataWemallOrder|string $order
      * @param null|string $code 奖励编号
      * @throws Exception
      */

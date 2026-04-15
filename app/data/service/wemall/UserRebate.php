@@ -100,7 +100,7 @@ abstract class UserRebate
 
     /**
      * 执行订单返佣处理.
-     * @param PluginWemallOrder|string $order
+     * @param DataWemallOrder|string $order
      * @throws Exception
      * @throws DataNotFoundException
      * @throws DbException
@@ -211,7 +211,7 @@ abstract class UserRebate
 
     /**
      * 确认收货订单返佣.
-     * @param PluginWemallOrder|string $order
+     * @param DataWemallOrder|string $order
      * @throws Exception
      */
     public static function confirm($order): bool
@@ -231,7 +231,7 @@ abstract class UserRebate
 
     /**
      * 取消订单发放返佣.
-     * @param PluginWemallOrder|string $order
+     * @param DataWemallOrder|string $order
      * @throws Exception
      * @throws DataNotFoundException
      * @throws DbException

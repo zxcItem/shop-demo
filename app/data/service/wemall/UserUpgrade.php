@@ -24,7 +24,7 @@ abstract class UserUpgrade
 {
     /**
      * 读取用户代理编号.
-     * @param int|PluginWemallUserRelation $unid 会员用户
+     * @param int|DataWemallUserRelation $unid 会员用户
      * @param int $puid 代理用户
      * @throws Exception
      * @throws DataNotFoundException
@@ -50,7 +50,7 @@ abstract class UserUpgrade
 
     /**
      * 尝试绑定上级代理.
-     * @param int|PluginWemallUserRelation $unid 用户 UNID
+     * @param int|DataWemallUserRelation $unid 用户 UNID
      * @param int $puid 代理 UNID
      * @param int $mode 操作类型（0临时绑定, 1永久绑定, 2强行绑定）
      * @throws Exception
@@ -124,7 +124,7 @@ abstract class UserUpgrade
 
     /**
      * 同步计算会员等级.
-     * @param int|PluginWemallUserRelation $unid 指定用户
+     * @param int|DataWemallUserRelation $unid 指定用户
      * @param bool $parent 同步计算上级
      * @param ?string $orderNo 升级触发订单
      * @throws Exception
@@ -174,7 +174,7 @@ abstract class UserUpgrade
         $user->isExists() && $user->save(['extra' => array_merge($user->getAttr('extra'), $extra)]);
         // 会员等级数据
         $rela->save(['level_name' => $levelName, 'level_code' => $levelCode]);
-        $levelCurr < $levelCode && Library::$sapp->event->trigger('PluginWemallUpgradeLevel', [
+        $levelCurr < $levelCode && Library::$sapp->event->trigger('DataWemallUpgradeLevel', [
             'unid' => $unid, 'order_no' => $orderNo, 'level_code_old' => $levelCurr, 'level_code_new' => $levelCode,
         ]);
         if ($parent && empty($rela->getAttr('puids')) && $rela->getAttr('puid1') > 0) {

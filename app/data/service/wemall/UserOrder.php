@@ -60,7 +60,7 @@ abstract class UserOrder
 
     /**
      * 获取订单模型.
-     * @param PluginWemallOrder|string $order
+     * @param DataWemallOrder|string $order
      * @param ?int $unid 动态绑定变量
      * @param ?string $orderNo 动态绑定变量
      * @throws Exception
@@ -79,7 +79,7 @@ abstract class UserOrder
 
     /**
      * 根据订单更新会员等级.
-     * @param PluginWemallOrder|string $order
+     * @param DataWemallOrder|string $order
      * @return null|array [RELATION, ORDER, ENTRY]
      * @throws Exception
      * @throws DataNotFoundException
@@ -122,7 +122,7 @@ abstract class UserOrder
 
     /**
      * 刷新用户入会礼包.
-     * @param int|PluginWemallUserRelation $unid
+     * @param int|DataWemallUserRelation $unid
      * @throws Exception
      * @throws DataNotFoundException
      * @throws DbException
@@ -239,8 +239,8 @@ abstract class UserOrder
 
     /**
      * 更新订单支付状态
-     * @param PluginWemallOrder|string $order 订单模型
-     * @param PluginPaymentRecord $payment 支付行为记录
+     * @param DataWemallOrder|string $order 订单模型
+     * @param DataPaymentRecord $payment 支付行为记录
      * @return null|array|bool|string|void
      * @throws Exception
      * @throws DataNotFoundException
@@ -306,7 +306,7 @@ abstract class UserOrder
 
     /**
      * 取消订单撤销奖励.
-     * @param PluginWemallOrder|string $order
+     * @param DataWemallOrder|string $order
      * @param bool $setRebate 更新返佣
      */
     public static function cancel($order, bool $setRebate = false): string
@@ -334,7 +334,7 @@ abstract class UserOrder
 
     /**
      * 支付成功发放奖励.
-     * @param PluginWemallOrder|string $order
+     * @param DataWemallOrder|string $order
      */
     public static function payment($order): string
     {
@@ -360,7 +360,7 @@ abstract class UserOrder
 
     /**
      * 支付成功发放奖励.
-     * @param PluginWemallOrder|string $order
+     * @param DataWemallOrder|string $order
      */
     public static function confirm($order): string
     {
