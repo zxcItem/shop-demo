@@ -14,6 +14,7 @@ use think\admin\helper\QueryHelper;
  */
 class Device extends Controller
 {
+
     /**
      * 终端账号管理
      * @auth true
