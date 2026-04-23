@@ -1,6 +1,7 @@
 <?php
 
-declare (strict_types=1);
+declare(strict_types = 1)
+;
 
 namespace app\data\controller\api\auth;
 
@@ -37,29 +38,30 @@ class Center extends Auth
     {
         try {
             $data = $this->checkUserStatus()->_vali([
-                'headimg.default'     => '',
-                'nickname.default'    => '',
-                'password.default'    => '',
+                'headimg.default' => '',
+                'nickname.default' => '',
+                'password.default' => '',
                 'region_prov.default' => '',
                 'region_city.default' => '',
                 'region_area.default' => '',
             ]);
-            // 保存用户头像
-            if (!empty($data['headimg'])) {
-                $data['headimg'] = Storage::saveImage($data['headimg'], 'headimg')['url'] ?? '';
-            }
             // 修改登录密码
             if (!empty($data['password']) && strlen($data['password']) > 4) {
                 $this->account->pwdModify($data['password']);
                 unset($data['password']);
             }
-            foreach ($data as $k => $v) if ($v === '') unset($data[$k]);
-            if (empty($data)) $this->success('无需修改', $this->account->getApiData(true));
+            foreach ($data as $k => $v)
+                if ($v === '')
+                    unset($data[$k]);
+            if (empty($data))
+                $this->success('无需修改', $this->account->getApiData(true));
             $this->account->bind(['id' => $this->unid], $data);
             $this->success('修改成功', $this->account->getApiData(true));
-        } catch (HttpResponseException $exception) {
+        }
+        catch (HttpResponseException $exception) {
             throw $exception;
-        } catch (\Exception $exception) {
+        }
+        catch (\Exception $exception) {
             $this->error($exception->getMessage());
         }
     }
@@ -70,18 +72,22 @@ class Center extends Auth
      */
     public function forbid()
     {
-        if (($user = $this->account->user())->isExists()) try {
-            $this->app->db->transaction(function () use ($user) {
-                $user->save(['deleted' => 1, 'remark' => '用户主动申请注销账号！']);
-                DataAccountAuth::mk()->where(['usid' => $this->usid])->delete();
-                DataAccountBind::mk()->where(['unid' => $this->unid])->delete();
-            });
-            $this->success('账号注销成功！');
-        } catch (HttpResponseException $exception) {
-            throw $exception;
-        } catch (\Exception $exception) {
-            $this->error($exception->getMessage());
-        } else {
+        if (($user = $this->account->user())->isExists())
+            try {
+                $this->app->db->transaction(function () use ($user) {
+                    $user->save(['deleted' => 1, 'remark' => '用户主动申请注销账号！']);
+                    DataAccountAuth::mk()->where(['usid' => $this->usid])->delete();
+                    DataAccountBind::mk()->where(['unid' => $this->unid])->delete();
+                });
+                $this->success('账号注销成功！');
+            }
+            catch (HttpResponseException $exception) {
+                throw $exception;
+            }
+            catch (\Exception $exception) {
+                $this->error($exception->getMessage());
+            }
+        else {
             $this->error('未完成注册！');
         }
     }
@@ -94,14 +100,14 @@ class Center extends Auth
     {
         try {
             $data = $this->_vali([
-                'phone.mobile'   => '手机号错误',
-                'phone.require'  => '手机号为空',
+                'phone.mobile' => '手机号错误',
+                'phone.require' => '手机号为空',
                 'verify.require' => '验证码为空',
                 'passwd.default' => ''
             ]);
             if (Message::checkVerifyCode($data['verify'], $data['phone'])) {
                 Message::clearVerifyCode($data['phone']);
-                
+
                 // 检查手机号是否已被其他用户绑定
                 $existUser = \app\data\model\account\DataAccountUser::mk()
                     ->where(['phone' => $data['phone'], 'deleted' => 0])
@@ -115,7 +121,7 @@ class Center extends Auth
                         $this->error('该手机号已被其他用户绑定');
                     }
                 }
-                
+
                 $map = $bind = ['phone' => $data['phone']];
                 if (!$this->account->isBind()) {
                     $user = $this->account->get();
@@ -129,12 +135,15 @@ class Center extends Auth
                     $this->account->pwdModify($data['passwd']);
                 }
                 $this->success('关联成功!', $this->account->getApiData(true));
-            } else {
+            }
+            else {
                 $this->error('验证失败');
             }
-        } catch (HttpResponseException $exception) {
+        }
+        catch (HttpResponseException $exception) {
             throw $exception;
-        } catch (\Exception $exception) {
+        }
+        catch (\Exception $exception) {
             $this->error($exception->getMessage());
         }
     }
@@ -157,10 +166,10 @@ class Center extends Auth
     {
         try {
             $data = $this->_vali([
-                'type.require'         => '类型为空',
-                'code.default'         => '',
-                'token.default'        => '',
-                'openid.default'       => '',
+                'type.require' => '类型为空',
+                'code.default' => '',
+                'token.default' => '',
+                'openid.default' => '',
                 'redirect_uri.default' => '',
             ]);
             // 获取并验证驱动
@@ -179,9 +188,11 @@ class Center extends Auth
             // 执行账号绑定
             Account::bind($this->unid, $data['type'], $userInfo);
             $this->success('绑定成功', $this->account->getApiData(true));
-        } catch (HttpResponseException $exception) {
+        }
+        catch (HttpResponseException $exception) {
             throw $exception;
-        } catch (\Exception $exception) {
+        }
+        catch (\Exception $exception) {
             $this->error($exception->getMessage());
         }
     }
@@ -196,9 +207,11 @@ class Center extends Auth
             $data = $this->_vali(['type.require' => '类型为空']);
             Account::unBind($this->unid, $data['type']);
             $this->success('解绑成功', $this->account->getApiData(true));
-        } catch (HttpResponseException $exception) {
+        }
+        catch (HttpResponseException $exception) {
             throw $exception;
-        } catch (\Exception $exception) {
+        }
+        catch (\Exception $exception) {
             $this->error($exception->getMessage());
         }
     }
