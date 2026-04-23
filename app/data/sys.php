@@ -63,11 +63,11 @@ if (Library::$sapp->request->isCli()) {
 
     // 注册用户绑定事件
      Library::$sapp->event->listen('PluginAccountBind', function (array $data) {
-        $this->app->log->notice("Event PluginAccountBind {$data['unid']}#{$data['usid']}");
+        Library::$sapp->log->notice("Event PluginAccountBind {$data['unid']}#{$data['usid']}");
         // 初始化用户关系数据
         DataWemallUserRelation::withInit(intval($data['unid']));
         // 尝试临时绑定推荐人用户
-        $input = $this->app->request->post(['from', 'phone', 'fphone']);
+        $input = Library::$sapp->request->post(['from', 'phone', 'fphone']);
         if (!empty($input['fphone'])) {
             try {
                 $map = ['deleted' => 0];
@@ -88,25 +88,25 @@ if (Library::$sapp->request->isCli()) {
 
     // 注册支付审核事件
      Library::$sapp->event->listen('PluginPaymentAudit', function (DataPaymentRecord $payment) {
-        $this->app->log->notice("Event PluginPaymentAudit {$payment->getAttr('order_no')}");
+        Library::$sapp->log->notice("Event PluginPaymentAudit {$payment->getAttr('order_no')}");
         UserOrder::change($payment->getAttr('order_no'), $payment);
     });
 
     // 注册支付拒审事件
      Library::$sapp->event->listen('PluginPaymentRefuse', function (DataPaymentRecord $payment) {
-        $this->app->log->notice("Event PluginPaymentRefuse {$payment->getAttr('order_no')}");
+        Library::$sapp->log->notice("Event PluginPaymentRefuse {$payment->getAttr('order_no')}");
         UserOrder::change($payment->getAttr('order_no'), $payment);
     });
 
     // 注册支付完成事件
      Library::$sapp->event->listen('PluginPaymentSuccess', function (DataPaymentRecord $payment) {
-        $this->app->log->notice("Event PluginPaymentSuccess {$payment->getAttr('order_no')}");
+        Library::$sapp->log->notice("Event PluginPaymentSuccess {$payment->getAttr('order_no')}");
         UserOrder::change($payment->getAttr('order_no'), $payment);
     });
 
     // 注册支付取消事件
      Library::$sapp->event->listen('PluginPaymentCancel', function (DataPaymentRecord $payment) {
-        $this->app->log->notice("Event PluginPaymentCancel {$payment->getAttr('order_no')}");
+        Library::$sapp->log->notice("Event PluginPaymentCancel {$payment->getAttr('order_no')}");
         UserOrder::change($payment->getAttr('order_no'), $payment);
     });
 
@@ -118,7 +118,7 @@ if (Library::$sapp->request->isCli()) {
 
     // 订单确认收货事件
      Library::$sapp->event->listen('PluginWemallOrderConfirm', function (DataWemallOrder $order) {
-        $this->app->log->notice("Event PluginWemallOrderConfirm {$order->getAttr('order_no')}");
+        Library::$sapp->log->notice("Event PluginWemallOrderConfirm {$order->getAttr('order_no')}");
         UserOrder::confirm($order);
     });
 
