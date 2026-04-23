@@ -62,7 +62,11 @@ class Wxapp extends Controller
                 'unionid'     => $unionid,
                 'session_key' => $sesskey,
             ];
-            $this->success('授权换取成功', Account::mk($this->type)->set($data, true));
+            $account = Account::mk($this->type)->set($data, true);
+            $this->success('授权换取成功', [
+                'user'  => $account['user'] ?? [],
+                'token' => $account['token'] ?? '',
+            ]);
         } catch (HttpResponseException $exception) {
             throw $exception;
         } catch (\Exception $exception) {
@@ -94,7 +98,11 @@ class Wxapp extends Controller
                     'nickname' => $result['nickName'],
                 ];
                 if ($data['nickname'] === '微信用户') unset($data['headimg'], $data['nickname']);
-                $this->success('解密成功', Account::mk($this->type)->set($data, true));
+                $account = Account::mk($this->type)->set($data, true);
+                $this->success('解密成功', [
+                    'user'  => $account['user'] ?? [],
+                    'token' => $account['token'] ?? '',
+                ]);
             } elseif (is_array($result)) {
                 if (!empty($result['phoneNumber'])) {
                     $data = ['appid' => $this->params['appid'], 'openid' => $openid, 'unionid' => $unionid];
@@ -111,7 +119,11 @@ class Wxapp extends Controller
                         }
                     }
                     $account->bind(['phone' => $result['phoneNumber']], $data);
-                    $this->success('绑定成功', $account->get(true));
+                    $account = $account->get(true, true);
+                    $this->success('绑定成功', [
+                        'user'  => $account['user'] ?? [],
+                        'token' => $account['token'] ?? '',
+                    ]);
                 } else {
                     $this->success('解密成功', $result);
                 }
@@ -154,7 +166,11 @@ class Wxapp extends Controller
                 }
                 
                 $account->bind(['phone' => $result['phoneNumber']]);
-                $this->success('绑定成功', $account->get(true));
+                $account = $account->get(true, true);
+                $this->success('绑定成功', [
+                    'user'  => $account['user'] ?? [],
+                    'token' => $account['token'] ?? '',
+                ]);
             } else {
                 $this->error('解析失败');
             }
