@@ -131,7 +131,11 @@ class Login extends Controller
             if ($account->pwdVerify($data['password'])) {
                 // 密码错误次数限制检查（可选，增强安全性）
                 $account->isBind() || $account->bind($map, $map);
-                $this->success('登录成功', $account->expire()->get(true));
+                $account = $account->expire()->get(true, true);
+                $this->success('登录成功', [
+                    'user'  => $account['user'] ?? [],
+                    'token' => $account['token'] ?? '',
+                ]);
             } else {
                 $this->error('密码错误');
             }
