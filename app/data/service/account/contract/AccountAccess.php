@@ -484,10 +484,10 @@ class AccountAccess implements AccountInterface
         // 1. 通过 UnionId 查找可能的主账号 (微信体系、QQ等)
         if (empty($this->bind->getAttr('unid')) && !empty($data['unionid'])) {
             $lockKey = "account:bind:unionid:{$data['unionid']}";
-            $lockAcquired = $this->app->cache->add($lockKey, 1, 10);
-            if (!$lockAcquired) {
+            if ($this->app->cache->has($lockKey)) {
                 throw new Exception('账号关联处理中，请稍后重试！');
             }
+            $this->app->cache->set($lockKey, 1, 10);
             
             try {
                 // 查找主账号
@@ -512,10 +512,10 @@ class AccountAccess implements AccountInterface
             $email = filter_var($data['email'], FILTER_VALIDATE_EMAIL);
             if ($email !== false) {
                 $lockKey = "account:bind:email:" . md5($email);
-                $lockAcquired = $this->app->cache->add($lockKey, 1, 10);
-                if (!$lockAcquired) {
+                if ($this->app->cache->has($lockKey)) {
                     throw new Exception('账号关联处理中，请稍后重试！');
                 }
+                $this->app->cache->set($lockKey, 1, 10);
                 
                 try {
                     // 查找已绑定该邮箱的主账号
@@ -546,10 +546,10 @@ class AccountAccess implements AccountInterface
             $phone = $data['phone'];
             if (preg_match("/^1[3-9]\d{9}$/", $phone)) {
                 $lockKey = "account:bind:phone:{$phone}";
-                $lockAcquired = $this->app->cache->add($lockKey, 1, 10);
-                if (!$lockAcquired) {
+                if ($this->app->cache->has($lockKey)) {
                     throw new Exception('账号关联处理中，请稍后重试！');
                 }
+                $this->app->cache->set($lockKey, 1, 10);
                 
                 try {
                     // 查找已绑定该手机号的主账号
