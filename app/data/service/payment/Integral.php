@@ -49,7 +49,7 @@ abstract class Integral
         // 扣减积分检查
         $map = ['unid' => $unid, 'cancel' => 0, 'deleted' => 0];
         $usable = DataPaymentIntegral::mk()->where($map)->sum('amount');
-        if (bccomp(strval($amount), '0', 2) < 0 && bccomp(strval(abs($amount)), strval($usable), 2) > 0) {
+        if (bccomp(strval($amount), '0', 2) < 0 && bccomp(strval(abs(floatval($amount))), strval($usable), 2) > 0) {
             throw new Exception('扣减积分不足！');
         }
 
@@ -142,7 +142,7 @@ abstract class Integral
         if ($isUpdate) {
             $user->save(['extra' => array_merge($user->getAttr('extra'), $data)]);
         }
-        return ['lock' => $lock, 'used' => abs($used), 'total' => $total, 'usable' => $data['integral_usable']];
+        return ['lock' => $lock, 'used' => abs(floatval($used)), 'total' => $total, 'usable' => $data['integral_usable']];
     }
 
     /**

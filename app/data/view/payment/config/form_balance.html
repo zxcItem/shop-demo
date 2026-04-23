@@ -1,0 +1,17 @@
+<div class="layui-form-item label-required-prev">
+    <span class="help-label"><b>余额支付说明</b>Balance Payment Description</span>
+    <textarea class="layui-textarea" name="balance_description" placeholder="请输入余额支付说明（可选）" rows="3">{$vo.content.balance_description|default=''}</textarea>
+    <span class="help-block">可选，为用户展示余额支付的说明文字，留空则使用默认说明。</span>
+</div>
+
+<div class="layui-form-item">
+    <span class="help-label"><b>最低支付金额</b>Minimum Payment Amount</span>
+    <input class="layui-input" name="balance_min_amount" placeholder="请输入最低支付金额" value="{$vo.content.balance_min_amount|default='0.01'}" type="number" step="0.01" min="0">
+    <span class="help-block">可选，设置余额支付的最低金额限制，默认 0.01 元。</span>
+</div>
+
+<div class="layui-form-item">
+    <span class="help-label"><b>最高支付金额</b>Maximum Payment Amount</span>
+    <input class="layui-input" name="balance_max_amount" placeholder="请输入最高支付金额（0表示不限制）" value="{$vo.content.balance_max_amount|default='0'}" type="number" step="0.01" min="0">
+    <span class="help-block">可选，设置余额支付的最高金额限制，0 表示不限制。</span>
+</div>

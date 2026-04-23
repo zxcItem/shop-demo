@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\data\controller\api\wemall\auth;
 
 use app\data\model\payment\DataPaymentAddress;
+use app\data\service\account\Account;
 use app\data\service\payment\Balance;
 use app\data\service\payment\contract\PaymentResponse;
 use app\data\service\payment\Integral;
@@ -289,10 +290,52 @@ class Order extends Auth
      */
     public function channel()
     {
+        // 判断终端类型
+        $accountType = $this->getAccountType();
+
         $this->success('获取支付通道！', [
             'toratio' => Integral::ratio(),
-            'channels' => Payment::typesByAccess($this->type, true),
+            'channels' => Payment::typesByAccess($accountType, true),
         ]);
+    }
+
+    /**
+     * 获取当前账号的终端类型
+     * @return string
+     */
+    private function getAccountType(): string
+    {
+        // 优先从请求参数中获取指定的终端类型
+        $accountType = input('account_type', '');
+        if (!empty($accountType)) {
+            return $accountType;
+        }
+
+        // 根据 User-Agent 判断终端类型
+        $userAgent = $this->request->header('user-agent', '');
+
+        // 检查是否为微信环境
+        $isWechat = stripos($userAgent, 'MicroMessenger') !== false;
+
+        // 检查是否为移动端
+        $isMobile = preg_match('/(Android|webOS|iPhone|iPod|BlackBerry|IEMobile|Opera Mini)/i', $userAgent);
+
+        // 检查是否为小程序
+        $isWxapp = stripos($userAgent, 'miniProgram') !== false;
+
+        // 判断终端类型
+        if ($isWxapp) {
+            return Account::WXAPP;
+        } elseif ($isWechat && $isMobile) {
+            // 微信内置浏览器 + 移动端 = 微信公众号
+            return Account::WECHAT;
+        } elseif ($isMobile) {
+            // 普通移动端 = H5
+            return Account::WAP;
+        } else {
+            // PC端 = WEB
+            return Account::WEB;
+        }
     }
 
     /**
@@ -368,28 +411,30 @@ class Order extends Auth
             }
 
             // 积分抵扣处理
-            if ($leaveAmount > 0 && $data['integral'] > 0) {
-                if ($data['integral'] > $order->getAttr('allow_integral')) {
+            $integralAmount = intval($data['integral']);
+            if ($leaveAmount > 0 && $integralAmount > 0) {
+                if ($integralAmount > $order->getAttr('allow_integral')) {
                     $this->error('超出积分抵扣！');
                 }
-                if ($data['integral'] > Integral::recount($this->unid)['usable']) {
+                if ($integralAmount > Integral::recount($this->unid)['usable']) {
                     $this->error('账号积分不足！');
                 }
-                $response = Payment::mk(Payment::INTEGRAL)->create($this->account, $data['order_no'], '账号积分抵扣', $orderAmount, $data['integral']);
+                $response = Payment::mk(Payment::INTEGRAL)->create($this->account, $data['order_no'], '账号积分抵扣', $orderAmount, strval($integralAmount));
                 if (($leaveAmount = Payment::leaveAmount($data['order_no'], $orderAmount)) <= 0) {
                     $this->success('已完成支付！', $response->toArray());
                 }
             }
 
             // 余额支付扣减
-            if ($leaveAmount > 0 && $data['balance'] > 0) {
-                if ($data['balance'] > $order->getAttr('allow_balance')) {
+            $balanceAmount = floatval($data['balance']);
+            if ($leaveAmount > 0 && $balanceAmount > 0) {
+                if ($balanceAmount > $order->getAttr('allow_balance')) {
                     $this->error('超出余额限额！');
                 }
-                if ($data['balance'] > Balance::recount($this->unid)['usable']) {
+                if ($balanceAmount > Balance::recount($this->unid)['usable']) {
                     $this->error('账号余额不足！');
                 }
-                $response = Payment::mk(Payment::BALANCE)->create($this->account, $data['order_no'], '账号余额支付！', $orderAmount, $data['balance']);
+                $response = Payment::mk(Payment::BALANCE)->create($this->account, $data['order_no'], '账号余额支付！', $orderAmount, strval($balanceAmount));
                 if (($leaveAmount = Payment::leaveAmount($data['order_no'], $orderAmount)) <= 0) {
                     $this->success('已完成支付！', $response->toArray());
                 }
