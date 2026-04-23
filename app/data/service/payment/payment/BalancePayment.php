@@ -100,11 +100,6 @@ class BalancePayment implements PaymentInterface
             BalanceService::create($unid, "ZF{$payCode}", $orderTitle, strval(bcmul(strval($payAmount), '-1', 2)), $payRemark, true);
             // 更新支付行为
             $data = $this->updateAction($payCode, "ZF{$payCode}", $payAmount, '账户余额支付');
-            // 更新订单状态
-            $map = ['code' => $payCode, 'channel_code' => $this->cfgCode, 'channel_type' => $this->cfgType];
-            if (($payment = DataPaymentRecord::mk()->where($map)->findOrEmpty())->isExists()) {
-                UserOrder::change($orderNo, $payment);
-            }
             // 刷新用户余额
             BalanceService::recount($unid);
             // 返回支付结果
