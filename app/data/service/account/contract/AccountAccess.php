@@ -10,6 +10,7 @@ use app\data\service\account\Account;
 use think\admin\Exception;
 use think\admin\extend\CodeExtend;
 use think\admin\extend\JwtExtend;
+use think\admin\Storage;
 use think\App;
 
 /**
@@ -108,15 +109,19 @@ class AccountAccess implements AccountInterface
             $this->auth = DataAccountAuth::mk()->where($map)->findOrEmpty();
             $this->bind = $this->auth->client()->findOrEmpty();
             $this->user = $this->bind->user()->findOrEmpty();
-        } elseif (is_array($token)) {
+        }
+        elseif (is_array($token)) {
             // 返向查询终端账号
             $map = ['deleted' => 0];
-            if ($this->type) $map['type'] = $this->type;
+            if ($this->type)
+                $map['type'] = $this->type;
             $this->bind = DataAccountBind::mk()->where($map)->where($token)->findOrEmpty();
             $this->user = $this->bind->user()->findOrEmpty();
             if ($this->bind->isExists()) {
-                if (empty($this->type)) $this->type = $this->bind->getAttr('type');
-                if ($this->auth->isEmpty()) $this->token(false);
+                if (empty($this->type))
+                    $this->type = $this->bind->getAttr('type');
+                if ($this->auth->isEmpty())
+                    $this->token(false);
             }
         }
         return $this;
@@ -138,16 +143,20 @@ class AccountAccess implements AccountInterface
                 if ($data[$this->field] !== $this->bind->getAttr($this->field)) {
                     throw new Exception('禁止强行关联！');
                 }
-            } else {
+            }
+            else {
                 $map = [$this->field => $data[$this->field]];
-                if ($this->type) $map['type'] = $this->type;
+                if ($this->type)
+                    $map['type'] = $this->type;
                 $this->bind = DataAccountBind::mk()->where($map)->findOrEmpty();
             }
-        } elseif ($this->bind->isEmpty()) {
+        }
+        elseif ($this->bind->isEmpty()) {
             throw new Exception("字段 {$this->field} 为空！");
         }
         $this->bind = $this->save(array_merge($data, ['type' => $this->type]));
-        if ($this->bind->isEmpty()) throw new Exception('更新资料失败！');
+        if ($this->bind->isEmpty())
+            throw new Exception('更新资料失败！');
         // 刷新更新用户模型
         $this->user = $this->bind->user()->findOrEmpty();
         return $this->token()->get($rejwt);
@@ -171,9 +180,10 @@ class AccountAccess implements AccountInterface
                 $this->user = $this->bind->user()->findOrEmpty();
             }
             $data['user'] = $this->user->hidden(['sort', 'password'], true)->toArray();
-            if ($rejwt) $data['token'] = $this->isjwt ? JwtExtend::token([
-                'type' => $this->auth->getAttr('type'), 'token' => $this->auth->getAttr('token')
-            ]) : $this->auth->getAttr('token');
+            if ($rejwt)
+                $data['token'] = $this->isjwt ?JwtExtend::token([
+                    'type' => $this->auth->getAttr('type'), 'token' => $this->auth->getAttr('token')
+                ]) : $this->auth->getAttr('token');
         }
         return $data;
     }
@@ -187,7 +197,7 @@ class AccountAccess implements AccountInterface
     {
         $data = $this->get(true, $refresh);
         return [
-            'user'  => $data['user'] ?? [],
+            'user' => $data['user'] ?? [],
             'token' => $data['token'] ?? '',
         ];
     }
@@ -201,7 +211,8 @@ class AccountAccess implements AccountInterface
     public function pwdVerify(string $pass): bool
     {
         $pass = md5($pass);
-        if ($this->user->getAttr('password') === $pass) return !!$this->expire();
+        if ($this->user->getAttr('password') === $pass)
+            return !!$this->expire();
         return $this->bind->getAttr('password') === $pass && $this->expire();
     }
 
@@ -213,13 +224,16 @@ class AccountAccess implements AccountInterface
      */
     public function pwdModify(string $pass, bool $event = true): bool
     {
-        if ($this->bind->isEmpty()) return false;
+        if ($this->bind->isEmpty())
+            return false;
         $data = ['password' => md5($pass)];
         $this->user->isExists() && $this->user->save($data);
-        if (!$this->bind->save($data)) return false;
-        if ($event) $this->app->event->trigger('DataAccountChangePassword', [
-            'unid' => $this->getUnid(), 'pass' => $pass
-        ]);
+        if (!$this->bind->save($data))
+            return false;
+        if ($event)
+            $this->app->event->trigger('DataAccountChangePassword', [
+                'unid' => $this->getUnid(), 'pass' => $pass
+            ]);
         return true;
     }
 
@@ -232,8 +246,9 @@ class AccountAccess implements AccountInterface
      */
     public function bind(array $map, array $data = []): array
     {
-        if ($this->bind->isEmpty()) throw new Exception('终端账号异常！');
-        
+        if ($this->bind->isEmpty())
+            throw new Exception('终端账号异常！');
+
         // 使用数据库事务确保绑定操作的原子性
         return $this->app->db->transaction(function () use ($map, $data) {
             $this->user = DataAccountUser::mk()->where(['deleted' => 0])->where($map)->findOrEmpty();
@@ -246,30 +261,37 @@ class AccountAccess implements AccountInterface
             // 检查用户是否已绑定同类账号
             if ($this->user->isExists()) {
                 $count = DataAccountBind::mk()->where([
-                    'unid'    => $this->user->getAttr('id'),
-                    'type'    => $this->type,
+                    'unid' => $this->user->getAttr('id'),
+                    'type' => $this->type,
                     'deleted' => 0,
                 ])->where('id', '<>', $this->bind->getAttr('id'))->count();
-                if ($count > 0) throw new Exception('您已绑定该类型的其他账号，请先解绑！');
+                if ($count > 0)
+                    throw new Exception('您已绑定该类型的其他账号，请先解绑！');
             }
-            if (!empty($data['extra'])) $this->user->setAttr('extra', array_merge($this->user->getAttr('extra'), $data['extra']));
+            if (!empty($data['extra']))
+                $this->user->setAttr('extra', array_merge($this->user->getAttr('extra'), $data['extra']));
             unset($data['id'], $data['code'], $data['extra']);
             // 生成新的用户编号
-            if ($this->user->isEmpty()) do $check = ['code' => $data['code'] = $this->userCode()];
-            while (DataAccountUser::mk()->master()->where($check)->findOrEmpty()->isExists());
+            if ($this->user->isEmpty())
+                do
+                    $check = ['code' => $data['code'] = $this->userCode()];
+                while (DataAccountUser::mk()->master()->where($check)->findOrEmpty()->isExists());
             // 自动绑定默认头像
             if (empty($data['headimg']) && $this->user->isEmpty() || empty($this->user->getAttr('headimg'))) {
-                if (empty($data['headimg'] = $this->bind->getAttr('headimg'))) $data['headimg'] = Account::headimg();
+                if (empty($data['headimg'] = $this->bind->getAttr('headimg')))
+                    $data['headimg'] = Account::headimg();
             }
             if (empty($data['invite_code']) && $this->user->isEmpty() || empty($this->user->getAttr('invite_code'))) {
-                if (empty($data['invite_code'] = $this->bind->getAttr('invite_code'))) $data['invite_code'] = Account::invite_code();
+                if (empty($data['invite_code'] = $this->bind->getAttr('invite_code')))
+                    $data['invite_code'] = Account::invite_code();
             }
             // 自动生成用户昵称
             if (empty($data['nickname']) && empty($this->user->getAttr('nickname'))) {
                 $prefix = Account::config('userPrefix') ?: (Account::get($this->type)['name'] ?? $this->type);
                 if ($phone = $data['phone'] ?? $this->user->getAttr('phone')) {
                     $data['nickname'] = $prefix . substr($phone, -4);
-                } else {
+                }
+                else {
                     $data['nickname'] = "{$prefix}{$this->bind->getAttr('id')}";
                 }
             }
@@ -286,7 +308,8 @@ class AccountAccess implements AccountInterface
                     'usid' => intval($this->bind->getAttr('id')),
                 ]);
                 return $this->get();
-            } else {
+            }
+            else {
                 throw new Exception('绑定用户失败！');
             }
         });
@@ -338,14 +361,17 @@ class AccountAccess implements AccountInterface
     public function allBind(): array
     {
         try {
-            if ($this->isNull()) return [];
+            if ($this->isNull())
+                return [];
             if ($this->isBind() && ($unid = $this->bind->getAttr('unid'))) {
                 $map = ['unid' => $unid, 'deleted' => 0];
                 return DataAccountBind::mk()->where($map)->select()->toArray();
-            } else {
+            }
+            else {
                 return [$this->bind->refresh()->toArray()];
             }
-        } catch (\Exception $exception) {
+        }
+        catch (\Exception $exception) {
             return [];
         }
     }
@@ -371,9 +397,11 @@ class AccountAccess implements AccountInterface
      */
     public function recode(): array
     {
-        if ($this->bind->isEmpty()) return $this->get();
+        if ($this->bind->isEmpty())
+            return $this->get();
         if ($this->user->isExists()) {
-            do $check = ['code' => $this->userCode()];
+            do
+                $check = ['code' => $this->userCode()];
             while (DataAccountUser::mk()->master()->where($check)->findOrEmpty()->isExists());
             $this->user->save($check);
         }
@@ -462,7 +490,8 @@ class AccountAccess implements AccountInterface
         }
         // 生成新令牌数据
         if ($this->auth->isEmpty()) {
-            do $check = ['type' => $this->type, 'token' => md5(uniqid(strval(rand(0, 999))))];
+            do
+                $check = ['type' => $this->type, 'token' => md5(uniqid(strval(rand(0, 999))))];
             while (DataAccountAuth::mk()->master()->where($check)->findOrEmpty()->isExists());
             $time = $this->expire > 0 ? $this->expire + time() : 0;
             $this->auth->save($check + ['usid' => $usid, 'time' => $time]);
@@ -477,7 +506,8 @@ class AccountAccess implements AccountInterface
      */
     public function expire(): AccountInterface
     {
-        if ($this->auth->isEmpty()) throw new Exception('无授权记录！');
+        if ($this->auth->isEmpty())
+            throw new Exception('无授权记录！');
         $this->auth->save(['time' => $this->expire > 0 ? $this->expire + time() : 0]);
         return $this;
     }
@@ -490,11 +520,12 @@ class AccountAccess implements AccountInterface
      */
     private function save(array $data): DataAccountBind
     {
-        if (empty($data)) throw new Exception('资料不能为空！');
-        
+        if (empty($data))
+            throw new Exception('资料不能为空！');
+
         // 收集所有可能的关联ID，统一处理避免冲突
         $candidateUnid = null;
-        
+
         // 1. 通过 UnionId 查找可能的主账号 (微信体系、QQ等)
         if (empty($this->bind->getAttr('unid')) && !empty($data['unionid'])) {
             $lockKey = "account:bind:unionid:{$data['unionid']}";
@@ -502,24 +533,26 @@ class AccountAccess implements AccountInterface
                 throw new Exception('账号关联处理中，请稍后重试！');
             }
             $this->app->cache->set($lockKey, 1, 10);
-            
+
             try {
                 // 查找主账号
                 $user = DataAccountUser::mk()->where(['unionid' => $data['unionid'], 'deleted' => 0])->findOrEmpty();
                 if ($user->isExists()) {
                     $candidateUnid = $user->getAttr('id');
-                } else {
+                }
+                else {
                     // 查找其他已绑定的终端账号
                     $bind = DataAccountBind::mk()->where(['unionid' => $data['unionid'], 'deleted' => 0])->where('unid', '>', 0)->findOrEmpty();
                     if ($bind->isExists()) {
                         $candidateUnid = $bind->getAttr('unid');
                     }
                 }
-            } finally {
+            }
+            finally {
                 $this->app->cache->delete($lockKey);
             }
         }
-        
+
         // 2. 通过 Email 查找可能的主账号 (Apple/Google/Facebook/邮箱登录等)
         // 仅当未通过unionid找到关联时才继续
         if (empty($candidateUnid) && empty($this->bind->getAttr('unid')) && !empty($data['email'])) {
@@ -530,13 +563,14 @@ class AccountAccess implements AccountInterface
                     throw new Exception('账号关联处理中，请稍后重试！');
                 }
                 $this->app->cache->set($lockKey, 1, 10);
-                
+
                 try {
                     // 查找已绑定该邮箱的主账号
                     $user = DataAccountUser::mk()->where(['email' => $email, 'deleted' => 0])->findOrEmpty();
                     if ($user->isExists()) {
                         $candidateUnid = $user->getAttr('id');
-                    } else {
+                    }
+                    else {
                         // 查找其他终端是否已用此邮箱关联了主账号
                         $bind = DataAccountBind::mk()
                             ->where('email', $email)
@@ -547,12 +581,13 @@ class AccountAccess implements AccountInterface
                             $candidateUnid = $bind->getAttr('unid');
                         }
                     }
-                } finally {
+                }
+                finally {
                     $this->app->cache->delete($lockKey);
                 }
             }
         }
-        
+
         // 3. 通过手机号查找可能的主账号 (仅当用户主动绑定时)
         // 注意：手机号绑定通常在 bind() 方法中处理，这里只处理自动关联场景
         // 如果传入了phone字段且当前终端未绑定，尝试关联
@@ -564,19 +599,20 @@ class AccountAccess implements AccountInterface
                     throw new Exception('账号关联处理中，请稍后重试！');
                 }
                 $this->app->cache->set($lockKey, 1, 10);
-                
+
                 try {
                     // 查找已绑定该手机号的主账号
                     $user = DataAccountUser::mk()->where(['phone' => $phone, 'deleted' => 0])->findOrEmpty();
                     if ($user->isExists()) {
                         $candidateUnid = $user->getAttr('id');
                     }
-                } finally {
+                }
+                finally {
                     $this->app->cache->delete($lockKey);
                 }
             }
         }
-        
+
         // 4. 统一处理关联结果
         if (!empty($candidateUnid)) {
             // 检查该主账号是否已被同类型终端绑定
@@ -585,19 +621,21 @@ class AccountAccess implements AccountInterface
                 'type' => $this->type,
                 'deleted' => 0,
             ])->where('id', '<>', $this->bind->getAttr('id'))->findOrEmpty();
-            
+
             if (!$existBind->isExists()) {
                 // 该类型终端未被绑定，可以自动关联
                 $data['unid'] = $candidateUnid;
             }
-            // 如果已被绑定，不报错，继续作为独立账号存在
+        // 如果已被绑定，不报错，继续作为独立账号存在
         }
-        
+
         $data['extra'] = array_merge($this->bind->getAttr('extra'), $data['extra'] ?? []);
-        // 写入默认头像内容
+
+        // 统一默认图像地址 (当新图像为空且原图像也为空时，赋予默认图像)
         if (empty($data['headimg']) && empty($this->bind->getAttr('headimg'))) {
             $data['headimg'] = Account::headimg();
         }
+
         // 自动生成账号昵称
         if (empty($data['nickname']) && empty($this->bind->getAttr('nickname'))) {
             $name = Account::get($this->type)['name'] ?? $this->type;
@@ -614,7 +652,8 @@ class AccountAccess implements AccountInterface
                 ]);
             }
             return $this->bind->refresh();
-        } else {
+        }
+        else {
             throw new Exception('资料保存失败！');
         }
     }
