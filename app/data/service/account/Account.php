@@ -77,15 +77,15 @@ abstract class Account
     private static $types = [
         // 手机号体系
         self::PHONE    => ['name' => '手机号登录', 'field' => 'phone', 'status' => 1],
-        
+
         // 微信体系
         self::WECHAT   => ['name' => '微信登录', 'field' => 'openid', 'status' => 1],
         self::WXAPP    => ['name' => '微信小程序', 'field' => 'openid', 'status' => 1],
-        
+
         // 传统体系 (复用 openid 字段存储账号标识)
         self::EMAIL    => ['name' => '邮箱登录', 'field' => 'openid', 'status' => 1],
         self::USERNAME => ['name' => '用户名登录', 'field' => 'openid', 'status' => 1],
-        
+
         // 国内第三方
         self::QQ       => ['name' => 'QQ登录', 'field' => 'openid', 'status' => 1],
         self::TIKTOK   => ['name' => '抖音登录', 'field' => 'openid', 'status' => 1],
@@ -94,6 +94,12 @@ abstract class Account
         self::APPLE    => ['name' => '苹果登录', 'field' => 'openid', 'status' => 1],
         self::GOOGLE   => ['name' => '谷歌登录', 'field' => 'openid', 'status' => 1],
         self::FACEBOOK => ['name' => '脸书登录', 'field' => 'openid', 'status' => 1],
+
+        // 终端类型 (用于支付方式配置)
+        self::WAP      => ['name' => 'H5移动端', 'field' => '', 'status' => 1],
+        self::WEB      => ['name' => 'PC网页端', 'field' => '', 'status' => 1],
+        self::IOSAPP   => ['name' => 'iOS应用端', 'field' => '', 'status' => 1],
+        self::ANDROID  => ['name' => '安卓应用端', 'field' => '', 'status' => 1],
     ];
 
     /**
