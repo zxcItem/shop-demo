@@ -112,4 +112,17 @@ abstract class Auth extends Controller
         }
         return $this;
     }
+
+    /**
+     * 响应账号成功数据
+     * @param string $info 提示内容
+     * @param array $account 账号资料
+     */
+    protected function successAccount(string $info, array $account)
+    {
+        $this->success($info, [
+            'user'  => $account['user'] ?? [],
+            'token' => $account['token'] ?? '',
+        ]);
+    }
 }

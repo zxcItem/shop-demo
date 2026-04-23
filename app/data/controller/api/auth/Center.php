@@ -26,7 +26,7 @@ class Center extends Auth
      */
     public function get()
     {
-        $this->success('获取资料', $this->account->get());
+        $this->successAccount('获取资料', $this->account->get(true, true));
     }
 
     /**
@@ -54,8 +54,8 @@ class Center extends Auth
                 unset($data['password']);
             }
             foreach ($data as $k => $v) if ($v === '') unset($data[$k]);
-            if (empty($data)) $this->success('无需修改', $this->account->get());
-            $this->success('修改成功', $this->account->bind(['id' => $this->unid], $data));
+            if (empty($data)) $this->successAccount('无需修改', $this->account->get(true, true));
+            $this->successAccount('修改成功', $this->account->bind(['id' => $this->unid], $data));
         } catch (HttpResponseException $exception) {
             throw $exception;
         } catch (\Exception $exception) {
@@ -127,7 +127,7 @@ class Center extends Auth
                 if (!empty($data['passwd'])) {
                     $this->account->pwdModify($data['passwd']);
                 }
-                $this->success('关联成功!', $this->account->get(true));
+                $this->successAccount('关联成功!', $this->account->get(true, true));
             } else {
                 $this->error('验证失败');
             }
@@ -145,7 +145,7 @@ class Center extends Auth
     public function unbind()
     {
         $this->account->unBind();
-        $this->success('关联成功', $this->account->get());
+        $this->successAccount('关联成功', $this->account->get(true, true));
     }
 
     /**
@@ -177,7 +177,7 @@ class Center extends Auth
             $userInfo = $driver->verify($data['openid'], $data['token']);
             // 执行账号绑定
             Account::bind($this->unid, $data['type'], $userInfo);
-            $this->success('绑定成功', $this->account->get(true));
+            $this->successAccount('绑定成功', $this->account->get(true, true));
         } catch (HttpResponseException $exception) {
             throw $exception;
         } catch (\Exception $exception) {
@@ -194,7 +194,7 @@ class Center extends Auth
         try {
             $data = $this->_vali(['type.require' => '类型为空']);
             Account::unBind($this->unid, $data['type']);
-            $this->success('解绑成功', $this->account->get(true));
+            $this->successAccount('解绑成功', $this->account->get(true, true));
         } catch (HttpResponseException $exception) {
             throw $exception;
         } catch (\Exception $exception) {
