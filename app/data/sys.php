@@ -9,6 +9,7 @@ use app\data\model\wemall\DataWemallOrder;
 use app\data\model\wemall\DataWemallUserRelation;
 use app\data\service\wemall\UserOrder;
 use app\data\service\wemall\UserRebate;
+use app\data\service\wemall\UserUpgrade;
 use think\Console;
 use think\admin\Library;
 use think\Request;
@@ -61,10 +62,10 @@ if (Library::$sapp->request->isCli()) {
     }, 'route');
 
     // 注册用户绑定事件
-    $this->app->event->listen('PluginAccountBind', function (array $data) {
+     Library::$sapp->event->listen('PluginAccountBind', function (array $data) {
         $this->app->log->notice("Event PluginAccountBind {$data['unid']}#{$data['usid']}");
         // 初始化用户关系数据
-        PluginWemallUserRelation::withInit(intval($data['unid']));
+        DataWemallUserRelation::withInit(intval($data['unid']));
         // 尝试临时绑定推荐人用户
         $input = $this->app->request->post(['from', 'phone', 'fphone']);
         if (!empty($input['fphone'])) {
@@ -75,7 +76,7 @@ if (Library::$sapp->request->isCli()) {
                 } else {
                     $map['id'] = $input['from'] ?? 0;
                 }
-                $from = PluginAccountUser::mk()->where($map)->value('id');
+                $from = DataAccountUser::mk()->where($map)->value('id');
                 if ($from > 0) {
                     UserUpgrade::bindAgent(intval($data['unid']), $from, 0);
                 }
@@ -86,37 +87,37 @@ if (Library::$sapp->request->isCli()) {
     });
 
     // 注册支付审核事件
-    $this->app->event->listen('PluginPaymentAudit', function (DataPaymentRecord $payment) {
+     Library::$sapp->event->listen('PluginPaymentAudit', function (DataPaymentRecord $payment) {
         $this->app->log->notice("Event PluginPaymentAudit {$payment->getAttr('order_no')}");
         UserOrder::change($payment->getAttr('order_no'), $payment);
     });
 
     // 注册支付拒审事件
-    $this->app->event->listen('PluginPaymentRefuse', function (DataPaymentRecord $payment) {
+     Library::$sapp->event->listen('PluginPaymentRefuse', function (DataPaymentRecord $payment) {
         $this->app->log->notice("Event PluginPaymentRefuse {$payment->getAttr('order_no')}");
         UserOrder::change($payment->getAttr('order_no'), $payment);
     });
 
     // 注册支付完成事件
-    $this->app->event->listen('PluginPaymentSuccess', function (DataPaymentRecord $payment) {
+     Library::$sapp->event->listen('PluginPaymentSuccess', function (DataPaymentRecord $payment) {
         $this->app->log->notice("Event PluginPaymentSuccess {$payment->getAttr('order_no')}");
         UserOrder::change($payment->getAttr('order_no'), $payment);
     });
 
     // 注册支付取消事件
-    $this->app->event->listen('PluginPaymentCancel', function (DataPaymentRecord $payment) {
+     Library::$sapp->event->listen('PluginPaymentCancel', function (DataPaymentRecord $payment) {
         $this->app->log->notice("Event PluginPaymentCancel {$payment->getAttr('order_no')}");
         UserOrder::change($payment->getAttr('order_no'), $payment);
     });
 
     // 注册订单确认事件
-    $this->app->event->listen('PluginPaymentConfirm', function (array $data) {
+     Library::$sapp->event->listen('PluginPaymentConfirm', function (array $data) {
         $this->app->log->notice("Event PluginPaymentConfirm {$data['order_no']}");
         UserRebate::confirm($data['order_no']);
     });
 
     // 订单确认收货事件
-    $this->app->event->listen('PluginWemallOrderConfirm', function (DataWemallOrder $order) {
+     Library::$sapp->event->listen('PluginWemallOrderConfirm', function (DataWemallOrder $order) {
         $this->app->log->notice("Event PluginWemallOrderConfirm {$order->getAttr('order_no')}");
         UserOrder::confirm($order);
     });
