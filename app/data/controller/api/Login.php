@@ -49,8 +49,11 @@ class Login extends Controller
                     }
                 }
                 $account->isBind() || $account->bind($inset, $inset);
-                $account = $account->expire()->get(true);
-                $this->success('登录成功', $account);
+                $account = $account->expire()->get(true, true);
+                $this->success('登录成功', [
+                    'user'  => $account['user'] ?? [],
+                    'token' => $account['token'] ?? '',
+                ]);
             } else {
                 $this->error('短信验证失败');
             }
