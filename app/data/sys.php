@@ -22,7 +22,7 @@ if (Library::$sapp->request->isCli()) {
 }else{
 
 // 注册时填写推荐时检查
-    $this->app->middleware->add(function (Request $request, \Closure $next) {
+    Library::$sapp->middleware->add(function (Request $request, \Closure $next) {
         $input = $request->post(['from', 'phone', 'fphone']);
         if (!empty($input['phone']) && !empty($input['fphone'])) {
             $showError = static function ($message, array $data = []) {
