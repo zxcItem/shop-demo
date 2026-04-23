@@ -59,6 +59,9 @@ abstract class Auth extends Controller
                 $token = substr($token, 7);
             }
             if (empty($token)) {
+                $token = $this->request->header('api-token', '');
+            }
+            if (empty($token)) {
                 $token = $this->request->header('token', '');
             }
             if (empty($token)) {

@@ -68,7 +68,7 @@ class Data extends Controller
                 'schemeAndroid' => $config['scheme_android'] ?? '',
                 'schemeRedirect' => $config['scheme_redirect'] ?? '',
             ],
-            'layout' => (object)sysdata('Data.wemall.design'),
+            'layout' => (object)sysdata('plugin.wemall.design'),
         ]);
     }
 
