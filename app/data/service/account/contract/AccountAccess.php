@@ -179,6 +179,20 @@ class AccountAccess implements AccountInterface
     }
 
     /**
+     * 获取接口成功资料
+     * @param boolean $refresh
+     * @return array
+     */
+    public function getApiData(bool $refresh = false): array
+    {
+        $data = $this->get(true, $refresh);
+        return [
+            'user'  => $data['user'] ?? [],
+            'token' => $data['token'] ?? '',
+        ];
+    }
+
+    /**
      * 验证终端密码
      * @param string $pass 待验证密码
      * @return boolean

@@ -62,11 +62,9 @@ class Wxapp extends Controller
                 'unionid'     => $unionid,
                 'session_key' => $sesskey,
             ];
-            $account = Account::mk($this->type)->set($data, true);
-            $this->success('授权换取成功', [
-                'user'  => $account['user'] ?? [],
-                'token' => $account['token'] ?? '',
-            ]);
+            $account = Account::mk($this->type);
+            $account->set($data, true);
+            $this->success('授权换取成功', $account->getApiData(true));
         } catch (HttpResponseException $exception) {
             throw $exception;
         } catch (\Exception $exception) {
@@ -98,11 +96,9 @@ class Wxapp extends Controller
                     'nickname' => $result['nickName'],
                 ];
                 if ($data['nickname'] === '微信用户') unset($data['headimg'], $data['nickname']);
-                $account = Account::mk($this->type)->set($data, true);
-                $this->success('解密成功', [
-                    'user'  => $account['user'] ?? [],
-                    'token' => $account['token'] ?? '',
-                ]);
+                $account = Account::mk($this->type);
+                $account->set($data, true);
+                $this->success('解密成功', $account->getApiData(true));
             } elseif (is_array($result)) {
                 if (!empty($result['phoneNumber'])) {
                     $data = ['appid' => $this->params['appid'], 'openid' => $openid, 'unionid' => $unionid];
@@ -119,11 +115,7 @@ class Wxapp extends Controller
                         }
                     }
                     $account->bind(['phone' => $result['phoneNumber']], $data);
-                    $account = $account->get(true, true);
-                    $this->success('绑定成功', [
-                        'user'  => $account['user'] ?? [],
-                        'token' => $account['token'] ?? '',
-                    ]);
+                    $this->success('绑定成功', $account->getApiData(true));
                 } else {
                     $this->success('解密成功', $result);
                 }
@@ -166,11 +158,7 @@ class Wxapp extends Controller
                 }
                 
                 $account->bind(['phone' => $result['phoneNumber']]);
-                $account = $account->get(true, true);
-                $this->success('绑定成功', [
-                    'user'  => $account['user'] ?? [],
-                    'token' => $account['token'] ?? '',
-                ]);
+                $this->success('绑定成功', $account->getApiData(true));
             } else {
                 $this->error('解析失败');
             }

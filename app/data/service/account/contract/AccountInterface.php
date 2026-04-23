@@ -18,7 +18,14 @@ interface AccountInterface
      * @param boolean $refresh
      * @return array
      */
-    public function get(bool $rejwt = false, bool $refresh = false): array;
+     public function get(bool $rejwt = false, bool $refresh = false): array;
+
+    /**
+     * 获取接口成功资料
+     * @param boolean $refresh
+     * @return array
+     */
+    public function getApiData(bool $refresh = false): array;
 
     /**
      * 设置子账号资料

@@ -49,11 +49,7 @@ class Login extends Controller
                     }
                 }
                 $account->isBind() || $account->bind($inset, $inset);
-                $account = $account->expire()->get(true, true);
-                $this->success('登录成功', [
-                    'user'  => $account['user'] ?? [],
-                    'token' => $account['token'] ?? '',
-                ]);
+                $this->success('登录成功', $account->getApiData(true));
             } else {
                 $this->error('短信验证失败');
             }
@@ -131,11 +127,7 @@ class Login extends Controller
             if ($account->pwdVerify($data['password'])) {
                 // 密码错误次数限制检查（可选，增强安全性）
                 $account->isBind() || $account->bind($map, $map);
-                $account = $account->expire()->get(true, true);
-                $this->success('登录成功', [
-                    'user'  => $account['user'] ?? [],
-                    'token' => $account['token'] ?? '',
-                ]);
+                $this->success('登录成功', $account->expire()->getApiData(true));
             } else {
                 $this->error('密码错误');
             }
