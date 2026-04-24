@@ -306,7 +306,7 @@ class Order extends Auth
     private function getAccountType(): string
     {
         // 优先从请求参数中获取指定的终端类型
-        $accountType = input('account_type', '');
+        $accountType = input('type', 'wxapp');
         if (!empty($accountType)) {
             return $accountType;
         }
