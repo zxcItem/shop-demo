@@ -221,20 +221,7 @@
                 <tr>
                     <th class="layui-bg-gray" :colspan="specs.length">{:lang('规格')}</th>
                     <th colspan="3">{:lang('商品价格')}</th>
-                    {if $enableBalance || $enableIntegral}
-                    {if $enableBalance && $enableIntegral}
-                    <th colspan="2">{:lang('允许抵扣')}</th>
-                    {else}
-                    <th colspan="1">{:lang('允许抵扣')}</th>
-                    {/if}
-                    {/if}
-                    {if $enableBalance || $enableIntegral}
-                    {if $enableBalance && $enableIntegral}
-                    <th colspan="2">{:lang('赠送奖励')}</th>
-                    {else}
-                    <th colspan="1">{:lang('赠送奖励')}</th>
-                    {/if}
-                    {/if}
+                    <th colspan="2">{:lang('积分兑换')}</th>
                     <th colspan="5">{:lang('其他属性')}</th>
                 </tr>
                 <tr>
@@ -242,18 +229,8 @@
                     <th class="nowrap" @click="batchSet('cost',2,'{:lang('请输入商品成本价格')}')"><b>{:lang('成本价')}</b><i class="layui-icon">&#xe63c;</i></th>
                     <th class="nowrap" @click="batchSet('market',2,'{:lang('请输入商品市场价格')}')"><b>{:lang('市场价')}</b><i class="layui-icon">&#xe63c;</i></th>
                     <th class="nowrap" @click="batchSet('selling',2,'{:lang('请输入商品销售价格')}')"><b>{:lang('销售价')}</b><i class="layui-icon">&#xe63c;</i></th>
-                    {notempty name='enableBalance'}
-                    <th class="nowrap" @click="batchSet('allow_balance',2,'{:lang('请输入最大余额支付')}')"><b>{:lang('余额')}</b><i class="layui-icon">&#xe63c;</i></th>
-                    {/notempty}
-                    {notempty name='enableIntegral'}
-                    <th class="nowrap" @click="batchSet('allow_integral',0,'{:lang('请输入最大积分抵扣')}')"><b>{:lang('积分')}</b><i class="layui-icon">&#xe63c;</i></th>
-                    {/notempty}
-                    {notempty name='enableBalance'}
-                    <th class="nowrap" @click="batchSet('balance',2,'{:lang('请输入赠送账户余额')}')"><b>{:lang('余额')}</b><i class="layui-icon">&#xe63c;</i></th>
-                    {/notempty}
-                    {notempty name='enableIntegral'}
-                    <th class="nowrap" @click="batchSet('integral',2,'{:lang('请输入赠送用户积分')}')"><b>{:lang('积分')}</b><i class="layui-icon">&#xe63c;</i></th>
-                    {/notempty}
+                    <th class="nowrap" @click="batchSet('allow_integral',0,'{:lang('请输入最大积分抵扣')}')"><b>{:lang('积分兑换')}</b><i class="layui-icon">&#xe63c;</i></th>
+                    <th class="nowrap" @click="batchSet('allow_balance',2,'{:lang('请输入最大余额支付')}')"><b>{:lang('补差余额')}</b><i class="layui-icon">&#xe63c;</i></th>
                     <th class="nowrap" @click="batchSet('virtual',0,'{:lang('请输入虚拟销量数值')}')"><b>{:lang('虚拟销量')}</b><i class="layui-icon">&#xe63c;</i></th>
                     <th class="nowrap" @click="batchSet('express',0,'{:lang('请输入快递计费系数')}')"><b>{:lang('快递系数')}</b><i class="layui-icon">&#xe63c;</i></th>
                     <th class="nowrap" width="9%" @click="batchSet('gsku',null,'{:lang('请输入商品SKU代码')}')"><b>{:lang('商品SKU')}</b> <i class="layui-icon">&#xe63c;</i></th>
@@ -267,18 +244,8 @@
                     <td><label><input class="layui-input" @blur="syncSet(hash)" v-model.trim="item.v.cost"></label></td>
                     <td><label><input class="layui-input" @blur="syncSet(hash)" v-model.trim="item.v.market"></label></td>
                     <td><label><input class="layui-input" @blur="syncSet(hash)" v-model.trim="item.v.selling"></label></td>
-                    {notempty name='enableBalance'}
-                    <td><label><input class="layui-input" @blur="syncSet(hash)" v-model.trim="item.v.allow_balance"></label></td>
-                    {/notempty}
-                    {notempty name='enableIntegral'}
                     <td><label><input class="layui-input" @blur="syncSet(hash)" v-model.trim="item.v.allow_integral"></label></td>
-                    {/notempty}
-                    {notempty name='enableBalance'}
-                    <td><label><input class="layui-input" @blur="syncSet(hash)" v-model.trim="item.v.balance"></label></td>
-                    {/notempty}
-                    {notempty name='enableIntegral'}
-                    <td><label><input class="layui-input" @blur="syncSet(hash)" v-model.trim="item.v.integral"></label></td>
-                    {/notempty}
+                    <td><label><input class="layui-input" @blur="syncSet(hash)" v-model.trim="item.v.allow_balance"></label></td>
                     <td><label><input class="layui-input" @blur="syncSet(hash)" v-model.trim="item.v.virtual"></label></td>
                     <td><label><input class="layui-input" @blur="syncSet(hash)" v-model.trim="item.v.express"></label></td>
                     <td><label><input class="layui-input font-code" v-model.trim="item.v.gsku"></label></td>
