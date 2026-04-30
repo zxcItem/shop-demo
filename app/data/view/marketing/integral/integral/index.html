@@ -1,0 +1,64 @@
+{extend name="table"}
+
+{block name='button'}
+<!--{if auth("add")}-->
+<button class='layui-btn layui-btn-sm layui-btn-primary' data-table-id="IntegralTable" data-modal='{:url("add")}' data-title="添加积分商品" data-width="600px">添加商品</button>
+<!--{/if}-->
+{/block}
+
+{block name="content"}
+{include file='marketing/sidebar'}
+<div class="think-box-shadow">
+    <table id="IntegralTable" data-url="{:request()->url()}" data-target-search="form.form-search"></table>
+</div>
+{/block}
+
+{block name='script'}
+<script>
+    $(function () {
+        $('#IntegralTable').layTable({
+            even: true, height: 'full',
+            sort: { field: 'sort desc,id', type: 'desc' },
+            cols: [[
+                {field: 'sort', title: '排序', align: 'center', width: 80, sort: true, templet: '#SortInputTpl'},
+                {field: 'goods_name', title: '商品名称', minWidth: 200, templet: function(d){
+                    let html = '<div><b>' + d.goods_name + '</b></div>';
+                    if(d.goods_spec) html += '<div class="color-desc layui-font-12">' + d.goods_spec + '</div>';
+                    return html;
+                }},
+                {
+                    title: '兑换价格', minWidth: 150, templet: function (d) {
+                        return '<b class="color-blue">' + d.integral_price + '</b> 积分 + <b class="color-red">' + d.cash_price + '</b> 元';
+                    }
+                },
+                {field: 'total_stock', title: '活动库存', align: 'center', width: 100},
+                {field: 'total_sales', title: '累计销量', align: 'center', width: 100},
+                {field: 'status', title: '状态', align: 'center', width: 110, templet: '#StatusSwitchTpl'},
+                {field: 'create_time', title: '创建时间', align: 'center', width: 170, sort: true},
+                {toolbar: '#toolbar', title: '操作', align: 'center', width: 160, fixed: 'right'},
+            ]]
+        });
+    });
+</script>
+
+<script type="text/html" id="StatusSwitchTpl">
+    <!--{if auth("state")}-->
+    <input type="checkbox" value="{{d.id}}" lay-skin="switch" lay-text="已启用|已禁用" lay-filter="StatusSwitch" {{-d.status>0?'checked':''}}>
+    <!--{else}-->
+    {{-d.status ? '<b class="color-green">已启用</b>' : '<b class="color-red">已禁用</b>'}}
+    <!--{/if}-->
+</script>
+
+<script type="text/html" id="toolbar">
+    <!--{if auth('edit')}-->
+    <a class="layui-btn layui-btn-sm" data-modal='{:url("edit")}?id={{d.id}}' data-title="编辑商品" data-width="600px">编 辑</a>
+    <!--{/if}-->
+    <!--{if auth('remove')}-->
+    <a class="layui-btn layui-btn-sm layui-btn-danger" data-confirm="确定要移除该积分商品吗？" data-action="{:url('remove')}" data-value="id#{{d.id}}">移 除</a>
+    <!--{/if}-->
+</script>
+
+<script type="text/html" id="SortInputTpl">
+    <input type="number" min="0" data-blur-number="0" data-action-blur="{:url('edit')}" data-value="id#{{d.id}};action#sort;sort#{value}" value="{{d.sort}}" class="layui-input text-center">
+</script>
+{/block}

@@ -1,0 +1,65 @@
+{extend name="table"}
+
+{block name='button'}
+<!--{if auth("add")}-->
+<button class='layui-btn layui-btn-sm layui-btn-primary' data-table-id="CouponTable" data-open='{:url("add")}'>{:lang('添加卡券')}</button>
+<!--{/if}-->
+
+<!--{if auth("remove")}-->
+<button class='layui-btn layui-btn-sm layui-btn-primary' data-table-id="CouponTable" data-action='{:url("remove")}' data-rule="id#{id}" data-confirm="{:lang('确定要删除这些卡券吗？')}">{:lang('删除卡券')}</button>
+<!--{/if}-->
+{/block}
+
+{block name="content"}
+{include file='marketing/sidebar'}
+<div class="think-box-shadow">
+    {include file='marketing/coupon/coupon/index_search'}
+    <table id="CouponTable" data-url="{:request()->url()}" data-target-search="form.form-search"></table>
+</div>
+{/block}
+
+{block name='script'}
+<script>
+    $(function () {
+        $('#CouponTable').layTable({
+            even: true, height: 'full',
+            sort: { field: 'sort desc,id', type: 'desc' },
+            cols: [[
+                {field: 'sort', title: '{:lang("排序权重")}', align: 'center', width: 100, sort: true, templet: '#SortInputTpl'},
+                {field: 'name', title: '{:lang("名称")}', align: 'left', minWidth: 80},
+                {field: 'type_name', title: '{:lang("类型")}', align: 'center', minWidth: 80},
+                {field: 'amount', title: '{:lang("金额")}', align: 'center', minWidth: 80},
+                {field: 'total_stock', title: '{:lang("库存数量")}', align: 'center', minWidth: 80},
+                {field: 'total_sales', title: '{:lang("领取数量")}', align: 'center', minWidth: 80},
+                {field: 'expire_days', title: '{:lang("有效时间")}', align: 'center', minWidth: 80, templet: '<div>{{d.expire_days>0?(d.expire_days+"' + '{:lang("天")}' + '"):"' + '{:lang("永久")}' + '"}}</div>'},
+                {field: 'status', title: '{:lang("卡券状态")}', align: 'center', minWidth: 110, templet: '#StatusSwitchTpl'},
+                {field: 'create_time', title: '{:lang("创建时间")}', align: 'center', minWidth: 170, sort: true},
+                {toolbar: '#toolbar', title: '{:lang("操作面板")}', align: 'center', minWidth: 160, fixed: 'right'},
+            ]]
+        });
+    });
+</script>
+
+<script type="text/html" id="StatusSwitchTpl">
+    <!--{if auth("state")}-->
+<input type="checkbox" value="{{d.id}}" lay-skin="switch" lay-text="已激活|已禁用" lay-filter="StatusSwitch"
+    {{-d.status>0?'checked':''}}>
+<!--{else}-->
+{{-d.status ? '<b class="color-green">已激活</b>' : '<b class="color-red">已禁用</b>'}}
+<!--{/if}-->
+</script>
+
+<script type="text/html" id="toolbar">
+    <!--{if auth('edit')}-->
+<a class="layui-btn layui-btn-sm" data-open='{:url("edit")}?id={{d.id}}' data-title="编辑优惠券" data-width="600px">编 辑</a>
+<!--{/if}-->
+<!--{if auth('remove')}-->
+<a class="layui-btn layui-btn-sm layui-btn-danger" data-confirm="确定要删除该优惠券吗？" data-action="{:url('remove')}"
+    data-value="id#{{d.id}}">删 除</a>
+<!--{/if}-->
+</script>
+
+<script type="text/html" id="SortInputTpl">
+    <input type="number" min="0" data-blur-number="0" data-action-blur="{:sysuri()}" data-value="id#{{d.id}};action#sort;sort#{value}" value="{{d.sort}}" class="layui-input text-center">
+</script>
+{/block}

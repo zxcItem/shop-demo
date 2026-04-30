@@ -1,0 +1,55 @@
+<style>
+    .sub-sidebar-container { display: flex; gap: 20px; align-items: flex-start; }
+    .sub-sidebar { 
+        width: 180px; flex-shrink: 0; background: #fff; border-radius: 12px; padding: 15px 10px; 
+        border: 1px solid #f0f0f0; min-height: 850px; box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    }
+    .sub-sidebar .sidebar-title { 
+        padding: 10px 15px; font-weight: 700; border-bottom: 2px solid #f8f9fa; 
+        margin-bottom: 15px; color: #333; font-size: 15px; letter-spacing: 0.5px;
+    }
+    .sub-sidebar a { 
+        display: block; padding: 12px 18px; color: #555; border-radius: 10px; 
+        margin-bottom: 6px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+        font-size: 14px; text-decoration: none !important; position: relative;
+    }
+    .sub-sidebar a:hover { background: #f3f4f6; color: #1e9fff; transform: translateX(3px); }
+    
+    /* 选中效果增强 */
+    .sub-sidebar a.active { 
+        background: linear-gradient(90deg, #eff6ff 0%, #ffffff 100%); 
+        color: #1e9fff; font-weight: 600; 
+        box-shadow: -3px 0 0 #1e9fff;
+        border-radius: 0 10px 10px 0;
+    }
+    .sub-sidebar a.active::after {
+        content: ''; position: absolute; right: 15px; top: 50%; transform: translateY(-50%);
+        width: 6px; height: 6px; background: #1e9fff; border-radius: 50%;
+    }
+
+    .sub-main-content { flex: 1; min-width: 0; }
+</style>
+
+<div class="sub-sidebar-container">
+    <div class="sub-sidebar">
+        <div class="sidebar-title">{$title|default='模块管理'}</div>
+        <div class="sidebar-menus">
+            <!-- DEBUG: controller={$app->request->controller()} action={$app->request->action()} -->
+            {if !empty($menus) && is_array($menus)}
+            {foreach $menus as $m}
+            <!-- DEBUG: menu_url={$m.url} active={$m.active?'TRUE':'FALSE'} -->
+            <a href="javascript:void(0)" data-open="{:url($m.url)}" class="{$m.active?'active':''}">{$m.title}</a>
+            {/foreach}
+            {/if}
+        </div>
+    </div>
+    <div class="sub-main-content">
+
+<script>
+    $(function () {
+        // 点击即时反馈逻辑
+        $('.sub-sidebar .sidebar-menus a').on('click', function () {
+            $(this).addClass('active').siblings().removeClass('active');
+        });
+    });
+</script>

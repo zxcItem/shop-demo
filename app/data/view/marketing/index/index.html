@@ -1,0 +1,39 @@
+{extend name="main"}
+
+{block name="content"}
+<style>
+    .marketing-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; padding: 10px; }
+    .module-card {
+        background: #fff; border-radius: 15px; padding: 25px; position: relative; overflow: hidden;
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); cursor: pointer; border: 1px solid #f0f0f0;
+        display: flex; flex-direction: column; height: 180px;
+    }
+    .module-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.08); border-color: #e0e0e0; }
+    .module-card .bg-icon {
+        position: absolute; right: -10px; bottom: -10px; font-size: 80px; opacity: 0.1;
+        transform: rotate(-15deg); transition: all 0.3s;
+    }
+    .module-card:hover .bg-icon { transform: rotate(0deg) scale(1.1); opacity: 0.15; }
+    .module-card .icon-box {
+        width: 45px; height: 45px; border-radius: 12px; display: flex; align-items: center; justify-content: center;
+        margin-bottom: 15px; color: #fff; font-size: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    .module-card h3 { font-size: 18px; font-weight: 600; color: #333; margin-bottom: 8px; }
+    .module-card p { font-size: 13px; color: #888; line-height: 1.6; }
+</style>
+
+<div class="think-box-shadow">
+    <div class="marketing-grid">
+        {foreach $modules as $m}
+        <div class="module-card" data-open='{:url($m.url)}'>
+            <div class="icon-box" style="background:{$m.color}">
+                <i class="layui-icon {$m.icon}"></i>
+            </div>
+            <h3>{$m.title}</h3>
+            <p>{$m.desc}</p>
+            <div class="bg-icon">{$m.bg}</div>
+        </div>
+        {/foreach}
+    </div>
+</div>
+{/block}

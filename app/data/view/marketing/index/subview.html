@@ -1,0 +1,31 @@
+{extend name="main"}
+
+{block name="content"}
+<style>
+    .sub-layout { display: flex; gap: 20px; min-height: 500px; }
+    .sub-sidebar { width: 200px; background: #fff; border-radius: 10px; padding: 15px 10px; border: 1px solid #f0f0f0; }
+    .sub-sidebar .title { padding: 10px 15px; font-weight: bold; border-bottom: 1px solid #f5f5f5; margin-bottom: 10px; color: #333; }
+    .sub-sidebar a { display: block; padding: 10px 15px; color: #666; border-radius: 6px; margin-bottom: 2px; transition: all 0.2s; }
+    .sub-sidebar a:hover { background: #f8f9fa; color: #333; }
+    .sub-sidebar a.active { background: #eef2ff; color: #4f46e5; font-weight: 600; }
+    .sub-content { flex: 1; background: #fff; border-radius: 10px; border: 1px solid #f0f0f0; padding: 30px; }
+    .back-nav { margin-bottom: 15px; }
+</style>
+
+<div class="sub-layout">
+    <div class="sub-sidebar">
+        <div class="title">{$title}</div>
+        <a href="#" class="active">管理列表</a>
+        <a href="#">数据统计</a>
+        <a href="#">规则设置</a>
+        <a href="#">操作日志</a>
+    </div>
+    <div class="sub-content">
+        <div style="text-align: center; padding-top: 100px; color: #999;">
+            <i class="layui-icon layui-icon-engine" style="font-size: 60px; opacity: 0.5;"></i>
+            <h2 style="margin-top: 20px; color: #666;">{$title}管理模块</h2>
+            <p style="margin-top: 10px;">此处正在开发中，将展示该营销工具的具体业务逻辑。</p>
+        </div>
+    </div>
+</div>
+{/block}
