@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace app\data\command;
 
-use app\data\model\wemall\DataWemallUserTransfer;
-use app\data\service\wemall\UserRebate;
+use app\data\model\shop\DataShopUserTransfer;
+use app\data\service\shop\UserRebate;
 use think\admin\Command;
 use think\admin\Exception;
 use think\admin\storage\LocalStorage;
@@ -51,9 +51,9 @@ class Trans extends Command
             'SIGN_ERROR' => '验证不通过。',
             'SYSTEM_ERROR' => '系统异常，请稍后重试。',
         ];
-        $model = DataWemallUserTransfer::mk()->where(['type' => 'wechat_wallet', 'status' => [3, 4]]);
+        $model = DataShopUserTransfer::mk()->where(['type' => 'wechat_wallet', 'status' => [3, 4]]);
         [$total, $count, $error, $changeNow] = [(clone $model)->count(), 0, 0, date('Y-m-d H:i:s')];
-        /* @var DataWemallUserTransfer $item */
+        /* @var DataShopUserTransfer $item */
         foreach ((clone $model)->cursor() as $model) {
             try {
                 $this->queue->message($total, ++$count, sprintf('开始处理订单 %s 提现', $model->getAttr('code')));
@@ -94,7 +94,7 @@ class Trans extends Command
      * @throws LocalCacheException
      * @throws Exception
      */
-    private function createTransferV3(DataWemallUserTransfer $model): array
+    private function createTransferV3(DataShopUserTransfer $model): array
     {
         $amount = strval(bcmul(bcsub(strval($model->getAttr('amount')), strval($model->getAttr('charge_amount')), 2), '100', 0));
         return TransfersV3::instance($this->getConfig($model))->batchs([
@@ -118,7 +118,7 @@ class Trans extends Command
      * @throws LocalCacheException
      * @throws Exception
      */
-    private function queryTransferV3(DataWemallUserTransfer $model): void
+    private function queryTransferV3(DataShopUserTransfer $model): void
     {
         $result = TransfersV3::instance($this->getConfig($model))->query($model->getAttr('trade_no'));
         p($result, false, 'transfer_notify');
@@ -171,7 +171,7 @@ class Trans extends Command
      * @throws Exception
      * @deprecated 微信商户已不再提供此接口
      */
-    private function createTransferBank(DataWemallUserTransfer $model): array
+    private function createTransferBank(DataShopUserTransfer $model): array
     {
         return TransfersBank::instance($this->getConfig($model))->create([
             'partner_trade_no' => $model->getAttr('code'),
@@ -190,7 +190,7 @@ class Trans extends Command
      * @throws Exception
      * @deprecated 微信商户已不再提供此接口
      */
-    private function createTransferWallet(DataWemallUserTransfer $model): array
+    private function createTransferWallet(DataShopUserTransfer $model): array
     {
         return Transfers::instance($this->getConfig($model))->create([
             'openid' => $model->getAttr('openid'),
@@ -209,7 +209,7 @@ class Trans extends Command
      * @throws Exception
      * @deprecated 微信商户已不再提供此接口
      */
-    private function queryTransferBank(DataWemallUserTransfer $model)
+    private function queryTransferBank(DataShopUserTransfer $model)
     {
         $result = TransfersBank::instance($this->getConfig($model))->query($model->getAttr('trade_no'));
         if ($result['return_code'] === 'SUCCESS' && $result['result_code'] === 'SUCCESS') {
@@ -239,7 +239,7 @@ class Trans extends Command
      * @throws Exception
      * @deprecated 微信商户已不再提供此接口
      */
-    private function queryTransferWallet(DataWemallUserTransfer $model)
+    private function queryTransferWallet(DataShopUserTransfer $model)
     {
         $result = Transfers::instance($this->getConfig($model))->query($model->getAttr('trade_no'));
         if ($result['return_code'] === 'SUCCESS' && $result['result_code'] === 'SUCCESS') {
@@ -256,7 +256,7 @@ class Trans extends Command
      * 获取微信提现参数.
      * @throws Exception
      */
-    private function getConfig(DataWemallUserTransfer $model): array
+    private function getConfig(DataShopUserTransfer $model): array
     {
         $data = sysdata('plugin.wemall.transfer.wxpay');
         if (empty($data)) {

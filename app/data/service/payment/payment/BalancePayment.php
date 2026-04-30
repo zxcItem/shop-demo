@@ -11,7 +11,7 @@ use app\data\service\payment\contract\PaymentInterface;
 use app\data\service\payment\contract\PaymentResponse;
 use app\data\service\payment\contract\PaymentUsageTrait;
 use app\data\service\payment\Payment;
-use app\data\service\wemall\UserOrder;
+use app\data\service\shop\UserOrder;
 use app\data\model\payment\DataPaymentRecord;
 use think\admin\Exception;
 use think\Response;

@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace app\data\command;
 
 use app\data\model\account\DataAccountUser;
-use app\data\service\wemall\UserAgent;
-use app\data\service\wemall\UserOrder;
-use app\data\service\wemall\UserUpgrade;
+use app\data\service\shop\UserAgent;
+use app\data\service\shop\UserOrder;
+use app\data\service\shop\UserUpgrade;
 use think\admin\Command;
 use think\console\Input;
 use think\console\Output;

@@ -5,11 +5,11 @@ declare (strict_types=1);
 
 use app\data\model\account\DataAccountUser;
 use app\data\model\payment\DataPaymentRecord;
-use app\data\model\wemall\DataWemallOrder;
-use app\data\model\wemall\DataWemallUserRelation;
-use app\data\service\wemall\UserOrder;
-use app\data\service\wemall\UserRebate;
-use app\data\service\wemall\UserUpgrade;
+use app\data\model\shop\DataShopOrder;
+use app\data\model\shop\DataShopUserRelation;
+use app\data\service\shop\UserOrder;
+use app\data\service\shop\UserRebate;
+use app\data\service\shop\UserUpgrade;
 use think\Console;
 use think\admin\Library;
 use think\Request;
@@ -45,14 +45,14 @@ if (Library::$sapp->request->isCli()) {
             if ($from->getAttr('phone') == $input['phone']) {
                 $showError('不能邀请自己！');
             }
-            [$rela] = DataWemallUserRelation::withRelation($from->getAttr('id'));
+            [$rela] = DataShopUserRelation::withRelation($from->getAttr('id'));
             if (empty($rela['entry_agent'])) {
                 $showError('无邀请权限！');
             }
             // 检查自己是否已绑定
             $where = ['phone' => $input['phone'], 'deleted' => 0];
             if (($user = DataAccountUser::mk()->where($where)->findOrEmpty())->isExists()) {
-                [$rela] = DataWemallUserRelation::withRelation($user->getAttr('id'));
+                [$rela] = DataShopUserRelation::withRelation($user->getAttr('id'));
                 if (!empty($rela['puid1']) && $rela['puid1'] != $from->getAttr('id')) {
                     $showError('该用户已注册');
                 }
@@ -65,7 +65,7 @@ if (Library::$sapp->request->isCli()) {
      Library::$sapp->event->listen('PluginAccountBind', function (array $data) {
         Library::$sapp->log->notice("Event PluginAccountBind {$data['unid']}#{$data['usid']}");
         // 初始化用户关系数据
-        DataWemallUserRelation::withInit(intval($data['unid']));
+        DataShopUserRelation::withInit(intval($data['unid']));
         // 尝试临时绑定推荐人用户
         $input = Library::$sapp->request->post(['from', 'phone', 'fphone']);
         if (!empty($input['fphone'])) {
@@ -117,8 +117,8 @@ if (Library::$sapp->request->isCli()) {
     });
 
     // 订单确认收货事件
-     Library::$sapp->event->listen('PluginWemallOrderConfirm', function (DataWemallOrder $order) {
-        Library::$sapp->log->notice("Event PluginWemallOrderConfirm {$order->getAttr('order_no')}");
+     Library::$sapp->event->listen('PluginShopOrderConfirm', function (DataShopOrder $order) {
+        Library::$sapp->log->notice("Event PluginShopOrderConfirm {$order->getAttr('order_no')}");
         UserOrder::confirm($order);
     });
 

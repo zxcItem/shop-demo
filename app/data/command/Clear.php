@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace app\data\command;
 
-use app\data\model\wemall\DataWemallOrder;
-use app\data\model\wemall\DataWemallOrderItem;
-use app\data\service\wemall\ConfigService;
-use app\data\service\wemall\UserAction;
-use app\data\service\wemall\UserOrder;
+use app\data\model\shop\DataShopOrder;
+use app\data\model\shop\DataShopOrderItem;
+use app\data\service\shop\ConfigService;
+use app\data\service\shop\UserAction;
+use app\data\service\shop\UserOrder;
 use think\admin\Command;
 use think\console\Input;
 use think\console\Output;
@@ -60,11 +60,11 @@ class Clear extends Command
                 $time = time() - intval(strval($this->config['comment_time']) * 3600);
                 $remark = $this->config['comment_text'] ?? '系统默认好评！';
                 $where = [['status', '=', 6], ['create_time', '<', date('Y-m-d H:i:s', $time)]];
-                [$count, $total] = [0, ($items = DataWemallOrder::mk()->where($where)->select())->count()];
-                $items->map(function (DataWemallOrder $order) use ($total, &$count, $remark) {
+                [$count, $total] = [0, ($items = DataShopOrder::mk()->where($where)->select())->count()];
+                $items->map(function (DataShopOrder $order) use ($total, &$count, $remark) {
                     $this->queue->message($total, ++$count, "开始评论订单 {$order->getAttr('order_no')}");
                     $order->save(['status' => 7]);
-                    $order->items()->select()->map(function (DataWemallOrderItem $item) use ($remark) {
+                    $order->items()->select()->map(function (DataShopOrderItem $item) use ($remark) {
                         UserAction::comment($item, '5.0', $remark, '');
                     });
                     $this->queue->message($total, $count, "完成评论订单 {$order->getAttr('order_no')}", 1);
@@ -88,11 +88,11 @@ class Clear extends Command
                 $time = time() - intval(strval($this->config['receipt_time']) * 3600);
                 $where = [['status', '=', 5], ['create_time', '<', date('Y-m-d H:i:s', $time)]];
                 $remark = $this->config['receipt_text'] ?? '系统自动签收订单！';
-                [$count, $total] = [0, ($items = DataWemallOrder::mk()->where($where)->select())->count()];
-                $items->map(function (DataWemallOrder $order) use ($total, &$count, $remark) {
+                [$count, $total] = [0, ($items = DataShopOrder::mk()->where($where)->select())->count()];
+                $items->map(function (DataShopOrder $order) use ($total, &$count, $remark) {
                     $this->queue->message($total, ++$count, "开始签收订单 {$order->getAttr('order_no')}");
                     $order->save(['status' => 6, 'confirm_time' => date('Y-m-d H:i:s'), 'confirm_remark' => $remark]);
-                    $this->app->event->trigger('PluginWemallOrderConfirm', $order);
+                    $this->app->event->trigger('PluginShopOrderConfirm', $order);
                     $this->queue->message($total, $count, "完成签收订单 {$order->getAttr('order_no')}", 1);
                 });
             } catch (\Exception $exception) {
@@ -114,8 +114,8 @@ class Clear extends Command
                 $time = time() - intval(strval($this->config['cancel_time']) * 3600);
                 $remark = $this->config['cancel_text'] ?? '自动取消未完成支付';
                 $where = [['status', 'in', [1, 2, 3]], ['create_time', '<', date('Y-m-d H:i:s', $time)]];
-                [$count, $total] = [0, ($items = DataWemallOrder::mk()->where($where)->select())->count()];
-                $items->map(function (DataWemallOrder $order) use ($total, &$count, $remark) {
+                [$count, $total] = [0, ($items = DataShopOrder::mk()->where($where)->select())->count()];
+                $items->map(function (DataShopOrder $order) use ($total, &$count, $remark) {
                     if ($order->payment()->findOrEmpty()->isExists()) {
                         $this->queue->message($total, ++$count, "订单 {$order->getAttr('order_no')} 存在支付记录");
                     } else {
@@ -144,8 +144,8 @@ class Clear extends Command
                 $time = time() - intval(strval($this->config['remove_time']) * 3600);
                 $remark = $this->config['remove_text'] ?? '系统自动清理已取消的订单！';
                 $where = [['status', '=', 0], ['deleted_status', '=', 0], ['create_time', '<', date('Y-m-d H:i:s', $time)]];
-                [$count, $total] = [0, ($items = DataWemallOrder::mk()->where($where)->select())->count()];
-                $items->map(function (DataWemallOrder $order) use ($total, &$count, $remark) {
+                [$count, $total] = [0, ($items = DataShopOrder::mk()->where($where)->select())->count()];
+                $items->map(function (DataShopOrder $order) use ($total, &$count, $remark) {
                     if ($order->payment()->findOrEmpty()->isExists()) {
                         $this->queue->message($total, ++$count, "订单 {$order->getAttr('order_no')} 存在支付记录");
                     } else {
@@ -157,7 +157,7 @@ class Clear extends Command
                             'deleted_remark' => $remark,
                         ]);
                         // 触发订单删除事件
-                        $this->app->event->trigger('PluginWemallOrderRemove', $order);
+                        $this->app->event->trigger('PluginShopOrderRemove', $order);
                         $this->queue->message($total, $count, "完成清理订单 {$order->getAttr('order_no')}", 1);
                     }
                 });

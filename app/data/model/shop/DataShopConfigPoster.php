@@ -1,0 +1,137 @@
+<?php
+
+declare(strict_types=1);
+
+namespace app\data\model\shop;
+
+use app\data\model\Abs;
+use app\data\service\account\Account;
+use think\db\exception\DataNotFoundException;
+use think\db\exception\DbException;
+use think\db\exception\ModelNotFoundException;
+use think\db\Query;
+
+/**
+ * 商城推广海报数据.
+ *
+ * @property int $deleted 删除状态(1已删,0未删)
+ * @property int $id
+ * @property int $sort 排序权重
+ * @property int $status 激活状态(0无效,1有效)
+ * @property string $code 推广编号
+ * @property string $content 二维位置
+ * @property string $create_time 创建时间
+ * @property string $devices 接口通道
+ * @property string $image 推广图片
+ * @property string $levels 用户等级
+ * @property string $name 推广标题
+ * @property string $remark 推广描述
+ * @property string $update_time 更新时间
+ * @class DataShopConfigPoster
+ */
+class DataShopConfigPoster extends Abs
+{
+    /**
+     * 指定会员等级获取配置.
+     * @param int $level 指定会员等级
+     * @param string $device 指定终端类型
+     * @throws DataNotFoundException
+     * @throws DbException
+     * @throws ModelNotFoundException
+     */
+    public static function items(int $level, string $device = ''): array
+    {
+        // 指定会员等级查看终端授权
+        $query = self::mk()->where(static function (Query $query) use ($level) {
+            $query->whereOr([['levels', 'like', "%,{$level},%"], ['levels', 'like', '%,-,%']]);
+        })->where(['status' => 1, 'deleted' => 0])->order('sort desc,id desc');
+        // 指定设备终端授权数据筛选
+        if ($device !== '') {
+            $query->where(static function (Query $query) use ($device) {
+                $query->whereOr([['devices', 'like', "%,{$device},%"], ['devices', 'like', '%,-,%']]);
+            });
+        }
+        return $query->withoutField('sort,status,deleted')->select()->toArray();
+    }
+
+    /**
+     * 获取会员等级数据.
+     * @param mixed $value
+     */
+    public function getLevelsAttr($value): array
+    {
+        return is_string($value) ? str2arr($value) : [];
+    }
+
+    /**
+     * 设置会员等级数据.
+     * @param mixed $value
+     */
+    public function setLevelsAttr($value): string
+    {
+        return is_array($value) ? arr2str($value) : $value;
+    }
+
+    /**
+     * 获取授权终端设备.
+     * @param mixed $value
+     */
+    public function getDevicesAttr($value): array
+    {
+        return $this->getLevelsAttr($value);
+    }
+
+    /**
+     * 格式化数据写入.
+     * @param mixed $value
+     */
+    public function setDevicesAttr($value): string
+    {
+        return is_array($value) ? arr2str($value) : $value;
+    }
+
+    /**
+     * 格式化定位数据.
+     * @param mixed $value
+     */
+    public function getContentAttr($value): array
+    {
+        return $this->getExtraAttr($value);
+    }
+
+    public function setContentAttr($value): string
+    {
+        return $this->setExtraAttr($value);
+    }
+
+    /**
+     * 数据名称转换处理.
+     */
+    public function toArray(): array
+    {
+        $data = parent::toArray();
+        if (isset($data['levels'])) {
+            $data['levels_names'] = [];
+            $types = array_column(DataShopConfigLevel::items(), 'name', 'number');
+            if (in_array('-', $data['levels'])) {
+                $data['levels_names'] = ['全部'];
+            } else {
+                foreach ($data['levels'] as $k) {
+                    $data['levels_names'][] = $types[$k] ?? $k;
+                }
+            }
+        }
+        if (isset($data['devices'])) {
+            $data['devices_names'] = [];
+            $types = array_column(Account::types(), 'name', 'code');
+            if (in_array('-', $data['devices'])) {
+                $data['devices_names'] = ['全部'];
+            } else {
+                foreach ($data['devices'] as $k) {
+                    $data['devices_names'][] = $types[$k] ?? $k;
+                }
+            }
+        }
+        return $data;
+    }
+}
