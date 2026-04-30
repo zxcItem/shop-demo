@@ -253,9 +253,7 @@ class Goods extends Base
                             'allow_balance' => $item['allow_balance'],
                             'allow_integral' => $item['allow_integral'],
                             'number_virtual' => $item['virtual'],
-                            'number_express' => $item['express'],
-                            'reward_balance' => $item['balance'],
-                            'reward_integral' => $item['integral'],
+                            'number_express' => $item['express']
                         ], 'ghash', ['gcode' => $data['code']]);
                     }
                 });
