@@ -52,7 +52,7 @@ class Goods extends Controller
         }, function (QueryHelper $query) {
             $query->withoutField('specs,content')->like('code|name#name')->like('marks,cates', ',');
             $query->equal('status,level_upgrade,delivery_code,rebate_type')->dateBetween('create_time');
-            $query->where(['status' => intval($this->type === 'index'), 'deleted' => 0]);
+            $query->where(['status' => intval($this->type === 'index'), 'deleted' => 0, 'is_exclusive' => 0]);
         });
     }
 

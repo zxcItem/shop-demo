@@ -358,6 +358,7 @@ class DataShop20260411 extends Migrator
         PhinxExtend::upgrade($table, [
             ['ssid', 'biginteger', ['limit' => 20, 'default' => 0, 'null' => true, 'comment' => '所属商家']],
             ['code', 'string', ['limit' => 20, 'default' => '', 'null' => true, 'comment' => '商品编号']],
+            ['is_exclusive', 'integer', ['limit' => 1, 'default' => 0, 'null' => true, 'comment' => '商品渠道(0普通商品,1积分商城)']],
             ['name', 'string', ['limit' => 500, 'default' => '', 'null' => true, 'comment' => '商品名称']],
             ['marks', 'string', ['limit' => 999, 'default' => '', 'null' => true, 'comment' => '商品标签']],
             ['cates', 'string', ['limit' => 999, 'default' => '', 'null' => true, 'comment' => '分类编号']],

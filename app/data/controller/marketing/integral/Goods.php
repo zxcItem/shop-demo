@@ -59,7 +59,7 @@ class Goods extends Base
         }, function (QueryHelper $query) {
             $query->withoutField('specs,content')->like('code|name#name')->like('marks,cates', ',');
             $query->equal('status,level_upgrade,delivery_code,rebate_type')->dateBetween('create_time');
-            $query->where(['status' => intval($this->type === 'index'), 'deleted' => 0]);
+            $query->where(['status' => intval($this->type === 'index'), 'deleted' => 0, 'is_exclusive' => 1]);
         });
     }
 
@@ -231,6 +231,7 @@ class Goods extends Base
                 if (empty($count)) {
                     $this->error('无效的的商品价格信息！');
                 }
+                $data['is_exclusive'] = 1; # 标记为积分专属
                 $this->app->db->transaction(static function () use ($data, $items) {
                     // 标识所有规格无效
                     DataShopGoodsItem::mk()->where(['gcode' => $data['code']])->update(['status' => 0]);
