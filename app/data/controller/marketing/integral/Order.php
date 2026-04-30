@@ -15,7 +15,7 @@ class Order extends Base
 {
     protected $menus = [
         ['title' => '商城设置', 'url' => 'data/marketing.integral.config/index'],
-        ['title' => '商品管理', 'url' => 'data/marketing.integral.integral/index'],
+        ['title' => '商品管理', 'url' => 'data/marketing.integral.goods/index'],
         ['title' => '兑换记录', 'url' => 'data/marketing.integral.order/index'],
     ];
 
