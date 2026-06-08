@@ -817,50 +817,6 @@ class DataShop20260411 extends Migrator
 
     /**
      * 创建数据对象
-     * @class dataShopOrderSend
-     * @table data_shop_order_send
-     */
-    private function _create_data_shop_order_send()
-    {
-        // 创建数据表对象
-        $table = $this->table('data_shop_order_send', [
-            'engine' => 'InnoDB', 'collation' => 'utf8mb4_general_ci', 'comment' => '商城-订单-配送',
-        ]);
-        // 创建或更新数据表
-        PhinxExtend::upgrade($table, [
-            ['unid', 'biginteger', ['limit' => 20, 'default' => 0, 'null' => true, 'comment' => '商城用户编号']],
-            ['order_no', 'string', ['limit' => 20, 'default' => '', 'null' => true, 'comment' => '商城订单单号']],
-            ['address_id', 'string', ['limit' => 20, 'default' => '', 'null' => true, 'comment' => '配送地址编号']],
-            ['user_idcode', 'string', ['limit' => 100, 'default' => '', 'null' => true, 'comment' => '收货人证件号码']],
-            ['user_idimg1', 'string', ['limit' => 500, 'default' => '', 'null' => true, 'comment' => '收货人证件正面']],
-            ['user_idimg2', 'string', ['limit' => 500, 'default' => '', 'null' => true, 'comment' => '收货人证件反面']],
-            ['user_name', 'string', ['limit' => 50, 'default' => '', 'null' => true, 'comment' => '收货人联系名称']],
-            ['user_phone', 'string', ['limit' => 20, 'default' => '', 'null' => true, 'comment' => '收货人联系手机']],
-            ['region_prov', 'string', ['limit' => 30, 'default' => '', 'null' => true, 'comment' => '配送地址的省份']],
-            ['region_city', 'string', ['limit' => 30, 'default' => '', 'null' => true, 'comment' => '配送地址的城市']],
-            ['region_area', 'string', ['limit' => 30, 'default' => '', 'null' => true, 'comment' => '配送地址的区域']],
-            ['region_addr', 'string', ['limit' => 255, 'default' => '', 'null' => true, 'comment' => '配送的详细地址']],
-            ['delivery_code', 'string', ['limit' => 20, 'default' => '', 'null' => true, 'comment' => '配送模板编号']],
-            ['delivery_count', 'biginteger', ['limit' => 20, 'default' => 0, 'null' => true, 'comment' => '快递计费基数']],
-            ['delivery_amount', 'decimal', ['precision' => 20, 'scale' => 2, 'default' => '0.00', 'null' => true, 'comment' => '配送计算金额']],
-            ['delivery_remark', 'string', ['limit' => 255, 'default' => '', 'null' => true, 'comment' => '配送计算描述']],
-            ['express_time', 'string', ['limit' => 20, 'default' => '', 'null' => true, 'comment' => '快递发送时间']],
-            ['express_code', 'string', ['limit' => 80, 'default' => '', 'null' => true, 'comment' => '快递运送单号']],
-            ['express_remark', 'string', ['limit' => 255, 'default' => '', 'null' => true, 'comment' => '快递发送备注']],
-            ['company_code', 'string', ['limit' => 20, 'default' => '', 'null' => true, 'comment' => '快递公司编码']],
-            ['company_name', 'string', ['limit' => 100, 'default' => '', 'null' => true, 'comment' => '快递公司名称']],
-            ['extra', 'text', ['default' => null, 'null' => true, 'comment' => '原始数据']],
-            ['status', 'integer', ['limit' => 1, 'default' => 1, 'null' => true, 'comment' => '发货状态(1待发货,2已发货,3已收货)']],
-            ['deleted', 'integer', ['limit' => 1, 'default' => 0, 'null' => true, 'comment' => '删除状态(0未删,1已删)']],
-            ['create_time', 'datetime', ['default' => null, 'null' => true, 'comment' => '创建时间']],
-            ['update_time', 'datetime', ['default' => null, 'null' => true, 'comment' => '更新时间']],
-        ], [
-            'unid', 'status', 'deleted', 'order_no', 'create_time',
-        ], true);
-    }
-
-    /**
-     * 创建数据对象
      * @class dataShopOrderSender
      * @table data_shop_order_sender
      */
